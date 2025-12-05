@@ -1,0 +1,53 @@
+- name: Role Facts
+  ansible.builtin.include_role:
+    name: '{{ role }}'
+    tasks_from: facts
+  loop:
+    - external_dns
+    - k3s
+  loop_control:
+    loop_var: role
+
+- name: Set Account ID Fact
+  vars:
+    cloudflare_env_data: "{{ lookup('ansible.builtin.template', 'env.yaml' ) | from_yaml }}"
+  ansible.builtin.set_fact:
+    api_token: "{{ cloudflare_env_data['cloudflare-token'] }}"
+    email: "{{ cloudflare_env_data['email'] }}"
+
+
+- name: Create ArgoCD namespace
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition: 
+      - apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: external-dns
+
+- name: Create Cloudflare Api token Secret
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata: 
+        name: cloudflare-api-token-secret
+        namespace: external-dns
+      stringData: 
+        api-token: "{{ api_token }}"
+  
+- name: Deploy to argocd
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'argocd.yaml') | from_yaml }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Deploy cluster issuer
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'cluster_issuer.j2') | from_yaml }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+

@@ -1,0 +1,48 @@
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: external-dns
+    namespace: argocd
+    finalizers:
+      - resources-finalizer.argocd.argoproj.io
+  spec:
+    project: default
+    source:
+      chart: '{{ externaldns_vars.kubernetes.helm.chart.name }}'
+      repoURL: '{{ externaldns_vars.kubernetes.helm.repository.url }}'
+      targetRevision: '{{ externaldns_vars.kubernetes.helm.chart.version }}'
+
+      helm:
+        valuesObject:
+          sources:
+            - crd
+            - ingress
+            - service 
+          policy: sync
+          provider:
+            name: cloudflare
+          env:
+          - name: CF_API_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: cloudflare-api-token-secret
+                key: api-token
+          resources:
+            limits: 
+              memory: '{{ externaldns_vars.kubernetes.resources.limits.memory }}'
+            requests:
+              cpu: '{{ externaldns_vars.kubernetes.resources.requests.cpu }}'
+              memory: '{{ externaldns_vars.kubernetes.resources.requests.memory }}'
+
+          logLevel: debug 
+          labelFilter: "external-dns=true"
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: external-dns
+
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+        - CreateNamespace=true

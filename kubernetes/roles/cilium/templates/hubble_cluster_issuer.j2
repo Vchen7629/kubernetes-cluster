@@ -1,0 +1,8 @@
+{# cluster issuer for hubble components relay, ui etc #}
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ cilium_map.ca.hubble.cluster.issuer.name }}
+spec:
+  ca:
+    secretName: {{ cilium_map.ca.hubble.certificate.root.name }}

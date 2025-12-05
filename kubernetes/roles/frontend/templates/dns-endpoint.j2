@@ -1,0 +1,25 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+    name: frontend-dns
+    namespace: frontend
+    labels:
+        external-dns: "true"
+spec:
+    endpoints:
+    - dnsName: "{{ cilium_map.gateway.frontend.base_hostname }}"
+      recordTTL: 1
+      recordType: CNAME
+      targets:
+      - "{{ tunnel_id }}.cfargotunnel.com"
+      providerSpecific:
+      - name: external-dns.alpha.kubernetes.io/cloudflare-proxied
+        value: "true"
+    - dnsName: "{{ cilium_map.gateway.frontend.hostname }}"
+      recordTTL: 1
+      recordType: CNAME
+      targets:
+      - "{{ tunnel_id }}.cfargotunnel.com"
+      providerSpecific:
+      - name: external-dns.alpha.kubernetes.io/cloudflare-proxied
+        value: "true"

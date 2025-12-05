@@ -1,0 +1,127 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: timescaledb-monitoring-queries
+  namespace: postgres
+data:
+  queries: |
+    # TimescaleDB hypertable metrics
+    timescaledb_hypertable_info:
+      query: |
+        SELECT
+          schemaname,
+          tablename,
+          num_dimensions,
+          num_chunks,
+          table_bytes,
+          index_bytes,
+          toast_bytes,
+          total_bytes,
+          compression_status
+        FROM timescaledb_information.hypertables
+      metrics:
+        - schemaname:
+            usage: "LABEL"
+            description: "Schema name"
+        - tablename:
+            usage: "LABEL"
+            description: "Hypertable name"
+        - num_dimensions:
+            usage: "GAUGE"
+            description: "Number of dimensions"
+        - num_chunks:
+            usage: "GAUGE"
+            description: "Number of chunks"
+        - table_bytes:
+            usage: "GAUGE"
+            description: "Table size in bytes"
+        - index_bytes:
+            usage: "GAUGE"
+            description: "Index size in bytes"
+        - toast_bytes:
+            usage: "GAUGE"
+            description: "TOAST size in bytes"
+        - total_bytes:
+            usage: "GAUGE"
+            description: "Total size in bytes"
+        - compression_status:
+            usage: "LABEL"
+            description: "Compression status"
+       
+    # TimescaleDB chunk statistics
+    timescaledb_chunks:
+      query: |
+        SELECT
+          hypertable_schema,
+          hypertable_name,
+          COUNT(*) as chunk_count,
+          COUNT(*) FILTER (WHERE is_compressed = true) as compressed_chunks
+        FROM timescaledb_information.chunks
+        GROUP BY hypertable_schema, hypertable_name
+      metrics:
+        - hypertable_schema:
+            usage: "LABEL"
+            description: "Hypertable schema"
+        - hypertable_name:
+            usage: "LABEL"
+            description: "Hypertable name"
+        - chunk_count:
+            usage: "GAUGE"
+            description: "Total number of chunks"
+        - compressed_chunks:
+            usage: "GAUGE"
+            description: "Number of compressed chunks"
+        
+    # TimescaleDB compression stats
+    timescaledb_compression_stats:
+      query: |
+        SELECT
+          hypertable_schema,
+          hypertable_name,
+          COALESCE(SUM(before_compression_total_bytes), 0) as before_compression_bytes,
+          COALESCE(SUM(after_compression_total_bytes), 0) as after_compression_bytes
+        FROM timescaledb_information.compression_settings cs
+        LEFT JOIN timescaledb_information.compressed_chunk_stats ccs
+          ON cs.hypertable_schema = ccs.hypertable_schema
+          AND cs.hypertable_name = ccs.hypertable_name
+        GROUP BY cs.hypertable_schema, cs.hypertable_name
+      metrics:
+        - hypertable_schema:
+        90 +              usage: "LABEL"
+        91 +              description: "Hypertable schema"
+        92 +          - hypertable_name:
+        93 +              usage: "LABEL"
+        94 +              description: "Hypertable name"
+        95 +          - before_compression_bytes:
+        96 +              usage: "GAUGE"
+        97 +              description: "Size before compression in bytes"
+        98 +          - after_compression_bytes:
+        99 +              usage: "GAUGE"
+       100 +              description: "Size after compression in bytes"
+       101 +  
+       102 +      # TimescaleDB jobs
+       103 +      timescaledb_jobs:
+       104 +        query: |
+       105 +          SELECT
+       106 +            application_name,
+       107 +            proc_name,
+       108 +            scheduled::int as scheduled,
+       109 +            (next_start IS NOT NULL)::int as has_next_start,
+       110 +            EXTRACT(EPOCH FROM schedule_interval) as schedule_interval_seconds
+       111 +          FROM timescaledb_information.jobs
+       112 +        metrics:
+       113 +          - application_name:
+       114 +              usage: "LABEL"
+       115 +              description: "Application name"
+       116 +          - proc_name:
+       117 +              usage: "LABEL"
+       118 +              description: "Procedure name"
+       119 +          - scheduled:
+       120 +              usage: "GAUGE"
+       121 +              description: "Job is scheduled (1) or not (0)"
+       122 +          - has_next_start:
+       123 +              usage: "GAUGE"
+       124 +              description: "Job has next start time (1) or not (0)"
+       125 +          - schedule_interval_seconds:
+       126 +              usage: "GAUGE"
+       127 +              description: "Schedule interval in seconds"

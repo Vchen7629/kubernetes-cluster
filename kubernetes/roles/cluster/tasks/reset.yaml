@@ -1,0 +1,14 @@
+- name: Role Reset
+  block:
+    - name: Remove packages
+      ansible.builtin.apt:
+        name: '{{ item }}'
+        state: absent
+        autoremove: true
+        clean: true
+        purge: true
+      loop:
+        - cifs-utils
+      when: 
+        - item in ansible_facts.packages
+    

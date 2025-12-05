@@ -1,0 +1,25 @@
+- name: Set map fact
+  ansible.builtin.set_fact:
+    externaldns_map:
+      cloudflare:
+        acme:
+          server: "{{ '-staging' if externaldns_vars.cloudflare.acme.server | lower == 'staging' | default('') }}"
+        ca:
+          cluster:
+            issuer: # cloudflare-cluster-issuer
+              name: '{{ externaldns_vars.cloudflare.prefix }}-cluster-issuer'
+
+- name: Set project fact
+  ansible.builtin.set_fact:
+    externaldns_project:
+      cloudflare:
+        acme:
+          server: # https://acme-staging-v02.api.letsencrypt.org/directory
+            url: https://acme{{ externaldns_map.cloudflare.acme.server }}-v02.api.letsencrypt.org/directory
+        cluster: # cloudflare-cluster-issuer-staging
+          issuer: '{{ externaldns_map.cloudflare.ca.cluster.issuer.name }}{{ externaldns_map.cloudflare.acme.server }}'
+
+- name: Set variables fact
+  ansible.builtin.set_fact:
+    externaldns_vars: '{{ externaldns_vars }}'
+  run_once: true

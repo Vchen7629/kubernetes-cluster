@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - chart: '{{ certmanager_vars.kubernetes.helm.chart.name }}'
+      repoURL: '{{ certmanager_vars.kubernetes.helm.repository.url }}'
+      targetRevision: '{{ certmanager_vars.kubernetes.helm.chart.version }}'
+
+      helm: 
+        valuesObject:
+          prometheus:
+            servicemonitor: 
+              enabled: true
+              interval: '30s'
+          resources:
+            limits:
+              memory: '{{ certmanager_vars.kubernetes.controller.resources.limits.memory }}'
+            requests:
+              cpu: '{{ certmanager_vars.kubernetes.controller.resources.requests.cpu }}'
+              memory: '{{ certmanager_vars.kubernetes.controller.resources.requests.memory }}'
+          config:
+            enableGatewayAPI: true
+          crds:
+            enabled: true
+          replicaCount: {{ certmanager_vars.kubernetes.controller.replicas }}
+
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: '{{ certmanager_vars.kubernetes.namespace }}'
+
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

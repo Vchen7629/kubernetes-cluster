@@ -1,0 +1,17 @@
+- name: Set map fact
+  ansible.builtin.set_fact:
+    certmanager_map:
+      ca:
+        cluster:
+          issuer:
+            name: '{{ certmanager_vars.kubernetes.helm.chart.name }}-cluster-issuer'
+      metrics:
+        service:
+          monitor:
+            enabled: true
+            scrape:
+              # If `null`, default value is `victoriametrics_map.service.monitor.scrape.interval`
+              interval: null
+              # If `null`, default value is `victoriametrics_map.service.monitor.scrape.timeout`
+              timeout: null
+  run_once: true

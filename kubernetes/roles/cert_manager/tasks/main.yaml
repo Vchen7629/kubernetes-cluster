@@ -1,0 +1,42 @@
+- name: Role Facts
+  ansible.builtin.include_role:
+    name: '{{ role }}'
+    tasks_from: facts
+  loop:
+    - external_dns
+    - cert_manager
+    - k3s
+  loop_control:
+    loop_var: role
+
+- name: Create namespaces
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition: 
+      - apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: cert-manager
+
+- name: Deploy to argocd
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'argocd-deployment.yaml') | from_yaml }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Deploy Cert Issuer
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'cluster_issuer.j2') | from_yaml }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Create ArgoCD Certificates
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', item ) | from_yaml }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+  with_items:
+    - ./templates/argocd-repo-server.yaml
+    - ./templates/argocd-dex-server.yaml
+    - ./templates/argocd-server.yaml

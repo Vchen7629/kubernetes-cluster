@@ -1,0 +1,16 @@
+{# hubble certificates issued by hubble_cluster_issuer.j2, used for hubble components #}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ cilium_map.ca.hubble.certificate.common.name }}
+  namespace: {{ certmanager_vars.kubernetes.namespace }}
+spec:
+  commonName: {{ cilium_map.ca.hubble.certificate.common.name }}
+  isCA: true
+  issuerRef:
+    kind: ClusterIssuer
+    name: {{ certmanager_map.ca.cluster.issuer.name }}
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  secretName: {{ cilium_map.ca.hubble.certificate.root.name }}

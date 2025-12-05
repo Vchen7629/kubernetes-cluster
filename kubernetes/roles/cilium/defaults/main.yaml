@@ -1,0 +1,156 @@
+---
+cilium_vars:
+  kubernetes:
+    agent:
+      resources:
+        limits:
+          cpu: null
+          memory: 256Mi
+        requests:
+          cpu: 10m
+          memory: 256Mi
+    # Conservative BPF settings to avoid SSH issues
+    bpf:
+      datapath_mode: netkit
+      monitor:
+        aggregation: low
+        interval: 15s
+      preallocate_maps: true # reduces latency but increases memory
+      masquerade: false  # Disable to prevent host network interference
+      tproxy: false  # Disable advanced features initially
+    cgroup:
+      resources:
+        limits:
+          cpu: null
+          memory: 128Mi
+        requests:
+          cpu: 10m
+          memory: 128Mi
+    client:
+      rate_limit:
+        burst: 100
+        qps: 50
+    cni:
+      resources:
+        limits:
+          cpu: null
+          memory: 128Mi
+        requests:
+          cpu: 10m
+          memory: 128Mi
+    # creates configmap containing prebuilt grafana dashboards for hubble/cilium
+    dashboards:
+      enabled: true
+    envoy:
+      resources:
+        limits:
+          cpu: null
+          memory: 128Mi
+        requests:
+          cpu: 10m
+          memory: 128Mi
+    helm:
+      chart:
+        name: cilium
+        version: v1.18.2
+      repository:
+        name: cilium
+        org: cilium
+        url: https://helm.cilium.io
+    hubble:
+      metrics:
+        # Enable detailed metrics with source/destination labels for service graph
+        - dns:query;ignoreAAAA
+        - drop:sourceContext=pod;destinationContext=pod
+        - flow:sourceContext=pod;destinationContext=pod
+        - "httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction"
+        - icmp
+        - port-distribution:sourceContext=pod;destinationContext=pod
+        - "tcp:sourceContext=pod;destinationContext=pod"
+        # Additional metrics for service graph
+        - flows-to-world:sourceContext=pod;destinationContext=pod
+        - policy-verdict:sourceContext=pod;destinationContext=pod
+      # required for ui, collects flow data from agents
+      relay:
+        enabled: true
+        replicas: 1
+        resources:
+          limits:
+            cpu: null
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 128Mi
+        retry_timeout: 10s
+      # enables hubble ui for network flow/policy diagnosing
+      ui:
+        enabled: true
+        backend:
+          resources:
+            limits:
+              cpu: null
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 128Mi
+        frontend:
+          resources:
+            limits:
+              cpu: null
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 128Mi
+        replicas: 1
+      tls:
+        auto:
+          method: certmanager
+    gateway:
+      service: hubble-ui
+      frontend_base_domain: cyphria.com
+      frontend_domain: "*.cyphria.com"
+    ipam:
+      operator:
+        cluster_pool: 10.42.0.0/16
+    loadbalancer:
+      algorithm: maglev
+      ip_pool:
+        blocks: # CiliumLoadBalancerIPPool ip pool
+          start: 192.168.4.20
+          stop: 192.168.4.100
+        name: cilium-ip-pool
+      table_size: 16381
+    kube_proxy:
+      bind:
+        address: 0.0.0.0
+        port: 10256
+    namespace: kube-system
+    operator:
+      liveness_probe:
+        timeout_seconds: 10
+      resources:
+        limits:
+          cpu: null
+          memory: 128Mi
+        requests:
+          cpu: 10m
+          memory: 128Mi
+  release:
+    cli:
+      file: cilium-linux-amd64.tar.gz
+      repository:
+        name: cilium-cli
+        org: cilium
+      version: v0.18.6
+    gateway_api:
+      file: experimental-install.yaml
+      repository:
+        name: gateway-api
+        org: kubernetes-sigs
+      version: v1.4.0
+    hubble:
+      file: hubble-linux-amd64.tar.gz
+      repository:
+        name: hubble
+        org: cilium
+      version: v1.18.0

@@ -1,0 +1,21 @@
+externaldns_vars:
+  cloudflare:
+    acme:
+      # either staging or production
+      server: staging
+    prefix: cloudflare
+  kubernetes:
+    helm: 
+      chart: 
+        name: external-dns
+        version: "1.19.0"
+      repository:
+        url: https://kubernetes-sigs.github.io/external-dns/
+    namespace: kube-system
+    resources:
+      limits: 
+        cpu: null
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 128Mi

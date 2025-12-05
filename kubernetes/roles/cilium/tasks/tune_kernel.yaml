@@ -1,0 +1,75 @@
+---
+# Tune kernel network buffers to prevent Cilium "no buffer space available" errors
+
+- name: Ensure sysctl directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/sysctl.d
+    state: directory
+    mode: '0755'
+
+- name: Configure kernel network buffers for Cilium
+  become: true
+  ansible.builtin.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+    sysctl_file: /etc/sysctl.d/99-cilium-buffers.conf
+  loop:
+    # Netlink socket buffers (prevents "no buffer space available")
+    - { key: 'net.core.rmem_max', value: '16777216' }  # 16MB receive buffer
+    - { key: 'net.core.wmem_max', value: '16777216' }  # 16MB send buffer
+    - { key: 'net.core.rmem_default', value: '262144' }  # 256KB default receive
+    - { key: 'net.core.wmem_default', value: '262144' }  # 256KB default send
+
+    # Network device backlog (helps with burst traffic)
+    - { key: 'net.core.netdev_max_backlog', value: '16384' }
+    - { key: 'net.core.netdev_budget', value: '600' }
+
+    # Neighbor table (ARP cache) - important for pod networking
+    - { key: 'net.ipv4.neigh.default.gc_thresh1', value: '8192' }
+    - { key: 'net.ipv4.neigh.default.gc_thresh2', value: '16384' }
+    - { key: 'net.ipv4.neigh.default.gc_thresh3', value: '32768' }
+
+    # Connection tracking (conntrack table sizes)
+    - { key: 'net.netfilter.nf_conntrack_max', value: '262144' }
+    - { key: 'net.nf_conntrack_max', value: '262144' }
+  register: sysctl_result
+
+- name: Display current kernel buffer settings
+  become: true
+  ansible.builtin.shell: |
+    echo "=== Current Kernel Network Buffer Settings ==="
+    sysctl net.core.rmem_max net.core.wmem_max net.core.netdev_max_backlog
+    echo ""
+    echo "=== Neighbor Table Settings ==="
+    sysctl net.ipv4.neigh.default.gc_thresh1 net.ipv4.neigh.default.gc_thresh2 net.ipv4.neigh.default.gc_thresh3
+    echo ""
+    echo "=== Connection Tracking ==="
+    sysctl net.netfilter.nf_conntrack_max 2>/dev/null || sysctl net.nf_conntrack_max 2>/dev/null || echo "Connection tracking not loaded"
+  register: buffer_settings
+  changed_when: false
+
+- name: Show buffer settings
+  ansible.builtin.debug:
+    var: buffer_settings.stdout_lines
+
+- name: Verify sysctl file was created
+  become: true
+  ansible.builtin.stat:
+    path: /etc/sysctl.d/99-cilium-buffers.conf
+  register: sysctl_file
+
+- name: Display sysctl file contents
+  become: true
+  ansible.builtin.command:
+    cmd: cat /etc/sysctl.d/99-cilium-buffers.conf
+  register: sysctl_contents
+  changed_when: false
+  when: sysctl_file.stat.exists
+
+- name: Show sysctl file contents
+  ansible.builtin.debug:
+    var: sysctl_contents.stdout_lines
+  when: sysctl_file.stat.exists
