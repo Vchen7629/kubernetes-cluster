@@ -1,0 +1,103 @@
+# Kafka Broker Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kafka-broker-to-kube-dns-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/cluster: cyphria-cluster
+      strimzi.io/kind: Kafka
+      strimzi.io/name: cyphria-cluster-kafka
+  egress:
+    # Allow DNS resolution
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+
+---
+# KMinion Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kminion-to-kube-dns-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: kminion
+      app.kubernetes.io/instance: kafka-metrics
+  egress:
+    # Allow DNS resolution
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"
+
+---
+# Strimzi Cluster Operator Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: strimzi-cluster-operator-to-kubedns-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/kind: cluster-operator
+  egress:
+    # Allow DNS resolution
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"
+
+---
+# Entity Operator Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: entity-operator-to-kubedns-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/name: cyphria-cluster-entity-operator
+  egress:
+    # Allow DNS resolution
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"

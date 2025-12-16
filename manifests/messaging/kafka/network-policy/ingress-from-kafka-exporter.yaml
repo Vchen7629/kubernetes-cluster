@@ -1,0 +1,22 @@
+# Kafka Broker Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kafka-broker-from-exporter-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/cluster: cyphria-cluster
+      strimzi.io/kind: Kafka
+      strimzi.io/name: cyphria-cluster-kafka
+  ingress:
+    # Allow Kafka Exporter
+    - fromEndpoints:
+        - matchLabels:
+            strimzi.io/name: cyphria-cluster-kafka-exporter
+            io.kubernetes.pod.namespace: kafka
+      toPorts:
+        - ports:
+            - port: "9091"
+              protocol: TCP

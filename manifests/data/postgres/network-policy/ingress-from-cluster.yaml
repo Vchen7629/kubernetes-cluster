@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cluster-replica-access
+  namespace: postgres
+spec:
+  endpointSelector:
+    matchLabels:
+      cnpg.io/cluster: timescaledb-cluster-pg17
+  ingress:
+    # Allow replica communication
+    - fromEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: timescaledb-cluster-pg17
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+  

@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # cluster resources
+  - cluster/postgres.yaml
+  - cluster/schema.yaml
+  - cluster/timescaledb_extension.yaml
+
+  # storage related
+  - storage/storage-class.yaml
+  - storage/backup.yaml
+
+  # secrets
+  - secrets/user.yaml
+
+  # network policies (egress)
+  - network-policy/egress-to-cnpg-operator.yaml
+  - network-policy/egress-to-host.yaml
+  - network-policy/egress-to-kubeapi-server.yaml
+
+  # network policies (ingress)
+  - network-policy/ingress-from-cluster.yaml
+  - network-policy/ingress-from-cnpg-system.yaml
+  - network-policy/ingress-from-messaging.yaml
+  - network-policy/ingress-from-observability.yaml
+  - network-policy/ingress-from-operator.yaml
+  - network-policy/ingress-from-tenant.yaml

@@ -1,0 +1,17 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-db-kube-api-access
+  namespace: backend
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: Exists
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - postgres
+  egress:
+    - toEntities:
+      - host

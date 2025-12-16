@@ -1,0 +1,34 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: data-ingestion-user
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: cyphria-cluster
+spec:
+  authentication:
+    type: tls
+  authorization:
+    type: simple
+    acls:
+      # Allows producing messages to raw-topic
+      - resource:
+          type: topic
+          name: raw-topic
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+
+      # Allows producing messages to raw-topic dlq
+      - resource:
+          type: topic
+          name: raw-topic-dlq
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"

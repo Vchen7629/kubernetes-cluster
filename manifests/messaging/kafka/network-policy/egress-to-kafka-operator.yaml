@@ -1,0 +1,22 @@
+# Kafka Broker Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kafka-broker-to-kafka-operator-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/cluster: cyphria-cluster
+      strimzi.io/kind: Kafka
+      strimzi.io/name: cyphria-cluster-kafka
+  egress:
+    # Allow connection to Strimzi Cluster Operator
+    - toEndpoints:
+        - matchLabels:
+            strimzi.io/kind: cluster-operator
+            io.kubernetes.pod.namespace: kafka
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

@@ -1,0 +1,70 @@
+# ArgoCD Redis
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-redis-from-server-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-redis
+  ingress:
+    # From ArgoCD components
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-server
+            io.kubernetes.pod.namespace: argocd
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+
+---
+# ArgoCD Repo Server
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-repo-server-from-server-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - argocd-repo-server
+          - argocd-repo-server-metrics
+  ingress:
+    # From ArgoCD components
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-server
+            io.kubernetes.pod.namespace: argocd
+      toPorts:
+        - ports:
+            - port: "8081"
+              protocol: TCP
+
+---
+# ArgoCD Dex Server
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-dex-server-from-server-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-dex-server
+  ingress:
+    # From ArgoCD server
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-server
+            io.kubernetes.pod.namespace: argocd
+      toPorts:
+        - ports:
+            - port: "5556"
+              protocol: TCP
+            - port: "5557"
+              protocol: TCP

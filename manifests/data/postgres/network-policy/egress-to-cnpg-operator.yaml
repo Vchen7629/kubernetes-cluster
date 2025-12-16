@@ -1,0 +1,26 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-db-cnpg-operator-access
+  namespace: backend
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: Exists
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - postgres
+  egress:
+    # CloudNativePG Operator
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: cloudnative-pg
+            io.kubernetes.pod.namespace: backend
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+            - port: "5432"
+              protocol: TCP

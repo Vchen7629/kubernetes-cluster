@@ -1,0 +1,78 @@
+
+---
+# ArgoCD Application Controller
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-application-controller-to-redis-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - argocd-application-controller
+          - argocd-metrics
+  egress:
+    # Redis access
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-redis
+            io.kubernetes.pod.namespace: argocd
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+
+---
+# ArgoCD Server
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-server-to-redis-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - argocd-server
+          - argocd-server-metrics
+  egress:
+    # Allowing argocd server -> redis
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-redis
+            io.kubernetes.pod.namespace: argocd
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+
+---
+# ArgoCD Repo Server
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-repo-server-to-redis-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - argocd-repo-server
+          - argocd-repo-server-metrics
+  egress:
+    # Redis access
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-redis
+            io.kubernetes.pod.namespace: argocd
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP

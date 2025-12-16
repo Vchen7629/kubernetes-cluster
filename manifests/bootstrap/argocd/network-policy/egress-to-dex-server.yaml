@@ -1,0 +1,26 @@
+# ArgoCD Server
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-server-to-dex-server-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - argocd-server
+          - argocd-server-metrics
+  egress:
+    # Allowing argocd server -> dex server
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-dex-server
+            io.kubernetes.pod.namespace: argocd
+      toPorts:
+        - ports:
+            - port: "5556"
+              protocol: TCP
+            - port: "5557"
+              protocol: TCP

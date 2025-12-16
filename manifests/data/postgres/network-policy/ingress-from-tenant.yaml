@@ -1,0 +1,27 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-db-loginapi-access
+  namespace: backend
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: Exists
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - postgres
+  ingress:
+    # Login API access
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: loginapi
+            io.kubernetes.pod.namespace: backend
+        - matchLabels:
+            argocd.argoproj.io/instance: login-api
+            io.kubernetes.pod.namespace: backend
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP

@@ -1,0 +1,99 @@
+---
+# ArgoCD Application Controller
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-application-controller-from-vm-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - argocd-application-controller
+          - argocd-metrics
+  ingress:
+    # Metrics endpoint
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8082"
+              protocol: TCP
+          rules:
+            http: 
+              - method: "GET"
+                path: "/metrics"
+
+---
+# ArgoCD Redis
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-redis-from-vm-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-redis
+  ingress:
+    # Metrics endpoint
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "9121"
+              protocol: TCP
+
+---
+# ArgoCD Server
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-server-from-vm-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - argocd-server
+          - argocd-server-metrics
+  ingress:
+    # Exposing ArgoCD server metrics endpoint
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8083"
+              protocol: TCP
+
+---
+# ArgoCD Repo Server
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-repo-server-from-vm-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - argocd-repo-server
+          - argocd-repo-server-metrics
+  ingress:
+    # Metrics endpoint
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8084"
+              protocol: TCP

@@ -1,0 +1,67 @@
+# KMinion Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kminion-from-observability-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: kminion
+      app.kubernetes.io/instance: kafka-metrics
+  ingress:
+    # Allow Prometheus scraping
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+
+---
+# Strimzi Cluster Operator Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: strimzi-cluster-operator-from-observability-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/kind: cluster-operator
+  ingress:
+    # Allow health checks and metrics
+    - toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # Allow Prometheus scraping
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: prometheus
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+
+---
+# Entity Operator Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: entity-operator-from-observability-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/name: cyphria-cluster-entity-operator
+  ingress:
+    # Allow Prometheus scraping
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: prometheus
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

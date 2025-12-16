@@ -1,0 +1,16 @@
+# Topic containing the raw reddit data (unprocessed)
+# with subreddit, post text, timestamp, post id
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: raw-data
+  namespace: kafka
+  labels:
+    # cluster name that the topics are in
+    strimzi.io/cluster: cyphria-cluster
+spec:
+  partitions: 3
+  replicas: 2
+  config:
+    retention.ms: 28800000 # 8 hours
+    segment.bytes: 1073741824

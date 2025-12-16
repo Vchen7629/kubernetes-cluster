@@ -1,0 +1,71 @@
+# KMinion Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kminion-to-kafka-brokers
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: kminion
+      app.kubernetes.io/instance: kafka-metrics
+  egress:
+    # Allow communication with Kafka brokers (bootstrap service on port 9092)
+    - toEndpoints:
+        - matchLabels:
+            strimzi.io/cluster: cyphria-cluster
+            strimzi.io/kind: Kafka
+            io.kubernetes.pod.namespace: kafka
+      toPorts:
+        - ports:
+            - port: "9092"
+              protocol: TCP
+
+---
+# Strimzi Cluster Operator Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: strimzi-cluster-operator-to-kafka-brokers-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/kind: cluster-operator
+  egress:
+    # Allow communication with Kafka brokers
+    - toEndpoints:
+        - matchLabels:
+            strimzi.io/cluster: cyphria-cluster
+            io.kubernetes.pod.namespace: kafka
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+            - port: "9090"
+              protocol: TCP
+            - port: "9091"
+              protocol: TCP
+
+---
+# Entity Operator Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: entity-operator-to-kafka-brokers-acess
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/name: cyphria-cluster-entity-operator
+  egress:
+    # Allow communication with Kafka brokers
+    - toEndpoints:
+        - matchLabels:
+            strimzi.io/cluster: cyphria-cluster
+            strimzi.io/kind: Kafka
+            io.kubernetes.pod.namespace: kafka
+      toPorts:
+        - ports:
+            - port: "9091"
+              protocol: TCP

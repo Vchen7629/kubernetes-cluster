@@ -1,0 +1,45 @@
+---
+# ArgoCD Repo Server
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-repo-server-to-world-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - argocd-repo-server
+          - argocd-repo-server-metrics
+  egress:
+    # Github access
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "22"
+              protocol: TCP
+
+---
+# ArgoCD Dex Server
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-dex-server-to-world-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-dex-server
+  egress:
+    # 3rd party authentication
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

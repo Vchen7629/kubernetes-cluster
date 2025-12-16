@@ -1,0 +1,50 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: sentiment-analysis-user
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: cyphria-cluster
+spec:
+  authentication:
+    type: tls
+  authorization:
+    type: simple
+    acls:
+      # Allows producing messages to aggregated
+      - resource:
+          type: topic
+          name: aggregated
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # Allows producing messages to aggregated dlq
+      - resource:
+          type: topic
+          name: aggregated-dlq
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # Allows consuming from topic-classified topic
+      - resource:
+          type: topic
+          name: topic-classified
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # consumer group defined in service code
+      - resource:
+          type: group
+          name: sentiment-analysis-service
+          patternType: literal
+        operations:
+          - Read

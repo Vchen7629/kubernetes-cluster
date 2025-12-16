@@ -1,0 +1,48 @@
+# Kafka Broker Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kafka-broker-to-kube-apiserver-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/cluster: cyphria-cluster
+      strimzi.io/kind: Kafka
+      strimzi.io/name: cyphria-cluster-kafka
+  egress:
+    # Allow Kubernetes API access (critical for PVC creation)
+    - toEntities:
+        - kube-apiserver
+
+---
+# Strimzi Cluster Operator Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: strimzi-cluster-operator-to-kube-apiserver-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/kind: cluster-operator
+  egress:
+    # Allow Kubernetes API access
+    - toEntities:
+        - kube-apiserver
+
+---
+# Entity Operator Network Policy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: entity-operator-to-kube-apiserver-access
+  namespace: kafka
+spec:
+  endpointSelector:
+    matchLabels:
+      strimzi.io/name: cyphria-cluster-entity-operator
+  egress:
+    # Allow Kubernetes API access
+    - toEntities:
+        - kube-apiserver

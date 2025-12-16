@@ -1,0 +1,17 @@
+# Topic containing the sentence embeddings of
+# the post corresponding extracted using bert
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: sentence-embeddings
+  namespace: kafka
+  labels:
+    # cluster name that the topics are in
+    strimzi.io/cluster: cyphria-cluster
+spec:
+  partitions: 3
+  replicas: 2
+  config:
+    retention.ms: 28800000 # 8 hours
+    segment.bytes: 1073741824

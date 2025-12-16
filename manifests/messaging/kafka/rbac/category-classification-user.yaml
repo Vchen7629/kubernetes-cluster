@@ -1,0 +1,50 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: category-classification-user
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: cyphria-cluster
+spec:
+  authentication:
+    type: tls
+  authorization:
+    type: simple
+    acls:
+      # Allows producing messages to aggregated
+      - resource:
+          type: topic
+          name: aggregated
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # Allows producing messages to aggregated dlq
+      - resource:
+          type: topic
+          name: aggregated-dlq
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # Allows consuming from sentence-embeddings topic
+      - resource:
+          type: topic
+          name: sentence-embeddings
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # consumer group defined in service code
+      - resource:
+          type: group
+          name: category-classifier-service
+          patternType: literal
+        operations:
+          - Read

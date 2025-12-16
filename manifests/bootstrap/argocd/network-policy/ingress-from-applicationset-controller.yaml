@@ -1,0 +1,24 @@
+# ArgoCD Repo Server
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-repo-server-from-applicationset-controller-access
+  namespace: argocd
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - argocd-repo-server
+          - argocd-repo-server-metrics
+  ingress:
+    # From ArgoCD components
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-applicationset-controller
+            io.kubernetes.pod.namespace: argocd
+      toPorts:
+        - ports:
+            - port: "8081"
+              protocol: TCP

@@ -1,0 +1,50 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: topic-classification-user
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: cyphria-cluster
+spec:
+  authentication:
+    type: tls
+  authorization:
+    type: simple
+    acls:
+      # Allows producing messages to topic-classified
+      - resource:
+          type: topic
+          name: topic-classified
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # Allows producing messages to topic-classified dlq
+      - resource:
+          type: topic
+          name: topic-classified-dlq
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # Allows consuming from sentence-embeddings topic
+      - resource:
+          type: topic
+          name: sentence-embeddings
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # consumer group defined in service code
+      - resource:
+          type: group
+          name: keyword-extraction-service
+          patternType: literal
+        operations:
+          - Read

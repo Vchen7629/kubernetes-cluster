@@ -1,0 +1,16 @@
+# DLQ for topics classified topic
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: topic-classified-dlq
+  namespace: kafka
+  labels:
+    # cluster name that the topics are in
+    strimzi.io/cluster: cyphria-cluster
+spec:
+  partitions: 1
+  replicas: 1
+  config:
+    retention.ms: 86400000 # 1 day
+    segment.bytes: 1073741824

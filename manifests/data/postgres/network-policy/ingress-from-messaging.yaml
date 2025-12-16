@@ -1,0 +1,18 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cluster-access-kafka
+  namespace: postgres
+spec:
+  endpointSelector:
+    matchLabels:
+      cnpg.io/cluster: timescaledb-cluster-pg17
+  ingress:
+    # PostgreSQL database access from kafka cluster
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kafka
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP

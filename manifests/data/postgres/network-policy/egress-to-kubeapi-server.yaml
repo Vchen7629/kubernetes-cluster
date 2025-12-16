@@ -1,0 +1,26 @@
+---
+# PostgreSQL Database
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-db-egress-kubeapi
+  namespace: backend
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: Exists
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - postgres
+  egress:
+    # Kubernetes API access
+    - toEntities:
+      - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+            - port: "5432"
+              protocol: TCP

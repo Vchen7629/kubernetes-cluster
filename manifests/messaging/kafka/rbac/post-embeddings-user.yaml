@@ -1,0 +1,50 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: post-embeddings-user
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: cyphria-cluster
+spec:
+  authentication:
+    type: tls
+  authorization:
+    type: simple
+    acls:
+      # Allows producing messages to sentence-embeddings
+      - resource:
+          type: topic
+          name: sentence-embeddings
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # Allows producing messages to sentence-embeddings dlq
+      - resource:
+          type: topic
+          name: sentence-embeddings-dlq
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # Allows consuming from raw data topic
+      - resource:
+          type: topic
+          name: raw-data
+          patternType: literal
+        operations:
+          - Describe
+          - Create
+          - Write
+        host: "*"
+      # consumer group defined in service code
+      - resource:
+          type: group
+          name: sentence-embeddings-service
+          patternType: literal
+        operations:
+          - Read

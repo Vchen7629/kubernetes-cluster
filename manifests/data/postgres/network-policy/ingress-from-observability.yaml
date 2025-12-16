@@ -1,0 +1,73 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cnpg-operator-monitoring
+  namespace: postgres
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-operator
+  ingress:
+    # Allow Prometheus scraping
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+
+---
+# Postgres cluster
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cnpg-cluster-monitoring
+  namespace: postgres
+spec:
+  endpointSelector:
+    matchLabels:
+      cnpg.io/cluster: timescaledb-cluster-pg17
+  ingress:
+    # Allow metrics scraping from victoria-metrics
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "9187"
+              protocol: TCP
+    # Allow status endpoint from victoria-metrics
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+
+---
+# PostgreSQL Database
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-db-monitoring
+  namespace: backend
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: Exists
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - postgres
+  ingress:
+    # Prometheus metrics
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: prometheus
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
