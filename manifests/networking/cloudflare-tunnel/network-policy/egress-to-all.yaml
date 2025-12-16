@@ -1,0 +1,13 @@
+---
+# Cloudflare Tunnel
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cloudflare-tunnel-to-all-access
+  namespace: cloudflare-tunnel
+spec:
+  endpointSelector: {}
+  egress:
+    # Allow all other egress (required for L7 visibility with LoadBalancer)
+    - toEntities:
+        - all

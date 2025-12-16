@@ -1,0 +1,24 @@
+---
+# Cloudflare Tunnel
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cloudflare-tunnel-to-kube-dns-access
+  namespace: cloudflare-tunnel
+spec:
+  endpointSelector: {}
+  egress:
+    # DNS lookups
+    - toEndpoints:
+        - matchLabels:
+            k8s-app: kube-dns
+            io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"

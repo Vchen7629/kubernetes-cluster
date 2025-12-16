@@ -1,0 +1,16 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cloudflare-tunnel-from-vm-access
+  namespace: cloudflare-tunnel
+spec:
+  endpointSelector: {}
+  ingress:
+    # Prometheus metrics
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "20241"
+              protocol: TCP

@@ -1,0 +1,13 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cloudflare-tunnel-from-cilium-envoy-access
+  namespace: cloudflare-tunnel
+spec:
+  endpointSelector: {}
+  ingress:
+    # Allow return traffic from Cilium Gateway
+    - fromEndpoints:
+        - matchLabels:
+            k8s-app: cilium-envoy
+            io.kubernetes.pod.namespace: kube-system

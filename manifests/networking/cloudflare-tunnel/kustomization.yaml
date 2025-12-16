@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # network policies (egress)
+  - network-policy/egress-to-all.yaml
+  - network-policy/egress-to-kube-dns.yaml
+
+  # network policies (ingress)
+  - network-policy/ingress-from-networking.yaml
+  - network-policy/ingress-from-observability.yaml
+  - network-policy/ingress-from-world.yaml

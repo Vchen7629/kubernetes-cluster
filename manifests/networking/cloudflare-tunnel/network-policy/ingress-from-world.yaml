@@ -1,0 +1,10 @@
+kind: CiliumNetworkPolicy
+metadata:
+  name: cloudflare-tunnel-from-world-access
+  namespace: cloudflare-tunnel
+spec:
+  endpointSelector: {}
+  ingress:
+    # Allow traffic from the Internet
+    - fromEntities:
+        - world
