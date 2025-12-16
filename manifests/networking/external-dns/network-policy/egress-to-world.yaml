@@ -1,0 +1,19 @@
+---
+# External DNS
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: external-dns-to-world-access
+  namespace: external-dns
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: external-dns
+  egress:
+    # Cloudflare API access
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

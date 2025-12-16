@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # network policies (egress)
+  - network-policy/egress-to-host.yaml
+  - network-policy/egress-to-kube-apiserver.yaml
+  - network-policy/egress-to-kube-dns.yaml
+  - network-policy/egress-to-world.yaml
