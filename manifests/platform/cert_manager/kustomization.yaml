@@ -11,3 +11,6 @@ resources:
   # network policies (ingress)
   - network-policy/ingress-from-kube-apiserver.yaml
   - network-policy/ingress-from-observability.yaml
+
+  # observability (dashboard)
+  - observability/cert-manager-dashboard.yaml
