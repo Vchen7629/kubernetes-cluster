@@ -27,17 +27,20 @@ resources:
   - network-policy/ingress-from-operator.yaml
 
   # kafka broker config
-  - brokers/cyphria-broker.yaml
+  - custom/cyphria-broker.yaml
 
   # kafka cluster config
-  - clusters/cyphria-cluster.yaml
+  - custom/cyphria-cluster.yaml
   
   # topics config
-  - topics/aggregated-dlq.yaml
-  - topics/aggregated.yaml
-  - topics/raw-data-dlq.yaml
-  - topics/raw-data.yaml
-  - topics/sentence-embeddings-dlq.yaml
-  - topics/sentence-embeddings.yaml
-  - topics/topic-classification-dlq.yaml
-  - topics/topic-classification.yaml
+  - custom/cyphria-aggregated-topic-dlq.yaml
+  - custom/cyphria-aggregated-topic.yaml
+  - custom/cyphria-raw-data-topic-dlq.yaml
+  - custom/cyphria-raw-data-topic.yaml
+  - custom/cyphria-sentence-embeddings-topic-dlq.yaml
+  - custom/cyphria-sentence-embeddings-topic.yaml
+  - custom/cyphria-topic-classification-topic-dlq.yaml
+  - custom/cyphria-topic-classification-topic.yaml
+
+  # observability
+  - observability/kminion-monitor-scrape.yaml
