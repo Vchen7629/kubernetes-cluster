@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: nginx-base-from-svclb-access
+  namespace: nginx
+spec:
+  endpointSelector: {}
+  ingress:
+    # Traffic from svclb (klipper load balancer) pods
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            svccontroller.k3s.cattle.io/svcnamespace: nginx
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP

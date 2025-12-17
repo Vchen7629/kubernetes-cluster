@@ -1,0 +1,11 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: nginx-base-to=
+  namespace: nginx
+spec:
+  endpointSelector: {}
+  egress:
+    # Kubernetes API access
+    - toEntities:
+      - kube-apiserver

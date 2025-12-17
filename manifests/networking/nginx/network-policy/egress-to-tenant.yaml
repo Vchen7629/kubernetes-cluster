@@ -1,0 +1,28 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: nginx-ingress-to-cyphria-access
+  namespace: nginx
+spec:
+  endpointSelector: {}
+  egress:
+    # nginx -> frontend
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: frontend
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+    # nginx -> loginapi
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: loginapi
+            io.kubernetes.pod.namespace: backend
+        - matchLabels:
+            argocd.argoproj.io/instance: login-api
+            io.kubernetes.pod.namespace: backend
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP

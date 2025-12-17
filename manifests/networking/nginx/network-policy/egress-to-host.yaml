@@ -1,0 +1,10 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: nginx-base-to-host-access
+  namespace: nginx
+spec:
+  endpointSelector: {}
+  egress:
+    - toEntities:
+      - host

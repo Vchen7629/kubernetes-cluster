@@ -1,0 +1,16 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: nginx-ingress-from-vm-access
+  namespace: nginx
+spec:
+  endpointSelector: {}
+  ingress:
+    # Prometheus metrics scraping
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "10254"
+              protocol: TCP
