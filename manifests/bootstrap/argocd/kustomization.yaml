@@ -20,3 +20,6 @@ resources:
   - network-policy/ingress-from-repo-server.yaml
   - network-policy/ingress-from-server.yaml
   - network-policy/ingress-from-tenant.yaml
+
+  # observability 
+  - observability/argocd-monitor-scrape.yaml
