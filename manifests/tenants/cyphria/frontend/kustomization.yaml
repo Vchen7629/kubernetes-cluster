@@ -3,9 +3,9 @@ kind: Kustomization
 
 resources:
   # docker image target for deployment onto the cluster
-  - base/deployment.yaml
-  - base/service.yaml
-  - base/autoscaler.yaml
+  - application/deployment.yaml
+  - application/service.yaml
+  - application/autoscaler.yaml
 
   # network policies (egress)
   - network-policy/egress-to-argocd-repo-server.yaml
