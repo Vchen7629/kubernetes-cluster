@@ -1,0 +1,11 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cert-manager-to-kube-apiserver-access
+  namespace: cert-manager
+spec:
+  endpointSelector: {}
+  egress:
+    # Kubernetes API access
+    - toEntities:
+      - kube-apiserver

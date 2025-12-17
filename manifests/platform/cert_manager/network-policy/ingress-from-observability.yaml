@@ -1,0 +1,16 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cert-manager-from-vm-access
+  namespace: cert-manager
+spec:
+  endpointSelector: {}
+  ingress:
+    # Prometheus metrics
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "9402"
+              protocol: TCP

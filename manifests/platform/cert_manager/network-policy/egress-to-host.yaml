@@ -1,0 +1,10 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cert-manager-to-host-access
+  namespace: cert-manager
+spec:
+  endpointSelector: {}
+  egress:
+    - toEntities:
+      - host
