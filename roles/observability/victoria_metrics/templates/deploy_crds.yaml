@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Vchen7629/Cyphria.git
+    repoURL: https://github.com/Vchen7629/kubernetes-cluster.git
     targetRevision: main
-    path: infrastructure/kubernetes/roles/victoria_metrics/overlay
+    path: manifests/observability/victoria_metrics
 
   destination:
     server: https://kubernetes.default.svc
