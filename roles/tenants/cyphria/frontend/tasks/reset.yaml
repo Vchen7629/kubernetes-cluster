@@ -6,7 +6,6 @@
     name: frontend
     namespace: argocd
 
-
 - name: Delete Frontend Services
   kubernetes.core.k8s:
     state: absent
@@ -20,7 +19,7 @@
 - name: Delete Frontend DNS
   kubernetes.core.k8s:
     state: absent
-    api_version: v1
+    api_version: externaldns.k8s.io/v1alpha1
     kind:  DNSEndpoint
     name: frontend-dns
     namespace: frontend
