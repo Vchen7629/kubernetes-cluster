@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Vchen7629/Cyphria.git
+    repoURL: https://github.com/Vchen7629/kubernetes-cluster.git
     targetRevision: main
-    path: infrastructure/kubernetes/roles/postgres/overlay
+    path: manifests/data/postgres
 
   destination:
     server: https://kubernetes.default.svc
