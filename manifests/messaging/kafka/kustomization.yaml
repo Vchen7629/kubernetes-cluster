@@ -42,5 +42,10 @@ resources:
   - custom/cyphria-topic-classification-topic-dlq.yaml
   - custom/cyphria-topic-classification-topic.yaml
 
-  # observability
+  # observability (endpoint targets)
   - observability/kminion-monitor-scrape.yaml
+
+  # observability (dashboards)
+  - observability/kafka-cluster-dashboard.yaml
+  - observability/kafka-consumer-group-dashboard.yaml
+  - observability/kafka-topic-dashboard.yaml
