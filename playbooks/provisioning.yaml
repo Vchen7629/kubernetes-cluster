@@ -4,7 +4,7 @@
   become: true
   gather_facts: true
   roles:
-    - cluster
+    - bootstrap/cluster
   tags: cluster
 
 #- name: Provision Load Balancer
@@ -17,8 +17,8 @@
   become: true
   gather_facts: true
   roles: 
-    - k3s
-    - helm
+    - bootstrap/k3s
+    - bootstrap/helm
   serial:
     - 1
     - 2
@@ -35,21 +35,21 @@
         name: '{{ postinstall }}'
         tasks_from: postinstall
       loop:
-        - argo_cd
-        - metrics_server
-        - cilium
+        - bootstrap/argocd
+        - observability/metrics_server
+        - networking/cilium
       loop_control:
         loop_var: postinstall
   roles: 
-    - cilium
-    - argo_cd
-    - network_policies
-    - metrics_server
-    - prometheus
-    - cert_manager
-    - nginx
-    - kafka
-    - cloudflare_tunnel
-    - external_dns
-    - frontend
+    - networking/cilium
+    - security/network_policies
+    - observability/victoria_metrics
+    - bootstrap/argocd
+    - observability/metrics_server
+    - platform/cert_manager
+    - networking/nginx
+    - messaging/kafka
+    - networking/cloudflare_tunnel
+    - networking/external_dns
+    - tenants/cyphria/frontend
   tags: charts
