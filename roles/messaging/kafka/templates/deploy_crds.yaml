@@ -8,9 +8,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Vchen7629/Cyphria.git
+    repoURL: https://github.com/Vchen7629/kubernetes-cluster.git
     targetRevision: main
-    path: infrastructure/kubernetes/roles/kafka/overlay
+    path: manifests/messaging/kafka
 
   destination:
     server: https://kubernetes.default.svc

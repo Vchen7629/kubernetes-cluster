@@ -29,3 +29,6 @@ resources:
 
   # observability (dashboard)
   - observability/postgres-dashboard.yaml
+
+  # observability (config-map)
+  - observability/timescaledb-monitoring-config-map.yaml

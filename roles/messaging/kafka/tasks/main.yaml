@@ -37,7 +37,7 @@
         definition: "{{ lookup('ansible.builtin.template', 'deploy_metrics.yaml') | from_yaml }}"
         kubeconfig: /etc/rancher/k3s/k3s.yaml
     
-    - name: Deploy kafka crds (topics, brokers, auth rules,)
+    - name: Deploy kafka crds (topics, brokers, auth rules, network policies, dashboards)
       kubernetes.core.k8s:
         state: present
         definition: "{{ lookup('ansible.builtin.template', 'deploy_crds.yaml') | from_yaml }}"
