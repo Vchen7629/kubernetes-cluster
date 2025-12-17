@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmsingle-from-grafana-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmsingle
+  ingress:
+    # Allow Grafana to query
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: grafana
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8428"
+              protocol: TCP

@@ -1,0 +1,15 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: victoria-metrics-operator-from-health-check-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: victoria-metrics-operator
+  ingress:
+    # Allow health checks and metrics
+    - toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

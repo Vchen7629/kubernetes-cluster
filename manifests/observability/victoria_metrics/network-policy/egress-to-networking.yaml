@@ -1,0 +1,38 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmagent-to-cloudflare-tunnel-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmagent
+  egress:
+    # Allow scraping cloudflared
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: cloudflare-tunnel
+      toPorts:
+        - ports:
+            - port: "20241"
+              protocol: TCP  
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmagent-to-nginx-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmagent
+  egress:
+    # Allow scraping nginx ingress
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: nginx
+      toPorts:
+        - ports:
+            - port: "10254"
+              protocol: TCP

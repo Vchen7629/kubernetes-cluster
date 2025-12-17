@@ -1,0 +1,20 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmagent-to-postgres-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmagent
+  egress:
+    # Allow scraping postgres components
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: postgres
+      toPorts:
+        - ports:
+            - port: "8080" # Operator metrics
+              protocol: TCP
+            - port: "9187" # Database metrics
+              protocol: TCP

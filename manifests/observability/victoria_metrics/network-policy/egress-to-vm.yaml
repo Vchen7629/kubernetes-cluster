@@ -1,0 +1,47 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: grafana-to-vm-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/instance: vm-stack
+  egress:
+    # Allow connection to VMSingle for data source
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8428"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmagent-to-vm-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmagent
+  egress:
+    # Allow scraping victoria metrics components
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+            - port: "3000"
+              protocol: TCP
+            - port: "9093"
+              protocol: TCP
+            - port: "9100" # node exporter
+              protocol: TCP
+            - port: "8428" # VMSingle
+              protocol: TCP

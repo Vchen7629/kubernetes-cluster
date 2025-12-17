@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmagent-to-argocd-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmagent
+  egress:
+    # Allow Scraping Argocd
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: argocd
+      toPorts:
+        - ports:
+            - port: "8082" # Application Controller
+              protocol: TCP
+            - port: "9121" # redis
+              protocol: TCP
+            - port: "8084" # repo server
+              protocol: TCP
+            - port: "8083" # server
+              protocol: TCP

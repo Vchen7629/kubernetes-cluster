@@ -1,0 +1,61 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmsingle-from-vm-agent-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmsingle
+  ingress:
+    # Allow VMAgent to scrape
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: vmagent
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8428"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: prometheus-node-exporter-from-vm-agent-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus-node-exporter
+  ingress:
+    # Allow VMAgent to scrape
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: vmagent
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "9100"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kube-state-metrics-from-vm-agent-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: kube-state-metrics
+  ingress:
+    # Allow VMAgent to scrape
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: vmagent
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

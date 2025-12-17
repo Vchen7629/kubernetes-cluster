@@ -1,0 +1,74 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: victoria-metrics-operator-to-kubeapi-server-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: victoria-metrics-operator
+  egress:
+    # Allow Kubernetes API access
+    - toEntities:
+        - kube-apiserver
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: grafana-to-kube-apiserver-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/instance: vm-stack
+  egress:
+    # Allow Kubernetes API access
+    - toEntities:
+        - kube-apiserver
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmsingle-to-kube-apiserver-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmsingle
+  egress:
+    # Allow Kubernetes API access
+    - toEntities:
+        - kube-apiserver
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmagent-to-kube-apiserver-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmagent
+  egress:
+    # Allow Kubernetes API access (for service discovery)
+    - toEntities:
+        - kube-apiserver
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kube-state-metrics-to-kube-apiserver-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: kube-state-metrics
+  egress:
+    # Allow Kubernetes API access
+    - toEntities:
+        - kube-apiserver

@@ -1,0 +1,17 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: prometheus-node-exporter-from-kubelet-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus-node-exporter
+  ingress:
+    # Allow health checks from kubelet (host)
+    - fromCIDR:
+        - 10.0.0.0/24
+      toPorts:
+        - ports:
+            - port: "9100"
+              protocol: TCP

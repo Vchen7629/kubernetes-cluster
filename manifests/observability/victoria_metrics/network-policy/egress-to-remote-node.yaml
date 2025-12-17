@@ -1,0 +1,23 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmagent-to-remote-node-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmagent
+  egress:
+    # Allow host access and scraping host-network pods
+    - toEntities:
+      - remote-node
+      toPorts:
+        - ports:
+            - port: "9100" # node-exporter
+              protocol: TCP
+            - port: "10250" # kubelet
+              protocol: TCP
+            - port: "9965" # hubble-metrics (cilium host-network pods)
+              protocol: TCP
+            - port: "9966" # hubble-relay-metrics
+              protocol: TCP
