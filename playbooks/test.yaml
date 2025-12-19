@@ -10,14 +10,16 @@
         name: '{{ postinstall }}'
         tasks_from: postinstall
       loop:
-        - cilium
-        - argo_cd
+        - bootstrap/argocd
+        - bootstrap/metrics_server
+        - networking/cilium
       loop_control:
         loop_var: postinstall
   roles:
-    - cilium
+    - networking/cilium
+    - bootstrap/argocd
     - cert_manager
-    - cloudflare_tunnel
+    - networking/cloudflare_tunnel
     - external_dns
     - frontend
   tags: charts
