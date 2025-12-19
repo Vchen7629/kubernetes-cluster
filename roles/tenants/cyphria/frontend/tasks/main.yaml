@@ -20,10 +20,10 @@
     email: "{{ cloudflare_env_data['email'] }}"
     zone_id: "{{ cloudflare_env_data['zone-id'] }}"
     
-- name: Deploy frontend
+- name: Deploy frontend crds (deployment, service, hpa, network-policies)
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('ansible.builtin.template', 'argo-cd-deployment.yaml') | from_yaml }}"
+    definition: "{{ lookup('ansible.builtin.template', 'deploy_crds') | from_yaml }}"
     kubeconfig: /etc/rancher/k3s/k3s.yaml
 
 - name: Deploy http Route for frontend connection

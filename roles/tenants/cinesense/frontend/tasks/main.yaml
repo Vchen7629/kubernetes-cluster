@@ -1,0 +1,9 @@
+- name: Role Facts
+  ansible.builtin.include_role:
+    name: '{{ role }}'
+    tasks_from: facts
+  loop:
+    - external_dns
+    - cilium
+  loop_control:
+    loop_var: role
