@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cinesense-frontend-deployment
+  labels:
+    app.kubernetes.io/name: cinesense-frontend
+spec: 
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cinesense-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cinesense-frontend
+    spec:
+      containers:
+        - name: cinesense-frontend
+          image: ghcr.io/vchen7629/cinesense-frontend
+          resources:
+            limits:
+              memory: 128Mi
+            requests: 
+              cpu: 100m
+              memory: 64Mi
