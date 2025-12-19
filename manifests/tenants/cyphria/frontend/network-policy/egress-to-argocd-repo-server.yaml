@@ -1,8 +1,8 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: frontend-to-argocd-repo-server-access
-  namespace: frontend
+  name: cyphria-frontend-to-argocd-repo-server-access
+  namespace: cyphria
 spec:
   endpointSelector: {}
   egress:

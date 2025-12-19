@@ -1,8 +1,8 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: frontend-to-kube-dns-access
-  namespace: frontend
+  name: cyphria-frontend-to-kube-dns-access
+  namespace: cyphria
 spec:
   endpointSelector: {}
   egress:
