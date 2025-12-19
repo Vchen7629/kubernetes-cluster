@@ -9,7 +9,7 @@ spec:
     # nginx -> frontend
     - toEndpoints:
         - matchLabels:
-            io.kubernetes.pod.namespace: frontend
+            io.kubernetes.pod.namespace: cyphria
       toPorts:
         - ports:
             - port: "3000"

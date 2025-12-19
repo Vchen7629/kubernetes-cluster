@@ -17,8 +17,8 @@ spec:
     # From ArgoCD components
     - fromEndpoints:
         - matchLabels:
-            app.kubernetes.io/name: frontend
-            io.kubernetes.pod.namespace: frontend
+            app.kubernetes.io/name: cyphria
+            io.kubernetes.pod.namespace: cyphria
       toPorts:
         - ports:
             - port: "8081"
