@@ -1,14 +1,14 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-    name: frontend-route
-    namespace: frontend
+    name: frontend-ingress-route
+    namespace: cyphria-frontend
     annotations:
       kubernetes.io/description: "Routes traffic to the frontend service"
 spec:
     hostnames:
-    - '{{ cilium_map.gateway.frontend.base_hostname }}'
-    - '{{ cilium_map.gateway.frontend.hostname }}'
+    - 'cyphria.com'
+    - '*.cyphria.com'
     parentRefs:
     - kind: Gateway
       name: hubble-ui
@@ -20,5 +20,5 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: frontend-service
+        - name: cyphria-frontend-service
           port: 80
