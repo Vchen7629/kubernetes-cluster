@@ -48,7 +48,6 @@
     - observability/metrics_server
     - platform/cert_manager
     - networking/nginx
-    - messaging/kafka
     - networking/cloudflare_tunnel
     - networking/external_dns
     - tenants/cyphria/frontend
