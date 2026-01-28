@@ -81,7 +81,7 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: postgres-from-ranking-access
+  name: postgres-from-ranking-calculator-access
   namespace: postgres
   annotations:
     kubernetes.io/description: allows ranking calculator service to send requests to postgres to save ranked products rows
@@ -97,7 +97,7 @@ spec:
   ingress:
     - fromEndpoints:
         - matchLabels:
-            app.kubernetes.io/name: cyphria-ranking
+            app.kubernetes.io/name: cyphria-ranking-calculator
             io.kubernetes.pod.namespace: cyphria-data-pipeline
       toPorts:
         - ports:
