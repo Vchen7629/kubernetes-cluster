@@ -1,0 +1,15 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cyphria-insights-api-from-frontend-access
+  namespace: cyphria-backend
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: cyphria-backend
+  ingress:
+    # insights api <- frontend
+    - toPorts:
+        - ports:
+            - port: 8000
+              protocol: TCP

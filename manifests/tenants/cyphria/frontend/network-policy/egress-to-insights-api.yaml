@@ -11,7 +11,7 @@ spec:
     # frontend -> insights api calls
     - toEndpoints:
         - matchLabels:
-            app.kubernetes.io/name: insights-api
+            app.kubernetes.io/name: cyphria-insights-api
             io.kubernetes.pod.namespace: cyphria-backend
       toPorts:
         - ports:
