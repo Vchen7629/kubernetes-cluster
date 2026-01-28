@@ -4,7 +4,7 @@ metadata:
     name: frontend-ingress-route
     namespace: cyphria-frontend
     annotations:
-      kubernetes.io/description: "Routes traffic to the frontend service"
+      kubernetes.io/description: "Routes cloudflare tunnel traffic to the endpoint cyphria.com to the frontend service"
 spec:
     hostnames:
     - 'cyphria.com'

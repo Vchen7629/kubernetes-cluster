@@ -4,6 +4,7 @@ metadata:
   name: cyphria-frontend-deployment
   labels:
     app.kubernetes.io/name: cyphria-frontend
+    kubernetes.io/description: "deployment for cyphria frontend docker container, specifies resources"
 spec: 
   selector:
     matchLabels:
