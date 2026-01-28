@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cyphria-sentiment-analysis-deployment
+  labels:
+    app.kubernetes.io/name: cyphria-sentiment-analysis
+    kubernetes.io/description: "deployment for cyphria sentiment analysis docker container, specifies resources"
+spec: 
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cyphria-sentiment-analysis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cyphria-sentiment-analysis
+    spec:
+      containers:
+        - name: cyphria-sentiment-analysis
+          image: ghcr.io/vchen7629/cyphria-sentiment-analysis
+          resources:
+            limits:
+              memory: 1024Mi
+            requests: 
+              cpu: 256m
+              memory: 512Mi
