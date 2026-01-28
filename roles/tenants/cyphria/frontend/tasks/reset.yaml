@@ -1,27 +1,9 @@
-- name: Delete Frontend Operator Deployment
-  kubernetes.core.k8s:
-    state: absent
-    api_version: apps/v1
-    kind: Deployment
-    name: frontend
-    namespace: argocd
-
-- name: Delete Frontend Services
-  kubernetes.core.k8s:
-    state: absent
-    api_version: v1
-    kind: Service
-    name: "{{ item }}"
-    namespace: frontend
-  loop:
-    - frontend-service
-
 - name: Delete Frontend DNS
   kubernetes.core.k8s:
     state: absent
     api_version: externaldns.k8s.io/v1alpha1
     kind:  DNSEndpoint
-    name: frontend-dns
+    name: cyphria-frontend-dns
     namespace: frontend
 
 - name: Uninstall frontend application in argocd
@@ -29,5 +11,5 @@
     api_version: argoproj.io/v1alpha1
     state: absent
     kind: Application
-    name: frontend
+    name: cyphria-frontend
     namespace: argocd
