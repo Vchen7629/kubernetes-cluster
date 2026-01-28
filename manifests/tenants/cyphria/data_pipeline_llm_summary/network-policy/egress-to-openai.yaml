@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cyphria-llm-summary-to-openai
+  namespace: cyphria-data-pipeline
+  annotations:
+    kubernetes.io/description: Allows calls to openai api for summarizing products with chatgpt
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: cyphria-llm-summary
+      io.kubernetes.pod.namespace: cyphria-data-pipeline
+  egress:
+    - toFQDNs:
+        - matchPattern: "*.openai.com"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

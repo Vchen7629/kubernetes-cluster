@@ -1,0 +1,21 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cyphria-llm-summary-to-postgres-access
+  namespace: cyphria-data-pipeline
+  annotations:
+    kubernetes.io/description: network policy allowing llm summary to call postgres to save data
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: cyphria-llm-summary
+      io.kubernetes.pod.namespace: cyphria-data-pipeline
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: postgres
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cyphria-llm-summary-deployment
+  labels:
+    app.kubernetes.io/name: cyphria-llm-summary
+    kubernetes.io/description: "deployment for cyphria llm summary docker container, specifies resources"
+spec: 
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cyphria-llm-summary
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cyphria-llm-summary
+    spec:
+      containers:
+        - name: cyphria-llm-summary
+          image: ghcr.io/vchen7629/cyphria-llm-summary
+          resources:
+            limits:
+              memory: 1024Mi
+            requests: 
+              cpu: 50m
+              memory: 256Mi
