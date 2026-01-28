@@ -3,6 +3,8 @@ kind: CiliumNetworkPolicy
 metadata:
   name: cyphria-insights-api-from-frontend-access
   namespace: cyphria-backend
+  annotations:
+    kubernetes.io/description: allows frontend to send requests to the insights api to display data
 spec:
   endpointSelector:
     matchLabels:

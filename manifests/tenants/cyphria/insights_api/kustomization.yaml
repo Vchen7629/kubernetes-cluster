@@ -8,8 +8,8 @@ resources:
   - application/autoscaler.yaml
 
   # network policies (egress)
-  - network-policy/egress-to-postgres.yaml
-  - network-policy/egress-to-valkey-cache.yaml
+  - network-policy/egress-to-data.yaml
 
   # network policies (ingress)
   - network-policy/ingress-from-frontend.yaml
+  - network-policy/ingress-from-observability.yaml

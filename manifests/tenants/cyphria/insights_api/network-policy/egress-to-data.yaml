@@ -1,0 +1,20 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cyphria-insights-api-to-postgres-access
+  namespace: cyphria-backend
+  annotations:
+    kubernetes.io/description: network policy allowing insights api to query postgres for data
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: cyphria-backend
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: postgres
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+

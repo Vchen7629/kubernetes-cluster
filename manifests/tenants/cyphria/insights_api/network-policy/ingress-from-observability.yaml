@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cyphria-insights-api-metrics
+  namespace: cyphria-backend
+  annotations:
+    kubernetes.io/description: allows vm to scrape the metrics endpoint for insights api
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: cyphria-backend
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: victoria-metrics
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
