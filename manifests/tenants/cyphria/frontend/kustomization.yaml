@@ -13,4 +13,4 @@ resources:
 
 images:
   - name: ghcr.io/vchen7629/cyphria-frontend
-    newTag: latest
+    newTag: frontend-1.0.3
