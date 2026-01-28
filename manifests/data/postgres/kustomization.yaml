@@ -4,15 +4,19 @@ kind: Kustomization
 resources:
   # cluster resources
   - cluster/postgres.yaml
-  - cluster/schema.yaml
   - cluster/timescaledb_extension.yaml
 
   # storage related
   - storage/storage-class.yaml
   - storage/backup.yaml
 
+  # create db schemas
+  - schemas/cyphria.yaml
+  - schemas/airflow.yaml
+  
   # secrets
   - secrets/user.yaml
+  - secrets/airflow.yaml
 
   # network policies (egress)
   - network-policy/egress-to-cnpg-operator.yaml
