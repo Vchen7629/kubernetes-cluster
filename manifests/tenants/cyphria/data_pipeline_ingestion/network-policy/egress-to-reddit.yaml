@@ -8,8 +8,8 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/name: cyphria-data-pipeline
-      io.kubernetes.pod.namespace: cyphria-backend
+      app.kubernetes.io/name: cyphria-data-ingestion
+      io.kubernetes.pod.namespace: cyphria-data-pipeline
   egress:
     - toFQDNs:
         - matchPattern: "*.reddit.com"
