@@ -1,0 +1,11 @@
+airflow_vars:
+  kubernetes:
+    controller:
+      replicas: 1
+    helm:
+      chart:
+        name: apache-airflow
+        version: v1.18.1
+      repository:
+        url: https://airflow.apache.org/
+    namespace: airflow

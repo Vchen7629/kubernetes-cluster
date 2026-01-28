@@ -1,0 +1,17 @@
+- name: Uninstall Airflow in argocd
+  kubernetes.core.k8s:
+    api_version: argoproj.io/v1alpha1
+    state: absent
+    kind: Application
+    name: airflow
+    namespace: argocd
+
+- name: Delete airflow namespace
+  kubernetes.core.k8s:
+    state: absent
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: airflow

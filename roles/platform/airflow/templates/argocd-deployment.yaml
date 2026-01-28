@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: airflow
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - chart: '{{ airflow_vars.kubernetes.helm.chart.name }}'
+      repoURL: '{{ airflow_vars.kubernetes.helm.repository.url }}'
+      targetRevision: '{{ airflow_vars.kubernetes.helm.chart.version }}'
+    
+      helm: 
+        valuesObject:
+          executor: "LocalExecutor"
+          webserver: 
+            replicas: 1
+          scheduler:
+            replicas: 1
+          postgresql:
+            enabled: false
+
+          # login credentials to the cnpg postgres
+          data:
+            metadataSecretName: airflow-metadata-secret              
+
+  destination:
+  server: https://kubernetes.default.svc
+  namespace: '{{ certmanager_vars.kubernetes.namespace }}'
+
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
