@@ -1,0 +1,5 @@
+- name: Deploy sentiment analysis crds (deployment, service, network-policies)
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'deploy_crds') | from_yaml }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml

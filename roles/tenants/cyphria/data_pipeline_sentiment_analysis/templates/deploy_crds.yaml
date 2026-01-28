@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: 
+  name: cyphria-sentiment-analysis
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec: 
+  project: default
+  source:
+    repoURL: https://github.com/Vchen7629/kubernetes-cluster.git
+    targetRevision: main
+    path: manifests/tenants/cyphria/data_pipeline_sentiment_analysis
+    
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cyphria-data-pipeline
+  
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=false
