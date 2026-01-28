@@ -25,6 +25,7 @@ resources:
   - network-policy/ingress-from-observability.yaml
   - network-policy/ingress-from-operator.yaml
   - network-policy/ingress-from-cyphria.yaml
+  - network-policy/ingress-from-platform.yaml
 
   # observability (dashboard)
   - observability/postgres-dashboard.yaml

@@ -1,0 +1,25 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-db-airflow-access
+  namespace: backend
+  annotations:
+    kubernetes.io/description: Allows airflow access to postgres for metdata access
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: Exists
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - postgres
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: airflow
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
