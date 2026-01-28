@@ -1,0 +1,132 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-from-insights-api-access
+  namespace: postgres
+  annotations:
+    kubernetes.io/description: allows insights api to send requests to postgres to fetch data
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: Exists
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - postgres
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: cyphria-backend
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-from-data-ingestion-access
+  namespace: postgres
+  annotations:
+    kubernetes.io/description: allows data ingestion service to send requests to postgres to save raw reddit comments
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: Exists
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - postgres
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: cyphria-data-ingestion
+            io.kubernetes.pod.namespace: cyphria-data-pipeline
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-from-sentiment-analysis-access
+  namespace: postgres
+  annotations:
+    kubernetes.io/description: allows sentiment-analysis service to send requests to postgres to save sentiment processed comments
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: Exists
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - postgres
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: cyphria-sentiment-analysis
+            io.kubernetes.pod.namespace: cyphria-data-pipeline
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-from-ranking-access
+  namespace: postgres
+  annotations:
+    kubernetes.io/description: allows ranking calculator service to send requests to postgres to save ranked products rows
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: Exists
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - postgres
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: cyphria-ranking
+            io.kubernetes.pod.namespace: cyphria-data-pipeline
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: postgres-from-llm-summary
+  namespace: postgres
+  annotations:
+    kubernetes.io/description: allows llm summary service to send requests to postgres to save product summaries
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cnpg.io/cluster
+        operator: Exists
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - postgres
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: cyphria-llm-summary
+            io.kubernetes.pod.namespace: cyphria-data-pipeline
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP

@@ -22,10 +22,9 @@ resources:
   # network policies (ingress)
   - network-policy/ingress-from-cluster.yaml
   - network-policy/ingress-from-cnpg-system.yaml
-  - network-policy/ingress-from-messaging.yaml
   - network-policy/ingress-from-observability.yaml
   - network-policy/ingress-from-operator.yaml
-  - network-policy/ingress-from-tenant.yaml
+  - network-policy/ingress-from-cyphria.yaml
 
   # observability (dashboard)
   - observability/postgres-dashboard.yaml
