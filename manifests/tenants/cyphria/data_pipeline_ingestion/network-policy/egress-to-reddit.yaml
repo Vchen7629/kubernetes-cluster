@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cyphria-data-ingestion-to-reddit-access
+  namespace: cyphria-backend
+  annotations:
+    kubernetes.io/description: Allows calls to reddit for fetching data
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: cyphria-data-ingestion
+      io.kubernetes.pod.namespace: cyphria-backend
+  egress:
+    - toFQDNs:
+        - matchPattern: "*.reddit.com"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

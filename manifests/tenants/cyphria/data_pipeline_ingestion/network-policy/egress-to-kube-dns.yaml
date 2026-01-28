@@ -1,0 +1,26 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cyphria-data-ingestion-to-kube-dns-access
+  namespace: cyphria-backend
+  annotations:
+    kubernetes.io/description: data ingestion can send requests to kube dns for dns lookups to see if its reddit.com
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: cyphria-data-ingestion
+      io.kubernetes.pod.namespace: cyphria-backend
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s-app: kube-dns
+            io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
