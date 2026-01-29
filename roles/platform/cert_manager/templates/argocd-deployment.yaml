@@ -10,12 +10,11 @@ spec:
       repoURL: '{{ certmanager_vars.kubernetes.helm.repository.url }}'
       targetRevision: '{{ certmanager_vars.kubernetes.helm.chart.version }}'
 
-      helm: 
+      helm:
         valuesObject:
           prometheus:
-            servicemonitor: 
-              enabled: true
-              interval: '30s'
+            servicemonitor:
+              enabled: false
           resources:
             limits:
               memory: '{{ certmanager_vars.kubernetes.controller.resources.limits.memory }}'
