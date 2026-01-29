@@ -1,74 +1,137 @@
-- name: Role Reset
+- name: Fully reset ArgoCD
   block:
-    - name: Remove Repo
+    - name: Delete all ArgoCD Applications (stops reconciliation)
+      kubernetes.core.k8s:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
+        namespace: argocd
+        state: absent
+        wait: true
+        wait_timeout: 60
+      ignore_errors: true
+
+    - name: Delete ArgoCD validating webhooks (prevents blocking API calls)
+      kubernetes.core.k8s:
+        api_version: admissionregistration.k8s.io/v1
+        kind: ValidatingWebhookConfiguration
+        label_selectors:
+          - app.kubernetes.io/part-of=argocd
+        state: absent
+      ignore_errors: true
+
+    - name: Delete ArgoCD mutating webhooks
+      kubernetes.core.k8s:
+        api_version: admissionregistration.k8s.io/v1
+        kind: MutatingWebhookConfiguration
+        label_selectors:
+          - app.kubernetes.io/part-of=argocd
+        state: absent
+      ignore_errors: true
+
+    - name: Scale down ArgoCD application controller and deployments
+      ansible.builtin.shell: |
+        kubectl scale statefulset -n argocd -l app.kubernetes.io/name=argocd-application-controller --replicas=0 2>/dev/null || true
+        kubectl scale deployment -n argocd -l app.kubernetes.io/part-of=argocd --replicas=0 2>/dev/null || true
+        sleep 5
+      ignore_errors: true
+
+    - name: Delete ApplicationSets
+      kubernetes.core.k8s:
+        api_version: argoproj.io/v1alpha1
+        kind: ApplicationSet
+        namespace: argocd
+        state: absent
+        wait: false
+      ignore_errors: true
+
+    - name: Delete AppProjects
+      kubernetes.core.k8s:
+        api_version: argoproj.io/v1alpha1
+        kind: AppProject
+        namespace: argocd
+        state: absent
+        wait: false
+      ignore_errors: true
+
+    - name: Delete argocd namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: argocd
+        state: absent
+        wait: false
+      ignore_errors: true
+
+    - name: Wait for namespace deletion
+      ansible.builtin.shell: |
+        for i in {1..15}; do
+          if ! kubectl get namespace argocd 2>/dev/null; then
+            echo "Namespace deleted successfully"
+            exit 0
+          fi
+          echo "Waiting for namespace deletion (attempt $i/15)..."
+          sleep 4
+        done
+        exit 1
+      register: ns_wait
+      failed_when: false
+      changed_when: false
+
+    # Fallback - force cleanup if namespace is stuck
+    - name: Force cleanup stuck namespace (fallback)
+      ansible.builtin.shell: |
+        echo "Namespace is stuck, applying force cleanup..."
+
+        # Remove finalizers from any remaining ArgoCD resources
+        kubectl api-resources --api-group=argoproj.io --namespaced -o name 2>/dev/null | while read resource_type; do
+          kubectl get ${resource_type} -n argocd -o name 2>/dev/null | while read resource; do
+            kubectl patch ${resource} -n argocd -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+          done
+        done
+
+        # Remove finalizers from stuck pods/pvcs/secrets/certificates
+        kubectl get pods,pvc,secrets,certificates -n argocd -o name 2>/dev/null | xargs -r -I {} kubectl patch {} -n argocd -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Remove namespace finalizer
+        kubectl patch namespace argocd -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Final verification
+        sleep 5
+        if kubectl get namespace argocd 2>/dev/null; then
+          echo "WARNING: Namespace still exists after force cleanup"
+        else
+          echo "Namespace successfully deleted"
+        fi
+      ignore_errors: true
+      when: ns_wait.rc != 0
+
+    - name: Delete ArgoCD CRDs
+      ansible.builtin.shell: |
+        kubectl get crd -o name 2>/dev/null | grep argoproj.io | while read crd; do
+          # Try graceful deletion first
+          kubectl delete ${crd} --timeout=30s 2>/dev/null || {
+            # If stuck, remove finalizer and force delete
+            kubectl patch ${crd} -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+            kubectl delete ${crd} 2>/dev/null || true
+          }
+        done
+      ignore_errors: true
+
+    - name: Clean up orphaned PersistentVolumes
+      ansible.builtin.shell: |
+        kubectl get pv -o json 2>/dev/null | jq -r '.items[] | select(.spec.claimRef.namespace=="argocd") | .metadata.name' 2>/dev/null | while read pv; do
+          [ -n "$pv" ] && kubectl delete pv ${pv} 2>/dev/null || true
+        done
+      ignore_errors: true
+
+    - name: Remove ArgoCD binary
+      ansible.builtin.file:
+        path: /usr/local/bin/argocd
+        state: absent
+      ignore_errors: true
+
+    - name: Remove Helm repository
       kubernetes.core.helm_repository:
         name: '{{ argocd_vars.kubernetes.helm.repository.org }}'
         repo_state: absent
-  
-    - name: remove binary
-      ansible.builtin.file: 
-        path: /usr/local/bin/argocd
-        state: absent
-    
-    - name: Delete argocd StatefulSet
-      kubernetes.core.k8s:
-        state: absent
-        api_version: apps/v1
-        kind: StatefulSet
-        name: argo-cd-argocd-application-controller
-        namespace: argocd # adjust namespace if needed
-
-    - name: Delete Prometheus Operator Deployment
-      kubernetes.core.k8s:
-        state: absent
-        api_version: apps/v1
-        kind: Deployment
-        name: "{{ item }}"
-        namespace: argocd
-      loop:
-        - argo-cd-argocd-applicationset-controller
-        - argo-cd-argocd-dex-server
-        - argo-cd-argocd-redis
-        - argo-cd-argocd-notifications-controller
-        - argo-cd-argocd-repo-server
-        - argo-cd-argocd-server
-
-    - name: Delete Pod Services
-      kubernetes.core.k8s:
-        state: absent
-        api_version: v1
-        kind: Service
-        name: "{{ item }}"
-        namespace: argocd # adjust namespace if needed
-      loop:
-        - argo-cd-argocd-application-controller-metrics
-        - argo-cd-argocd-applicationset-controller
-        - argo-cd-argocd-dex-server
-        - argo-cd-argocd-redis
-        - argo-cd-argocd-redis-metrics
-        - argo-cd-argocd-repo-server
-        - argo-cd-argocd-repo-server-metrics
-        - argo-cd-argocd-server
-        - argo-cd-argocd-server-metrics
-
-    - name: Delete ArgoCD Certificate resources
-      ansible.builtin.command:
-        cmd: "{{ certificate_resource }}"
-      loop:
-        - kubectl delete certificate argocd-repo-tls -n argocd
-        - kubectl delete certificate argocd-dex-tls -n argocd
-        - kubectl delete certificate argocd-server-tls -n argocd
-      loop_control:
-        loop_var: certificate_resource
-      ignore_errors: true
-    
-    - name: Delete ArgoCD Secrets resources
-      ansible.builtin.command:
-        cmd: "{{ secret_resource }}"
-      loop:
-        - kubectl delete secrets argocd-repo-server-tls -n argocd
-        - kubectl delete secrets argocd-dex-server-tls -n argocd
-        - kubectl delete secrets argocd-server-tls -n argocd
-      loop_control:
-        loop_var: secret_resource
       ignore_errors: true
