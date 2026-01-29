@@ -1,3 +1,4 @@
+---
 - name: Cluster Upgrade
   hosts: server
   become: true
@@ -6,11 +7,11 @@
     - name: Role Upgrade
       ansible.builtin.include_role:
         apply:
-          tags: '{{ upgrade }}'
-        name: '{{ upgrade }}'
+          tags: "{{ upgrade }}"
+        name: "{{ upgrade }}"
         tasks_from: upgrade
-      loop: 
-        #- cilium
+      loop:
+        # - cilium
         - network_policies
         #- kafka
         #- external_dns

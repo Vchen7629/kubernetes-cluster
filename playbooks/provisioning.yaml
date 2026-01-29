@@ -1,4 +1,4 @@
-
+---
 - name: OS configuration
   hosts: cluster
   become: true
@@ -12,11 +12,11 @@
 #  become: true
 #  gather_facts: true
 
-- name: k3s Provisioning
+- name: K3s Provisioning
   hosts: cluster
   become: true
   gather_facts: true
-  roles: 
+  roles:
     - bootstrap/k3s
     - bootstrap/helm
   serial:
@@ -32,7 +32,7 @@
   post_tasks:
     - name: Perform post-install tasks
       ansible.builtin.include_role:
-        name: '{{ postinstall }}'
+        name: "{{ postinstall }}"
         tasks_from: postinstall
       loop:
         - bootstrap/argocd
@@ -40,9 +40,8 @@
         - networking/cilium
       loop_control:
         loop_var: postinstall
-  roles: 
+  roles:
     - networking/cilium
-    - security/network_policies
     - observability/victoria_metrics
     - bootstrap/argocd
     - observability/metrics_server

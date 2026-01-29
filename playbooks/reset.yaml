@@ -1,3 +1,4 @@
+---
 - name: Reset Cluster - Server Apps
   hosts: server
   become: true
@@ -11,20 +12,20 @@
         name: "{{ reset }}"
         tasks_from: reset
       loop:
-        #- network_policies
-        #- prometheus
-        #- cert_manager
-        #- nginx
-        #- kafka
-        #- cloudflare_tunnel
-        #- external_dns
-        #- frontend
-        #- metrics_server
-        #- argo_cd
+        # - network_policies
+        # - prometheus
+        # - cert_manager
+        # - nginx
+        # - kafka
+        # - cloudflare_tunnel
+        # - external_dns
+        # - frontend
+        # - metrics_server
+        # - argo_cd
         - cilium
       loop_control:
         loop_var: reset
-    
+
     - name: Reset cluster roles
       ansible.builtin.include_role:
         name: "{{ reset }}"
@@ -42,7 +43,7 @@
   tasks:
     - name: Get packages information
       ansible.builtin.package_facts:
-      
+
     - name: Reset cluster roles
       ansible.builtin.include_role:
         name: "{{ reset }}"
