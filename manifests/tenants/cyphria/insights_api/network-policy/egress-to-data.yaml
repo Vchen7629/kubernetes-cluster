@@ -17,4 +17,26 @@ spec:
         - ports:
             - port: "5432"
               protocol: TCP
+  
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cyphria-insights-api-to-valkey-access
+  namespace: cyphria-backend
+  annotations:
+    kubernetes.io/description: network policy allowing insights api to use valkey as cache
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: cyphria-backend
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: valkey
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+
 
