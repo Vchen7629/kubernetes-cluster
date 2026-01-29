@@ -3,8 +3,8 @@
     name: '{{ role }}'
     tasks_from: facts
   loop:
-    - external_dns
-    - cilium
+    - networking/external_dns
+    - networking/cilium
   loop_control:
     loop_var: role
 

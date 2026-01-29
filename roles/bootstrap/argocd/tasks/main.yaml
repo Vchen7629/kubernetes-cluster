@@ -20,7 +20,7 @@
       ansible.builtin.set_fact:
         sha256_checksum: "{{ item.split(' ')[0] }}"
       loop: "{{ checksum.content.split('\n') }}"
-      when: item | regex_search(argocd_vars.release.file + '$' )
+      when: (item | regex_search(argocd_vars.release.file + '$' ) is not none)
       run_once: true
     
     - name: Install binary
@@ -63,5 +63,5 @@
 - name: Deploy CRDS (network policy, vm scrape targets)
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('ansible.builtin.template', 'deploy_crds.yaml') | from_yaml }}"
+    definition: "{{ lookup('ansible.builtin.template', 'deploy-crds.yaml') | from_yaml }}"
     kubeconfig: /etc/rancher/k3s/k3s.yaml

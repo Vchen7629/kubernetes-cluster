@@ -4,8 +4,8 @@
     name: '{{ role }}'
     tasks_from: facts
   loop:
-    - k3s
-    - metrics_server
+    - bootstrap/k3s
+    - observability/metrics_server
   loop_control:
     loop_var: role
 

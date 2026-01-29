@@ -1,12 +1,8 @@
 - name: Role Facts
   ansible.builtin.include_role:
-    name: '{{ role }}'
+    name: bootstrap/k3s
     tasks_from: facts
-  loop:
-    - k3s
-  loop_control:
-    loop_var: role
-
+    
 - name: Role Provisioning
   when: inventory_hostname in k3s_map.server.hosts
   block:

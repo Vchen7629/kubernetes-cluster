@@ -44,8 +44,8 @@
     - networking/cilium
     - bootstrap/argocd
     - observability/victoria_metrics
-    - observability/metrics_server
     - platform/cert_manager
+    - observability/metrics_server
     - networking/cloudflare_tunnel
     - networking/external_dns
     - data/postgres

@@ -3,8 +3,8 @@
     name: '{{ role }}'
     tasks_from: facts
   loop:
-    - external_dns
-    - k3s
+    - networking/external_dns
+    - bootstrap/k3s
   loop_control:
     loop_var: role
 

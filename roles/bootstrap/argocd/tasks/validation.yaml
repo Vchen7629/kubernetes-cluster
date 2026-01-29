@@ -3,8 +3,8 @@
     name: '{{ role }}'
     tasks_from: facts
   loop:
-    - k3s
-    - argo_cd
+    - bootstrap/k3s
+    - bootstrap/argocd
   loop_control:
     loop_var: role
 

@@ -3,8 +3,8 @@
     name: '{{ role }}'
     tasks_from: facts
   loop:
-    - external_dns
-    - cilium
+    - networking/external_dns
+    - networking/cilium
   loop_control:
     loop_var: role
 
@@ -25,7 +25,7 @@
     state: present
     definition: "{{ lookup('ansible.builtin.template', 'deploy_crds') | from_yaml }}"
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    
+
 - name: Deploy DNS Endpoint for external-dns
   kubernetes.core.k8s:
     state: present

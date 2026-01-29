@@ -1,6 +1,6 @@
 - name: Role Facts
   ansible.builtin.include_role:
-    name: airflow
+    name: platform/airflow
     tasks_from: facts
 
 - name: Create namespaces
