@@ -67,7 +67,7 @@
             operator: Exists
             effect: NoSchedule
       server: # this is from the hosts.yaml file in inventory folder
-        default_host: '{{ hostvars[groups.server[0]].hosts.ansible_hostname | default(groups.server[0]) }}'
+        default_host: '{{ hostvars[groups.server[0]].ansible_facts.hostname | default(groups.server[0]) }}'
         ha: '{{ groups.server | length > 2 }}'
         hosts: '{{ groups.server }}'
         non_ha: '{{ groups.server | length == 1}}'
@@ -94,9 +94,9 @@
 - name: Set Node fact
   ansible.builtin.set_fact:
     k3s_node:
-      ip: '{{ ansible_default_ipv4.address }}'
+      ip: '{{ ansible_facts["default_ipv4"]["address"] }}'
       binary: '{{ k3s_map.node.directory.bin }}/k3s'
-      service: 
+      service:
         name: "{{ 'agent' if inventory_hostname not in k3s_map.server.hosts else 'server' }}"
         type: "{{ 'agent' if inventory_hostname not in groups.server else 'server' }}"
 

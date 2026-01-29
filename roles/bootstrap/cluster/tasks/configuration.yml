@@ -14,10 +14,10 @@
     
     - name: set host facts
       ansible.builtin.set_fact:
-        cluster_host: 
+        cluster_host:
           extension: "{{ host_all_fqdns.stdout | split | first | split('.') | last | default('local') }}"
           fqdn: "{{ host_fqdn.stdout | split | first }}"
-          ipv4: "{{ ansible_default_ipv4['address'] }}"
+          ipv4: "{{ ansible_facts['default_ipv4']['address'] }}"
           name: "{{ ansible_host }}"
     
     - name: set host fqdn

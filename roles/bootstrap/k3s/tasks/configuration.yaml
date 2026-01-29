@@ -89,7 +89,7 @@
               ansible.builtin.set_fact:
                 sha256_checksum: "{{ item.split(' ')[0] }}"
               loop: "{{ checksum.content.split('\n') }}"
-              when: item | regex_search(k3s_vars.release.kubepug.file + '$')
+              when: (item | regex_search(k3s_vars.release.kubepug.file + '$')) is not none
 
         - name: download Kubepug archive
           ansible.builtin.get_url:
