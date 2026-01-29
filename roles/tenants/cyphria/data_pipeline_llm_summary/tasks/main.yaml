@@ -1,3 +1,25 @@
+- name: Set llm api key credentials
+  vars:
+    env_data: "{{ lookup('ansible.builtin.template', 'api_key.yaml' ) | from_yaml }}"
+  ansible.builtin.set_fact:
+    api_key: "{{ env_data['API_KEY'] }}"
+
+- name: Create api key Secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: llm-api-key
+        namespace: cyphria-data-pipeline
+        annotations:
+          kubernetes.io/description: LLM api key secret
+      stringData:
+        API_KEY: "{{ api_key }}"
+
 - name: Deploy llm summary crds (deployment, service, network-policies)
   kubernetes.core.k8s:
     state: present

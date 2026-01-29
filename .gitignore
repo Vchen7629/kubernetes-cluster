@@ -1,4 +1,6 @@
 env.yaml
 reddit_env.yaml
+api_key.yaml
+
 temp.yaml
 .venv
