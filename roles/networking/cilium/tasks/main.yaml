@@ -166,16 +166,6 @@
             definition: "{{ lookup('ansible.builtin.template', 'loadbalancer_ip_pool.j2') | from_yaml }}"
             kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
             wait: true
-        
-        - name: Get gateway info
-          kubernetes.core.k8s_info:
-            kind: Gateway
-            kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
-            name: '{{ cilium_vars.kubernetes.gateway.service }}'
-            namespace: '{{ cilium_vars.kubernetes.namespace }}'
-            wait_timeout: 10
-            wait: true
-          register: cilium_gateway
 
     - name: Wait for Cilium pods to be ready
       kubernetes.core.k8s_info:
