@@ -14,10 +14,10 @@ argocd_vars:
       resources:
         limits:
           cpu: null
-          memory: 512Mi
+          memory: 2Gi
         requests:
           cpu: 10m
-          memory: 512Mi
+          memory: 1Gi
     dex: 
       resources:
         limits: 
