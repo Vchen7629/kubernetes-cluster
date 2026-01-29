@@ -16,5 +16,3 @@ cloudflared_vars:
     metrics:
       enable: true
       port: 20241
-    ingress:
-      hostname: cyphria.com

@@ -29,8 +29,9 @@ spec:
             tunnelName: cyphria
             tunnelSecret: "{{ tunnel_secret }}"
 
+          # this forwards 
           ingress:
-            - hostname: '{{ cloudflared_vars.kubernetes.ingress.hostname }}'
+            - hostname: 'cyphria.com'
               service: '{{ cilium_map.gateway.frontend.ingress }}'
 
             - hostname: '*.cyphria.com'
