@@ -24,3 +24,10 @@ spec:
             requests:
               cpu: 100m
               memory: 64Mi
+          env:
+            # Non-sensitive config from ConfigMap
+            - name: VITE_API_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-frontend-config
+                  key: VITE_API_BASE_URL

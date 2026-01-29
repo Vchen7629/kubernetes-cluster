@@ -1,0 +1,8 @@
+api_version: v1
+kind: ConfigMap
+metadata:
+  name: cyphria-frontend-config
+  annotations:
+    kubernetes.io/description: Non-sensitive application environment configuration values
+data:
+  VITE_API_BASE_URL: "http://cyphria-insights-api-service.cyphria-backend.svc.cluster.local"
