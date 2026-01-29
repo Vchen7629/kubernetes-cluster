@@ -1,17 +1,84 @@
-- name: Uninstall Airflow in argocd
-  kubernetes.core.k8s:
-    api_version: argoproj.io/v1alpha1
-    state: absent
-    kind: Application
-    name: airflow
-    namespace: argocd
-
-- name: Delete airflow namespace
-  kubernetes.core.k8s:
-    state: absent
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
+- name: Fully reset Airflow
+  block:
+    - name: Delete ArgoCD Application (stops reconciliation)
+      kubernetes.core.k8s:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
         name: airflow
+        namespace: argocd
+        state: absent
+        wait: true
+        wait_timeout: 60
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Delete CiliumNetworkPolicy custom resources
+      ansible.builtin.shell: |
+        kubectl delete ciliumnetworkpolicies.cilium.io -n airflow --all --timeout=30s 2>/dev/null || true
+      environment:
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Delete airflow namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: airflow
+        state: absent
+        wait: false
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Wait for namespace deletion
+      ansible.builtin.shell: |
+        for i in {1..15}; do
+          if ! kubectl get namespace airflow 2>/dev/null; then
+            echo "Namespace deleted successfully"
+            exit 0
+          fi
+          echo "Waiting for namespace deletion (attempt $i/15)..."
+          sleep 4
+        done
+        exit 1
+      environment:
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      register: ns_wait
+      failed_when: false
+      changed_when: false
+
+    # Fallback - force cleanup if namespace is stuck
+    - name: Force cleanup stuck namespace (fallback)
+      ansible.builtin.shell: |
+        echo "Namespace is stuck, applying force cleanup..."
+
+        # Remove finalizers from any remaining CiliumNetworkPolicy resources
+        kubectl get ciliumnetworkpolicies.cilium.io -n airflow -o name 2>/dev/null | while read resource; do
+          kubectl patch ${resource} -n airflow -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+        done
+
+        # Remove finalizers from stuck pods/pvcs
+        kubectl get pods,pvc -n airflow -o name 2>/dev/null | xargs -r -I {} kubectl patch {} -n airflow -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Remove namespace finalizer
+        kubectl patch namespace airflow -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Final verification
+        sleep 5
+        if kubectl get namespace airflow 2>/dev/null; then
+          echo "WARNING: Namespace still exists after force cleanup"
+        else
+          echo "Namespace successfully deleted"
+        fi
+      environment:
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+      when: ns_wait.rc != 0
+
+    - name: Clean up orphaned PersistentVolumes
+      ansible.builtin.shell: |
+        kubectl get pv -o json 2>/dev/null | jq -r '.items[] | select(.spec.claimRef.namespace=="airflow") | .metadata.name' 2>/dev/null | while read pv; do
+          [ -n "$pv" ] && kubectl delete pv ${pv} 2>/dev/null || true
+        done
+      environment:
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
