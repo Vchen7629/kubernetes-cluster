@@ -17,7 +17,7 @@ spec:
   egress:
     # Kubernetes API access
     - toEntities:
-      - kube-apiserver
+        - kube-apiserver
       toPorts:
         - ports:
             - port: "8000"

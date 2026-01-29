@@ -1,3 +1,4 @@
+---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -10,7 +11,7 @@ spec:
   egress:
     # Allow host access and scraping host-network pods
     - toEntities:
-      - remote-node
+        - remote-node
       toPorts:
         - ports:
             - port: "9100" # node-exporter

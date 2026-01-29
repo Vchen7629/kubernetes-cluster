@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: cyphria-frontend
     kubernetes.io/description: "deployment for cyphria frontend docker container, specifies resources"
-spec: 
+spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: cyphria-frontend
@@ -20,6 +21,6 @@ spec:
           resources:
             limits:
               memory: 128Mi
-            requests: 
+            requests:
               cpu: 100m
               memory: 64Mi

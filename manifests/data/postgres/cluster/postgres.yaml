@@ -1,3 +1,4 @@
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -40,21 +41,21 @@ spec:
       owner: postgres
       postInitApplicationSQLRefs:
         configMapRefs:
-        - name: cyphria-init-schema
-          key: init.sql
-        - name: airflow-init-schema
-          key: init.sql
-  
-  postgresql: 
+          - name: cyphria-init-schema
+            key: init.sql
+          - name: airflow-init-schema
+            key: init.sql
+
+  postgresql:
     # only allow connections over ssl/tls, to app database,
     # app_user user, from the ip range, and using password
     pg_hba:
       - hostssl app tiamat 10.0.0.0/16 scram-sha-256
     shared_preload_libraries:
-    - 'timescaledb'
+      - "timescaledb"
     parameters:
       max_wal_size: "4GB"
-      max_wal_senders: "3" 
+      max_wal_senders: "3"
       wal_level: "replica"
   # backup to hard drive
   backup:
@@ -70,15 +71,13 @@ spec:
       wal:
         compression: gzip
     retentionPolicy: "90d"
-  
+
   resources:
     limits:
       memory: 7G
     requests:
       cpu: "1"
       memory: 1G
-  
+
   monitoring:
     enablePodMonitor: true
-  
-    

@@ -1,3 +1,4 @@
+---
 # ArgoCD Server
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy

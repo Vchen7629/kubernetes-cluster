@@ -1,3 +1,4 @@
+---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -14,5 +15,5 @@ spec:
             io.kubernetes.pod.namespace: cert-manager
       toPorts:
         - ports:
-            - port: "9402" 
+            - port: "9402"
               protocol: TCP

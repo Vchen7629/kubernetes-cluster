@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -61,5 +62,3 @@ data:
 
     -- Compress data older than 2 hours
     SELECT add_compression_policy('aggregated_metrics', INTERVAL '2 hours');
-
-    

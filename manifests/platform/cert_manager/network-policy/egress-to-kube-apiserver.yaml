@@ -1,3 +1,4 @@
+---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -8,4 +9,4 @@ spec:
   egress:
     # Kubernetes API access
     - toEntities:
-      - kube-apiserver
+        - kube-apiserver

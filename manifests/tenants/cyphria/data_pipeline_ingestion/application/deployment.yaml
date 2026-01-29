@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: cyphria-data-ingestion
     kubernetes.io/description: "deployment for cyphria data ingestiondocker container, specifies resources"
-spec: 
+spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: cyphria-data-ingestion
@@ -20,6 +21,6 @@ spec:
           resources:
             limits:
               memory: 1024Mi
-            requests: 
+            requests:
               cpu: 125m
               memory: 512Mi

@@ -1,20 +1,21 @@
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-    name: frontend-ingress-route
-    namespace: cyphria-frontend
-    annotations:
-      kubernetes.io/description: "Routes cloudflare tunnel traffic to the endpoint cyphria.com to the frontend service"
+  name: frontend-ingress-route
+  namespace: cyphria-frontend
+  annotations:
+    kubernetes.io/description: "Routes cloudflare tunnel traffic to the endpoint cyphria.com to the frontend service"
 spec:
-    hostnames:
-    - 'cyphria.com'
-    - '*.cyphria.com'
-    parentRefs:
+  hostnames:
+    - "cyphria.com"
+    - "*.cyphria.com"
+  parentRefs:
     - kind: Gateway
       name: hubble-ui
       namespace: kube-system
       sectionName: frontend-http
-    rules:
+  rules:
     - matches:
         - path:
             type: PathPrefix

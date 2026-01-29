@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -6,7 +7,7 @@ metadata:
     kubernetes.io/description: "Exposes an port for the pod for rest of cluster access to this service"
 spec:
   type: ClusterIP
-  selector: 
+  selector:
     app.kubernetes.io/name: cyphria-data-ingestion
   ports:
     - port: 8000

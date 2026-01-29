@@ -1,3 +1,4 @@
+---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -7,4 +8,4 @@ spec:
   endpointSelector: {}
   egress:
     - toEntities:
-      - host
+        - host

@@ -1,3 +1,4 @@
+---
 kind: CiliumNetworkPolicy
 metadata:
   name: cloudflare-tunnel-from-world-access

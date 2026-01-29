@@ -1,3 +1,4 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
@@ -6,4 +7,3 @@ resources:
   - network-policy/egress-to-cyphria.yaml
   - network-policy/egress-to-data.yaml
   - network-policy/egress-to-kube-dns.yaml
-

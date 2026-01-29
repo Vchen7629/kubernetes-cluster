@@ -1,3 +1,4 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
@@ -13,7 +14,7 @@ resources:
   # create db schemas
   - schemas/cyphria.yaml
   - schemas/airflow.yaml
-  
+
   # secrets
   - secrets/user.yaml
   - secrets/airflow.yaml

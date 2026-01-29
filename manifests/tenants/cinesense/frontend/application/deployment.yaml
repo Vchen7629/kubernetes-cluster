@@ -1,10 +1,11 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cinesense-frontend-deployment
   labels:
     app.kubernetes.io/name: cinesense-frontend
-spec: 
+spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: cinesense-frontend
@@ -19,6 +20,6 @@ spec:
           resources:
             limits:
               memory: 128Mi
-            requests: 
+            requests:
               cpu: 100m
               memory: 64Mi

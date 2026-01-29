@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: cyphria-insights-api
     kubernetes.io/description: "deployment for cyphria insights api docker container, specifies resources"
-spec: 
+spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: cyphria-insights-api
@@ -20,6 +21,6 @@ spec:
           resources:
             limits:
               memory: 1024Mi
-            requests: 
+            requests:
               cpu: 250m
               memory: 512Mi
