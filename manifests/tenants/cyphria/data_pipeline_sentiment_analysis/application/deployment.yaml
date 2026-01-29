@@ -24,3 +24,46 @@ spec:
             requests:
               cpu: 256m
               memory: 512Mi
+          env:
+            # Non-sensitive config from ConfigMap
+            - name: PRODUCTION_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-sentiment-analysis-config
+                  key: PRODUCTION_MODE
+            - name: FASTAPI_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-sentiment-analysis-config
+                  key: FASTAPI_PORT
+            - name: SENTIMENT_BATCH_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-sentiment-analysis-config
+                  key: SENTIMENT_BATCH_SIZE
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-sentiment-analysis-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-sentiment-analysis-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-sentiment-analysis-config
+                  key: DB_NAME
+            # Sensitive data from Secrets
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cyphria-user-secret
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: cyphria-user-secret
+                  key: password

@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cyphria-sentiment-analysis-config
+  annotations:
+    kubernetes.io/description: Non-sensitive application environment configuration values
+data:
+  PRODUCTION_MODE: "true"
+  FASTAPI_PORT: "8000"
+  SENTIMENT_BATCH_SIZE: 64
+
+  # PostgreSQL connection details
+  DB_HOST: "cyphria-postgres-cluster-rw.postgres.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "cyphria"
