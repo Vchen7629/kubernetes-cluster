@@ -3,10 +3,10 @@
     name: '{{ role }}'
     tasks_from: facts
   loop:
-    - cert_manager
-    - external_dns
-    - k3s
-    - cilium
+    - platform/cert_manager
+    - networking/external_dns
+    - bootstrap/k3s
+    - networking/cilium
   loop_control:
     loop_var: role
 

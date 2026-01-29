@@ -4,11 +4,11 @@
     name: '{{ role }}'
     tasks_from: facts
   loop:
-    - k3s
-    - cert_manager
-    - external_dns
-    - victoria_metrics
-    - cilium
+    - bootstrap/k3s
+    - platform/cert_manager
+    - networking/external_dns
+    - observability/victoria_metrics
+    - networking/cilium
   loop_control:
     loop_var: role
 
@@ -197,25 +197,6 @@
         cmd: kubectl get nodes -o wide
       register: nodes_status
       changed_when: false
-    
-    - name: Update chart setup fact
-      ansible.builtin.set_fact:
-        cilium_setup: false
-
-    - name: Update chart setup values
-      kubernetes.core.helm:
-        chart_ref: '{{ cilium_map.helm.chart.reference }}'
-        chart_version: '{{ cilium_vars.kubernetes.helm.chart.version }}'
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
-        name: '{{ cilium_vars.kubernetes.helm.chart.name }}'
-        namespace: '{{ cilium_vars.kubernetes.namespace }}'
-        values: "{{ lookup('ansible.builtin.template', 'values.j2') | from_yaml }}"
-        update_repo_cache: true
-        wait: true
-      register: cilium_result
-      delay: 1
-      retries: 3
-      until: cilium_result is not failed
 
     - name: Create gateway
       when: cilium_vars.kubernetes.hubble.ui.enabled is truthy
