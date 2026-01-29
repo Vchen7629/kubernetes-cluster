@@ -1,7 +1,7 @@
 ---
 - name: Role Facts
   ansible.builtin.import_role:
-    name: k3s
+    name: bootstrap/k3s
     tasks_from: facts
 
 - name: Role Reset
