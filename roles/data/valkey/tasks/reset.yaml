@@ -1,17 +1,66 @@
-- name: Uninstall Valkey in argocd
-  kubernetes.core.k8s:
-    api_version: argoproj.io/v1alpha1
-    state: absent
-    kind: Application
-    name: valkey
-    namespace: argocd
-
-- name: Delete valkey namespace
-  kubernetes.core.k8s:
-    state: absent
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
+- name: Fully reset Valkey
+  block:
+    - name: Delete ArgoCD Application (stops reconciliation)
+      kubernetes.core.k8s:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
         name: valkey
+        namespace: argocd
+        state: absent
+        wait: true
+        wait_timeout: 60
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Delete valkey namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: valkey
+        state: absent
+        wait: false
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Wait for namespace deletion
+      ansible.builtin.shell: |
+        for i in {1..15}; do
+          if ! kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml get namespace valkey 2>/dev/null; then
+            echo "Namespace deleted successfully"
+            exit 0
+          fi
+          echo "Waiting for namespace deletion (attempt $i/15)..."
+          sleep 4
+        done
+        exit 1
+      register: ns_wait
+      failed_when: false
+      changed_when: false
+
+    # Fallback - force cleanup if namespace is stuck
+    - name: Force cleanup stuck namespace (fallback)
+      ansible.builtin.shell: |
+        echo "Namespace is stuck, applying force cleanup..."
+
+        # Remove finalizers from stuck pods/pvcs
+        kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml get pods,pvc -n valkey -o name 2>/dev/null | xargs -r -I {} kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml patch {} -n valkey -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Remove namespace finalizer
+        kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml patch namespace valkey -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Final verification
+        sleep 5
+        if kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml get namespace valkey 2>/dev/null; then
+          echo "WARNING: Namespace still exists after force cleanup"
+        else
+          echo "Namespace successfully deleted"
+        fi
+      ignore_errors: true
+      when: ns_wait.rc != 0
+
+    - name: Clean up orphaned PersistentVolumes
+      ansible.builtin.shell: |
+        kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml get pv -o json 2>/dev/null | jq -r '.items[] | select(.spec.claimRef.namespace=="valkey") | .metadata.name' 2>/dev/null | while read pv; do
+          [ -n "$pv" ] && kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml delete pv ${pv} 2>/dev/null || true
+        done
+      ignore_errors: true
