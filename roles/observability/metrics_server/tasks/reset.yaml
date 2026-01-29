@@ -19,24 +19,33 @@
         kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'                                                                             
       ignore_errors: true 
     
-    - name: Delete VMServiceScrape                                                                                                     
-      kubernetes.core.k8s:                                                                                                             
-        api_version: operator.victoriametrics.com/v1beta1                                                                              
-        kind: VMServiceScrape                                                                                                          
-        name: metrics-server                                                                                                           
-        namespace: '{{ metricsserver_vars.kubernetes.namespace }}'                                                                     
-        state: absent                                                                                                                  
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'                                                                             
+    - name: Check if VMServiceScrape CRD exists
+      ansible.builtin.shell: kubectl get crd vmservicescrapes.operator.victoriametrics.com --kubeconfig '{{ k3s_project.cluster.kubeconfig }}'
+      register: vmservicescrape_crd
+      failed_when: false
+      changed_when: false
+
+    - name: Delete VMServiceScrape
+      kubernetes.core.k8s:
+        api_version: operator.victoriametrics.com/v1beta1
+        kind: VMServiceScrape
+        name: metrics-server
+        namespace: '{{ metricsserver_vars.kubernetes.namespace }}'
+        state: absent
+        wait: true
+        wait_timeout: 60s
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      when: vmservicescrape_crd.rc == 0
       ignore_errors: true    
 
-    - name: Uninstall Helm chart                                                                                                       
-      kubernetes.core.helm:                                                                                                            
-        name: '{{ metricsserver_vars.kubernetes.helm.chart.name }}'                                                                    
-        namespace: '{{ metricsserver_vars.kubernetes.namespace }}'                                                                     
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'                                                                             
-        state: absent                                                                                                                  
-        wait: true                                                                                                                     
-        wait_timeout: 60                                                                                                               
+    - name: Uninstall Helm chart
+      kubernetes.core.helm:
+        name: '{{ metricsserver_vars.kubernetes.helm.chart.name }}'
+        namespace: '{{ metricsserver_vars.kubernetes.namespace }}'
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        state: absent
+        wait: true
+        wait_timeout: 60s
       ignore_errors: true 
 
     - name: Remove repository

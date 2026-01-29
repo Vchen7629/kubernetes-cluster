@@ -1,13 +1,24 @@
 - name: Fully reset ArgoCD
   block:
+    - name: Get all ArgoCD Applications
+      kubernetes.core.k8s_info:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
+        namespace: argocd
+      register: argocd_applications
+      ignore_errors: true
+
     - name: Delete all ArgoCD Applications (stops reconciliation)
       kubernetes.core.k8s:
         api_version: argoproj.io/v1alpha1
         kind: Application
+        name: "{{ item.metadata.name }}"
         namespace: argocd
         state: absent
         wait: true
-        wait_timeout: 60
+        wait_timeout: 120s
+      loop: "{{ argocd_applications.resources | default([]) }}"
+      when: argocd_applications.resources is defined
       ignore_errors: true
 
     - name: Delete ArgoCD validating webhooks (prevents blocking API calls)
