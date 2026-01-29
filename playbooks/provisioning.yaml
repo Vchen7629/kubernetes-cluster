@@ -25,7 +25,7 @@
     - 5
   tags: kubernetes
 
-- name: ArgoCD deployed applications provisioning
+- name: ArgoCD deployed cluster applications provisioning
   hosts: server
   become: true
   gather_facts: true
@@ -42,14 +42,26 @@
         loop_var: postinstall
   roles:
     - networking/cilium
-    - observability/victoria_metrics
     - bootstrap/argocd
+    - observability/victoria_metrics
     - observability/metrics_server
     - platform/cert_manager
-    - platform/airflow
     - networking/cloudflare_tunnel
     - networking/external_dns
     - data/postgres
     - data/valkey
-    - tenants/cyphria/frontend
   tags: charts
+
+- name: ArgoCD deployed cyphria tenant applications provisioning
+  hosts: server
+  become: true
+  gather_facts: true
+  roles:
+    - tenants/cyphria/frontend
+    - tenants/cyphria/insights_api
+    - tenants/cyphria/data_pipeline_ingestion
+    - tenants/cyphria/data_pipeline_llm_summary
+    - tenants/cyphria/data_pipeline_ranking_calculator
+    - tenants/cyphria/data_pipeline_sentiment_analysis
+    - platform/airflow
+  tags: cyphria
