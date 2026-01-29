@@ -10,7 +10,7 @@ data:
   FASTAPI_PORT: "8000"
   API_VERSION: "v1"
   # PostgreSQL connection details
-  DB_HOST: "timescaledb-cluster-pg17-rw.postgres.svc.cluster.local"
+  DB_HOST: "cyphria-postgres-cluster-rw.postgres.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "cyphria"
   # Valkey connection details
