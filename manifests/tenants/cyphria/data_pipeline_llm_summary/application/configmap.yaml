@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cyphria-llm-summary-config
+  annotations:
+    kubernetes.io/description: Non-sensitive application environment configuration values
+data:
+  PRODUCTION_MODE: "true"
+  FASTAPI_PORT: "8000"
+  # PostgreSQL connection details
+  DB_HOST: "cyphria-postgres-cluster-rw.postgres.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "cyphria"
+  
+  # LLM summarizer details
+  LLM_PROVIDER: openai
+  LLM_MODEL: gpt-5.2
+  LLM_TIMEOUT: 30 # seconds
+  LLM_MAX_RETRIES: 3

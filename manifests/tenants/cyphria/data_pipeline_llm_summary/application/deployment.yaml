@@ -24,3 +24,66 @@ spec:
             requests:
               cpu: 50m
               memory: 256Mi
+          env:
+            # Non-sensitive config from ConfigMap
+            - name: PRODUCTION_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-llm-summary-config
+                  key: PRODUCTION_MODE
+            - name: FASTAPI_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-llm-summary-config
+                  key: FASTAPI_PORT
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-llm-summary-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-llm-summary-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-llm-summary-config
+                  key: DB_NAME
+            - name: LLM_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-llm-summary-config
+                  key: LLM_PROVIDER
+            - name: LLM_MODEL
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-llm-summary-config
+                  key: LLM_MODEL
+            - name: LLM_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-llm-summary-config
+                  key: LLM_TIMEOUT
+            - name: LLM_MAX_RETRIES
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-llm-summary-config
+                  key: LLM_MAX_RETRIES
+            # Sensitive data from Secrets
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cyphria-user-secret
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: cyphria-user-secret
+                  key: password
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: llm-api-key
+                  key: API_KEY

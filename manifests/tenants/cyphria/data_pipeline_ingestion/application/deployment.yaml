@@ -29,27 +29,27 @@ spec:
             - name: PRODUCTION_MODE
               valueFrom:
                 configMapKeyRef:
-                  name: cyphria-insights-api-config
+                  name: cyphria-data-ingestion-config
                   key: PRODUCTION_MODE
             - name: FASTAPI_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: cyphria-insights-api-config
+                  name: cyphria-data-ingestion-config
                   key: FASTAPI_PORT
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: cyphria-insights-api-config
+                  name: cyphria-data-ingestion-config
                   key: DB_HOST
             - name: DB_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: cyphria-insights-api-config
+                  name: cyphria-data-ingestion-config
                   key: DB_PORT
             - name: DB_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: cyphria-insights-api-config
+                  name: cyphria-data-ingestion-config
                   key: DB_NAME
             # Sensitive data from Secrets
             - name: DB_USER
