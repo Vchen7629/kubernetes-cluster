@@ -24,3 +24,61 @@ spec:
             requests:
               cpu: 125m
               memory: 512Mi
+          env:
+            # Non-sensitive config from ConfigMap
+            - name: PRODUCTION_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: PRODUCTION_MODE
+            - name: FASTAPI_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: FASTAPI_PORT
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: DB_NAME
+            # Sensitive data from Secrets
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cyphria-user-secret
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: cyphria-user-secret
+                  key: password
+            - name: REDDIT_API_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: reddit-api-connection-secret
+                  key: REDDIT_API_CLIENT_ID
+            - name: REDDIT_API_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: reddit-api-connection-secret
+                  key: REDDIT_API_CLIENT_SECRET
+            - name: REDDIT_ACCOUNT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: reddit-api-connection-secret
+                  key: REDDIT_ACCOUNT_USERNAME
+            - name: REDDIT_ACCOUNT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: reddit-api-connection-secret
+                  key: REDDIT_ACCOUNT_PASSWORD
