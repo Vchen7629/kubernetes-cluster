@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: valkey-from-insights-api-access
+  namespace: valkey
+  annotations:
+    kubernetes.io/description: allows insights api to send requests to valkey to fetch data
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: valkey
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: cyphria-backend
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP

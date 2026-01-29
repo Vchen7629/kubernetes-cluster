@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2                                                                                                               
+kind: CiliumNetworkPolicy                                                                                                              
+metadata:                                                                                                                              
+  name: valkey-from-vm-scrape                                                                                             
+  namespace: valkey                                                                                                                    
+  annotations:                                                                                                                         
+    kubernetes.io/description: allows victoriametrics vmagent to scrape valkey metrics                                                 
+spec:                                                                                                                                  
+  endpointSelector:                                                                                                                    
+    matchLabels:                                                                                                                       
+      io.kubernetes.pod.namespace: valkey                                                                                              
+  ingress:                                                                                                                             
+    - fromEndpoints:                                                                                                                   
+        - matchLabels:                                                                                                                 
+            io.kubernetes.pod.namespace: victoria-metrics                                                                              
+      toPorts:                                                                                                                         
+        - ports:                                                                                                                       
+            - port: "9121"                                                                                                             
+              protocol: TCP 
