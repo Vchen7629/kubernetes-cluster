@@ -1,47 +1,163 @@
-- name: Uninstall Cert manager in argocd
-  kubernetes.core.k8s:
-    api_version: argoproj.io/v1alpha1
-    state: absent
-    kind: Application
-    name: cert-manager
-    namespace: argocd
-
-- name: Delete Cert manager Services
-  kubernetes.core.k8s:
-    state: absent
-    api_version: v1
-    kind: Service
-    name: "{{ item }}"
-    namespace: cert-manager
-  loop:
-    - cert-manager
-    - cert-manager-cainjector 
-    - cert-manager-webhook
-  ignore_errors: true
-
-- name: Delete cert-manager namespace
-  kubernetes.core.k8s:
-    state: absent
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
+- name: Fully reset cert-manager
+  block:
+    - name: Delete ArgoCD Application (stops reconciliation)
+      kubernetes.core.k8s:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
         name: cert-manager
+        namespace: argocd
+        state: absent
+        wait: true
+        wait_timeout: 60
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
 
-- name: Delete ArgoCD Secrets resourcs
-  ansible.builtin.command:
-    cmd: "{{ certificate_resource }}"
-  loop:
-    - kubectl -n cert-manager delete certificaterequests -l cert-manager.io/certificate-name=argocd-repo-tls
-    - kubectl -n cert-manager delete certificaterequests -l cert-manager.io/certificate-name=argocd-dex-tls
-    - kubectl -n cert-manager delete certificaterequests -l cert-manager.io/certificate-name=argocd-server-tls
-    - kubectl -n cert-manager delete certificaterequests -l cert-manager.io/certificate-name=postgres-db-tls
-    - kubectl -n cert-manager delete certificaterequests -l cert-manager.io/certificate-name=postgres-ca
-    - kubectl -n cert-manager delete orders -l cert-manager.io/certificate-name=argocd-repo-tls
-    - kubectl -n cert-manager delete orders -l cert-manager.io/certificate-name=argocd-dex-tls
-    - kubectl -n cert-manager delete orders -l cert-manager.io/certificate-name=argocd-server-tls
-    - kubectl -n cert-manager delete orders -l cert-manager.io/certificate-name=postgres-tls
-  loop_control:
-    loop_var: certificate_resource
-  ignore_errors: true
+    - name: Delete cert-manager validating webhook
+      kubernetes.core.k8s:
+        api_version: admissionregistration.k8s.io/v1
+        kind: ValidatingWebhookConfiguration
+        name: cert-manager-webhook
+        state: absent
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Delete cert-manager mutating webhook
+      kubernetes.core.k8s:
+        api_version: admissionregistration.k8s.io/v1
+        kind: MutatingWebhookConfiguration
+        name: cert-manager-webhook
+        state: absent
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Delete Certificates in argocd namespace
+      kubernetes.core.k8s:
+        api_version: cert-manager.io/v1
+        kind: Certificate
+        namespace: argocd
+        state: absent
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        label_selectors: []
+      ignore_errors: true
+
+    - name: Delete Certificates in cert-manager namespace
+      kubernetes.core.k8s:
+        api_version: cert-manager.io/v1
+        kind: Certificate
+        namespace: cert-manager
+        state: absent
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        label_selectors: []
+      ignore_errors: true
+
+    - name: Delete cert-manager custom resources in dependency order
+      ansible.builtin.shell: |
+        # Delete challenges and orders first (depend on certificates)
+        kubectl delete challenges.acme.cert-manager.io -n cert-manager --all --timeout=30s 2>/dev/null || true
+        kubectl delete orders.acme.cert-manager.io -n cert-manager --all --timeout=30s 2>/dev/null || true
+
+        # Delete certificate requests
+        kubectl delete certificaterequests.cert-manager.io -n cert-manager --all --timeout=30s 2>/dev/null || true
+        kubectl delete certificaterequests.cert-manager.io -n argocd --all --timeout=30s 2>/dev/null || true
+
+        # Delete issuers (namespace-scoped)
+        kubectl delete issuers.cert-manager.io -n cert-manager --all --timeout=30s 2>/dev/null || true
+      ignore_errors: true
+
+    - name: Delete CiliumNetworkPolicy resources
+      kubernetes.core.k8s:
+        api_version: cilium.io/v2
+        kind: CiliumNetworkPolicy
+        namespace: cert-manager
+        state: absent
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        label_selectors: []
+      ignore_errors: true
+
+    - name: Delete cert-manager namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: cert-manager
+        state: absent
+        wait: false
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Wait for namespace deletion
+      ansible.builtin.shell: |
+        for i in {1..15}; do
+          if ! kubectl get namespace cert-manager 2>/dev/null; then
+            echo "Namespace deleted successfully"
+            exit 0
+          fi
+          echo "Waiting for namespace deletion (attempt $i/15)..."
+          sleep 4
+        done
+        exit 1
+      register: ns_wait
+      failed_when: false
+      changed_when: false
+
+    - name: Force cleanup stuck namespace (fallback)
+      ansible.builtin.shell: |
+        echo "Namespace is stuck, applying force cleanup..."
+
+        # Remove finalizers from any remaining cert-manager resources
+        kubectl api-resources --api-group=cert-manager.io --namespaced -o name 2>/dev/null | while read resource_type; do
+          kubectl get ${resource_type} -n cert-manager -o name 2>/dev/null | while read resource; do
+            kubectl patch ${resource} -n cert-manager -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+          done
+        done
+
+        kubectl api-resources --api-group=acme.cert-manager.io --namespaced -o name 2>/dev/null | while read resource_type; do
+          kubectl get ${resource_type} -n cert-manager -o name 2>/dev/null | while read resource; do
+            kubectl patch ${resource} -n cert-manager -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+          done
+        done
+
+        # Remove finalizers from stuck pods/pvcs
+        kubectl get pods,pvc -n cert-manager -o name 2>/dev/null | xargs -r -I {} kubectl patch {} -n cert-manager -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Remove namespace finalizer
+        kubectl patch namespace cert-manager -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Final verification
+        sleep 5
+        if kubectl get namespace cert-manager 2>/dev/null; then
+          echo "WARNING: Namespace still exists after force cleanup"
+        else
+          echo "Namespace successfully deleted"
+        fi
+      ignore_errors: true
+      when: ns_wait.rc != 0
+
+    - name: Delete cluster-scoped ClusterIssuers
+      ansible.builtin.shell: |
+        kubectl delete clusterissuers.cert-manager.io --all --timeout=30s 2>/dev/null || {
+          # If stuck, remove finalizers
+          kubectl get clusterissuers.cert-manager.io -o name 2>/dev/null | while read issuer; do
+            kubectl patch ${issuer} -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+            kubectl delete ${issuer} 2>/dev/null || true
+          done
+        }
+      ignore_errors: true
+
+    - name: Delete cert-manager CRDs (cluster scoped resources)
+      ansible.builtin.shell: |
+        kubectl get crd -o name 2>/dev/null | grep -E '(cert-manager\.io|acme\.cert-manager\.io)' | while read crd; do
+          # Try graceful deletion first
+          kubectl delete ${crd} --timeout=30s 2>/dev/null || {
+            # If stuck, remove finalizer and force delete
+            kubectl patch ${crd} -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+            kubectl delete ${crd} 2>/dev/null || true
+          }
+        done
+      ignore_errors: true
+
+    - name: Clean up orphaned PersistentVolumes
+      ansible.builtin.shell: |
+        kubectl get pv -o json 2>/dev/null | jq -r '.items[] | select(.spec.claimRef.namespace=="cert-manager") | .metadata.name' 2>/dev/null | while read pv; do
+          [ -n "$pv" ] && kubectl delete pv ${pv} 2>/dev/null || true
+        done
+      ignore_errors: true
