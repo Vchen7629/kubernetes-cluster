@@ -27,10 +27,7 @@ service:
 metrics:
   enabled: true
 serviceMonitor:
-  enabled: true
-  interval: {{ metricsserver_map.metrics.service.monitor.scrape.interval }}
-  namespace: kube-system
-  scrapeTimeout: {{ metricsserver_map.metrics.service.monitor.scrape.timeout }}
+  enabled: false
 {% endif %}
 tls:
     clusterDomain: {{ k3s_vars.cluster.domain }}

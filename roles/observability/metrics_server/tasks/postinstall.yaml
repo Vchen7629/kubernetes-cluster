@@ -9,6 +9,12 @@
       ansible.builtin.set_fact:
         metricsserver_postinstall: true
 
+    - name: Deploy to crds (vm service monitor)
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('ansible.builtin.template', 'deploy_crds.yaml') | from_yaml }}"
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+
     - name: Update chart postinstall values
       kubernetes.core.helm:
         chart_ref: '{{ metricsserver_map.helm.chart.reference }}'

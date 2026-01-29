@@ -7,6 +7,38 @@
 - name: Role Reset
   when: inventory_hostname in k3s_map.server.hosts
   block:
+    - name: Delete ArgoCD Application (stops reconciliation)
+      kubernetes.core.k8s:                                                                                                             
+        api_version: argoproj.io/v1alpha1                                                                                              
+        kind: Application                                                                                                              
+        name: metrics-server                                                                                                           
+        namespace: argocd                                                                                                              
+        state: absent                                                                                                                  
+        wait: true                                                                                                                     
+        wait_timeout: 60                                                                                                               
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'                                                                             
+      ignore_errors: true 
+    
+    - name: Delete VMServiceScrape                                                                                                     
+      kubernetes.core.k8s:                                                                                                             
+        api_version: operator.victoriametrics.com/v1beta1                                                                              
+        kind: VMServiceScrape                                                                                                          
+        name: metrics-server                                                                                                           
+        namespace: '{{ metricsserver_vars.kubernetes.namespace }}'                                                                     
+        state: absent                                                                                                                  
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'                                                                             
+      ignore_errors: true    
+
+    - name: Uninstall Helm chart                                                                                                       
+      kubernetes.core.helm:                                                                                                            
+        name: '{{ metricsserver_vars.kubernetes.helm.chart.name }}'                                                                    
+        namespace: '{{ metricsserver_vars.kubernetes.namespace }}'                                                                     
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'                                                                             
+        state: absent                                                                                                                  
+        wait: true                                                                                                                     
+        wait_timeout: 60                                                                                                               
+      ignore_errors: true 
+
     - name: Remove repository
       kubernetes.core.helm_repository:
         name: '{{ metricsserver_vars.kubernetes.helm.repository.name }}'

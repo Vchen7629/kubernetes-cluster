@@ -1,0 +1,20 @@
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: metrics-server-service-monitor
+  namespace: victoria-metrics
+  labels:
+    app.kubernetes.io/instance: victoria-metrics
+    kubernetes.io/description: VMServiceScrape to scrape metrics for kubernetes metrics server
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: argo-cd
+  namespaceSelector:
+    matchNames:
+      - kube-system
+  endpoints:
+    - port: metrics
+      path: /metrics # argocd application controller metrics
+      interval: 30s
