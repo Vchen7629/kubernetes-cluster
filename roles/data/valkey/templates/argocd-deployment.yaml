@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: valkey
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - chart: '{{ valkey_vars.kubernetes.helm.chart.name }}'
+      repoURL: '{{ valkey_vars.kubernetes.helm.repository.url }}'
+      targetRevision: '{{ valkey_vars.kubernetes.helm.chart.version }}'
+    
+      helm: 
+        valuesObject:
+          resources:
+            limits: 
+              memory: '{{ valkey_vars.kubernetes.valkey.resources.limits.memory }}'
+            requests: 
+              cpu: '{{ valkey_vars.kubernetes.valkey.resources.limits.cpu }}'
+              memory: '{{ valkey_vars.kubernetes.valkey.resources.requests.memory }}'
+          metrics:
+            enabled: '{{ valkey_vars.kubernetes.metrics.enabled }}'  
+            resources:
+              limits: 
+                memory: '{{ valkey_vars.kubernetes.valkey.metrics.limits.memory }}'
+              requests: 
+                cpu: '{{ valkey_vars.kubernetes.valkey.metrics.limits.cpu }}'
+                memory: '{{ valkey_vars.kubernetes.valkey.metrics.requests.memory }}'
+
+  destination:
+  server: https://kubernetes.default.svc
+  namespace: '{{ valkey_vars.kubernetes.namespace }}'
+
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

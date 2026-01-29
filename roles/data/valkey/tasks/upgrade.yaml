@@ -1,0 +1,3 @@
+- name: Role Upgrade
+  ansible.builtin.include_tasks:
+    file: 'main.yaml'

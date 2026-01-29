@@ -1,0 +1,24 @@
+valkey_vars:
+  kubernetes:
+    valkey:
+      resources:
+        limits:
+          memory: 256Mi
+        requests:
+          cpu: 10m
+          memory: 128Mi
+    metrics:
+      enabled: true
+      resources:
+        limits:
+          memory: 128Mi
+        requests: 
+          cpu: 20m
+          memory: 64Mi
+    helm:
+      chart:
+        name: valkey
+        version: v0.9.3
+      repository:
+        url: https://valkey.io/valkey-helm/
+    namespace: valkey
