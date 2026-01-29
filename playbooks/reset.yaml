@@ -12,14 +12,11 @@
         name: "{{ reset }}"
         tasks_from: reset
       loop:
-        # - network_policies
-        # - prometheus
-        # - cert_manager
-        # - cloudflare_tunnel
-        # - external_dns
-        # - frontend
-        # - metrics_server
-        # - argo_cd
+        #- platform/cert_manager
+        #- networking/cloudflare_tunnel
+        #- networking/external_dns
+        #- observability/victoria_metrics
+        - bootstrap/argocd
         - networking/cilium
       loop_control:
         loop_var: reset
