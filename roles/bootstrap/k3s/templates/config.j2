@@ -2,8 +2,9 @@ data-dir: {{ k3s_map.node.directory.data }}
 {% if k3s_map.node.default_registry_endpoint.enabled is falsy %}
 disable-default-registry-endpoint: true
 {% endif %}
+node-ip: {{ ansible_host }}
 {% if k3s_node.service.type | lower == 'server' %}
-bind-address: {{ k3s_node.ip }}
+bind-address: {{ ansible_host }}
 cluster-domain: {{ k3s_vars.cluster.domain }}
 {% if k3s_map.server.ha is truthy and k3s_postinstall is falsy and inventory_hostname == k3s_map.server.default_host %}
 cluster-init: true
@@ -19,8 +20,8 @@ flannel-backend: none
 {% if k3s_map.server.ha %}
 etcd-expose-metrics: true
 {% endif %}
-kube-controller-manager-arg: bind-address={{ k3s_node.ip }}
-kube-scheduler-arg: bind-address={{ k3s_node.ip }}
+kube-controller-manager-arg: bind-address={{ ansible_host }}
+kube-scheduler-arg: bind-address={{ ansible_host }}
 {% endif %}
 kubelet-arg:
   - config={{ k3s_project.cluster.config_kubelet }}

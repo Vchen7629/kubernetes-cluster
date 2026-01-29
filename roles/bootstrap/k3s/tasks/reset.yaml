@@ -21,14 +21,16 @@
       become: true
 
     - name: Wait until k3s and k3s-agent services are fully stopped
-      ansible.builtin.command: systemctl is-active {{ item }}
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
       register: service_status
       retries: 5
       delay: 2
-      until: service_status.rc != 0
+      until: service_status.status.ActiveState in ['inactive', 'failed']
       with_items:
         - k3s
         - k3s-agent
+      failed_when: false
       ignore_errors: true
     
     - name: Clear old k3s-agent state
@@ -42,14 +44,16 @@
     
     - name: Kill lingering K3s and container processes
       ansible.builtin.shell: |
-        pkill -f k3s || true
-        pkill -f containerd-shim || true
-        pkill -f containerd || true
-        pkill -f kubelet || true
+        set -e
+        pkill -9 -f k3s 2>/dev/null || true
+        pkill -9 -f containerd-shim 2>/dev/null || true
+        pkill -9 -f containerd 2>/dev/null || true
+        pkill -9 -f kubelet 2>/dev/null || true
+        sleep 1
       args:
         executable: /bin/bash
       become: true
-      ignore_errors: true
+      failed_when: false
     
     - name: Remove leftover CNI interfaces
       ansible.builtin.shell: |
