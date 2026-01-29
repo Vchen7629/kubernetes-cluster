@@ -65,7 +65,10 @@ resources:
     cpu: {{ cilium_vars.kubernetes.agent.resources.requests.cpu }}
     memory: {{ cilium_vars.kubernetes.agent.resources.requests.memory }}
 rollOutCiliumPods: true
-{% if cilium_map.metrics.enabled is truthy %}
+{% if cilium_map.metrics.enabled is truthy and cilium_setup is defined and not cilium_setup %}
+prometheus:
+  serviceMonitor:
+    trustCRDsExist: true
 envoy:
   prometheus:
     serviceMonitor:
@@ -83,7 +86,7 @@ hubble:
       enabled: {{ cilium_vars.kubernetes.dashboards.enabled | lower }}
     enabled:
       {{ cilium_vars.kubernetes.hubble.metrics | to_nice_yaml | trim | indent(6) }}
-{% if cilium_map.metrics.enabled is truthy %}
+{% if cilium_map.metrics.enabled is truthy and cilium_setup is defined and not cilium_setup %}
     serviceMonitor:
       enabled: true
     interval: {{ cilium_map.metrics.scrape.interval }}
@@ -96,7 +99,7 @@ hubble:
     enabled: true
     podDisruptionBudget:
       enabled: true
-{% if cilium_map.metrics.enabled is truthy %}
+{% if cilium_map.metrics.enabled is truthy and cilium_setup is defined and not cilium_setup %}
     prometheus:
       enabled: true
       serviceMonitor:
@@ -144,7 +147,7 @@ hubble:
       replicas: {{ cilium_vars.kubernetes.hubble.ui.replicas }}
     rollOutPods: true
 {% endif %}
-{% if cilium_vars.kubernetes.hubble.tls.auto.method | lower == 'certmanager' %}
+{% if cilium_vars.kubernetes.hubble.tls.auto.method | lower == 'certmanager' and cilium_setup is defined and not cilium_setup %}
   tls:
     auto:
       certManagerIssuerRef:
