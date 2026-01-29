@@ -1,74 +1,128 @@
 - name: Fully reset Victoria-metrics
   block:
-    - name: Delete Victoria Metrics webhooks first
-      ansible.builtin.shell: |
-        kubectl delete validatingwebhookconfigurations -l app.kubernetes.io/name=victoria-metrics-operator 2>/dev/null || true
-        kubectl delete mutatingwebhookconfigurations -l app.kubernetes.io/name=victoria-metrics-operator 2>/dev/null || true
-        kubectl get validatingwebhookconfigurations,mutatingwebhookconfigurations -o name 2>/dev/null | grep -E '(vm-|victoria)' | xargs -r kubectl delete 2>/dev/null || true
-      ignore_errors: true
-
-    - name: Remove ArgoCD Application finalizers
-      ansible.builtin.shell: |
-        kubectl patch application vm-stack -n argocd -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
-        kubectl patch application vm-crds -n argocd -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
-      ignore_errors: true
-
-    - name: Delete ArgoCD Applications
+    - name: Delete ArgoCD Applications (stops reconciliation)
       kubernetes.core.k8s:
         api_version: argoproj.io/v1alpha1
         kind: Application
         name: "{{ item }}"
         namespace: argocd
         state: absent
+        wait: true
+        wait_timeout: 60
       loop:
         - vm-stack
         - vm-crds
       ignore_errors: true
 
-    - name: Nuclear option - Force delete everything
+    - name: Scale down Victoria Metrics operator
       ansible.builtin.shell: |
-        echo "=== NUCLEAR CLEANUP START ==="
-
-        # Step 1: Remove ALL finalizers from ALL Victoria Metrics CRDs
-        echo "Step 1: Removing finalizers from VM CRDs..."
-        for resource_type in vmagents vmalertmanagers vmsingles vmalerts vmauths vmclusters vmnodescrapes vmpodscrapes vmprobes vmrules vmservicescrapes vmstaticscrapes vmscrapeconfigs vmusers vmalertmanagerconfigs vlogs vlsingles vlclusters vlagents vtsingles vtclusters vmanomalies; do
-          kubectl get ${resource_type}.operator.victoriametrics.com -n victoria-metrics -o name 2>/dev/null | xargs -r -I {} kubectl patch {} -n victoria-metrics -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
-        done
-
-        # Step 2: Force delete all VM CRDs
-        echo "Step 2: Force deleting VM CRDs..."
-        kubectl api-resources --api-group=operator.victoriametrics.com --namespaced -o name 2>/dev/null | xargs -r -I {} kubectl delete {} --all -n victoria-metrics --force --grace-period=0 2>/dev/null || true
-
-        # Step 3: Remove finalizers from standard resources
-        echo "Step 3: Removing finalizers from standard resources..."
-        for resourcetype in statefulsets deployments daemonsets replicasets services secrets serviceaccounts configmaps pvc pods; do
-          kubectl get ${resourcetype} -n victoria-metrics -o name 2>/dev/null | xargs -r -I {} kubectl patch {} -n victoria-metrics -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
-        done
-
-        # Step 4: Force delete standard resources
-        echo "Step 4: Force deleting standard resources..."
-        kubectl delete all --all -n victoria-metrics --force --grace-period=0 2>/dev/null || true
-        kubectl delete pvc,secret,configmap,serviceaccount --all -n victoria-metrics --force --grace-period=0 2>/dev/null || true
-
-        # Step 5: Remove namespace finalizer
-        echo "Step 5: Removing namespace finalizer..."
-        kubectl patch namespace victoria-metrics -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
-
-        echo "=== NUCLEAR CLEANUP COMPLETE ==="
+        kubectl scale deployment -n victoria-metrics -l app.kubernetes.io/name=victoria-metrics-operator --replicas=0 2>/dev/null || true
+        sleep 5
       ignore_errors: true
 
-    - name: Delete victoria-metrics namespace
+    - name: Delete Victoria Metrics operator deployment
+      kubernetes.core.k8s:
+        api_version: apps/v1
+        kind: Deployment
+        namespace: victoria-metrics
+        label_selectors:
+          - app.kubernetes.io/name=victoria-metrics-operator
+        state: absent
+        wait: false
+      ignore_errors: true
+
+    - name: Delete Victoria Metrics webhooks (to prevent blocking API calls)
+      ansible.builtin.shell: |
+        kubectl delete validatingwebhookconfigurations -l app.kubernetes.io/name=victoria-metrics-operator 2>/dev/null || true
+        kubectl delete mutatingwebhookconfigurations -l app.kubernetes.io/name=victoria-metrics-operator 2>/dev/null || true
+        kubectl get validatingwebhookconfigurations,mutatingwebhookconfigurations -o name 2>/dev/null | grep -E '(vm-|victoria)' | xargs -r kubectl delete 2>/dev/null || true
+      ignore_errors: true
+
+    - name: Delete Victoria Metrics custom resources in dependency order
+      ansible.builtin.shell: |
+        # Delete monitoring resources first (they depend on agents)
+        for resource_type in vmrules vmservicescrapes vmpodscrapes vmnodescrapes vmprobes vmstaticscrapes vmscrapeconfigs; do
+          kubectl delete ${resource_type}.operator.victoriametrics.com -n victoria-metrics --all --timeout=30s 2>/dev/null || true
+        done
+
+        # Delete VM components
+        for resource_type in vmagents vmalerts vmalertmanagers vmalertmanagerconfigs vmauths vmusers; do
+          kubectl delete ${resource_type}.operator.victoriametrics.com -n victoria-metrics --all --timeout=30s 2>/dev/null || true
+        done
+
+        # Delete VM storage clusters/singles
+        for resource_type in vmsingles vmclusters vlogs vlsingles vlclusters vlagents vtsingles vtclusters vmanomalies; do
+          kubectl delete ${resource_type}.operator.victoriametrics.com -n victoria-metrics --all --timeout=30s 2>/dev/null || true
+        done
+      ignore_errors: true
+
+    - name: Delete remaining resources in namespace
       kubernetes.core.k8s:
         api_version: v1
         kind: Namespace
         name: victoria-metrics
         state: absent
-        wait: true
-        wait_timeout: 300
+        wait: false
+      ignore_errors: true
+
+    - name: Wait for namespace deletion
+      ansible.builtin.shell: |
+        for i in {1..15}; do
+          if ! kubectl get namespace victoria-metrics 2>/dev/null; then
+            echo "Namespace deleted successfully"
+            exit 0
+          fi
+          echo "Waiting for namespace deletion (attempt $i/15)..."
+          sleep 4
+        done
+        exit 1
+      register: ns_wait
+      failed_when: false
+      changed_when: false
+
+    # Fallback - force cleanup if namespace is stuck
+    - name: Force cleanup stuck namespace (fallback)
+      ansible.builtin.shell: |
+        echo "Namespace is stuck, applying force cleanup..."
+
+        # Remove finalizers from any remaining VM resources
+        kubectl api-resources --api-group=operator.victoriametrics.com --namespaced -o name 2>/dev/null | while read resource_type; do
+          kubectl get ${resource_type} -n victoria-metrics -o name 2>/dev/null | while read resource; do
+            kubectl patch ${resource} -n victoria-metrics -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+          done
+        done
+
+        # Remove finalizers from stuck pods/pvcs
+        kubectl get pods,pvc -n victoria-metrics -o name 2>/dev/null | xargs -r -I {} kubectl patch {} -n victoria-metrics -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Remove namespace finalizer
+        kubectl patch namespace victoria-metrics -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Final verification
+        sleep 5
+        if kubectl get namespace victoria-metrics 2>/dev/null; then
+          echo "WARNING: Namespace still exists after force cleanup"
+        else
+          echo "Namespace successfully deleted"
+        fi
+      ignore_errors: true
+      when: ns_wait.rc != 0
+
+    - name: Delete Victoria Metrics CRDs (cluster scoped resources)
+      ansible.builtin.shell: |
+        kubectl get crd -o name 2>/dev/null | grep victoriametrics.com | while read crd; do
+          # Try graceful deletion first
+          kubectl delete ${crd} --timeout=30s 2>/dev/null || {
+            # If stuck, remove finalizer and force delete
+            kubectl patch ${crd} -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+            kubectl delete ${crd} 2>/dev/null || true
+          }
+        done
+      ignore_errors: true
 
     - name: Clean up orphaned PersistentVolumes
       ansible.builtin.shell: |
-        kubectl get pv -o json | jq -r '.items[] | select(.spec.claimRef.namespace=="victoria-metrics") | .metadata.name' 2>/dev/null | while read pv; do
-          kubectl delete pv ${pv} --force --grace-period=0 || true
+        kubectl get pv -o json 2>/dev/null | jq -r '.items[] | select(.spec.claimRef.namespace=="victoria-metrics") | .metadata.name' 2>/dev/null | while read pv; do
+          [ -n "$pv" ] && kubectl delete pv ${pv} 2>/dev/null || true
         done
       ignore_errors: true
