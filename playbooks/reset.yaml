@@ -17,6 +17,7 @@
         - networking/external_dns
         - observability/victoria_metrics
         - data/postgres
+        - observability/metrics_server
         - bootstrap/argocd
         - networking/cilium
       loop_control:
