@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: airflow-to-data-pipeline
+  namespace: airflow
+  annotations:
+    kubernetes.io/description: network policy allowing airflow to access the data pipeline services to invoke the runs
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: airflow
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: cyphria-data-pipeline
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
