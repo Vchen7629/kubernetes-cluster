@@ -8,9 +8,6 @@ resources:
   - application/configmap.yaml
   - application/service.yaml
 
-  # secrets
-  - secrets/reddit.yaml
-
   # network policies (egress)
   - network-policy/egress-to-data.yaml
   - network-policy/egress-to-kube-dns.yaml

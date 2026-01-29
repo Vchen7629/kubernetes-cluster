@@ -1,3 +1,31 @@
+- name: Set Reddit client credentials
+  vars:
+    env_data: "{{ lookup('ansible.builtin.template', 'reddit_env.yaml' ) | from_yaml }}"
+  ansible.builtin.set_fact:
+    reddit_api_client_id: "{{ env_data['REDDIT_API_CLIENT_ID'] }}"
+    reddit_api_client_secret: "{{ env_data['REDDIT_API_CLIENT_SECRET'] }}"
+    reddit_account_username: "{{ env_data['REDDIT_ACCOUNT_USERNAME'] }}"
+    reddit_account_password: "{{ env_data['REDDIT_ACCOUNT_PASSWORD'] }}"
+
+- name: Create Reddit API Secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: reddit-api-connection-secret
+        namespace: cyphria-data-pipeline
+        annotations:
+          kubernetes.io/description: Reddit api client connection credentials secret
+      stringData:
+        REDDIT_API_CLIENT_ID: "{{ reddit_api_client_id }}"
+        REDDIT_API_CLIENT_SECRET: "{{ reddit_api_client_secret }}"
+        REDDIT_ACCOUNT_USERNAME: "{{ reddit_account_username }}"
+        REDDIT_ACCOUNT_PASSWORD: "{{ reddit_account_password }}"
+
 - name: Deploy data ingestion crds (deployment, service, hpa, network-policies)
   kubernetes.core.k8s:
     state: present

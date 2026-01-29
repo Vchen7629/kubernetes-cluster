@@ -1,3 +1,14 @@
+- name: Delete reddit api secret for data ingestion
+  kubernetes.core.k8s:
+    state: absent
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: reddit-api-connection-secret
+        namespace: cyphria-data-pipeline
+
 - name: Uninstall data ingestion application in argocd
   kubernetes.core.k8s:
     api_version: argoproj.io/v1alpha1
