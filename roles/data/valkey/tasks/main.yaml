@@ -1,8 +1,3 @@
-- name: Role Facts
-  ansible.builtin.include_role:
-    name: data/valkey
-    tasks_from: facts
-
 - name: Create namespaces
   kubernetes.core.k8s:
     state: present
