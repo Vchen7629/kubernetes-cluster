@@ -1,129 +1,153 @@
-- name: Delete PostgreSQL resources
+- name: Fully reset PostgreSQL (CNPG)
   block:
-  - name: Delete PostgreSQL Cluster
-    kubernetes.core.k8s:
-      api_version: postgresql.cnpg.io/v1
-      kind: Cluster
-      name: timescaledb-cluster-pg17
-      namespace: postgres
-      state: absent
-      wait: true
-      wait_timeout: 300
-    ignore_errors: true
+    - name: Delete ArgoCD Applications (stops reconciliation)
+      kubernetes.core.k8s:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
+        name: "{{ item }}"
+        namespace: argocd
+        state: absent
+        wait: true
+        wait_timeout: 60
+      loop:
+        - postgres-operator
+        - postgres-crds
+      ignore_errors: true
 
-  - name: Delete ScheduledBackup
-    kubernetes.core.k8s:
-      api_version: postgresql.cnpg.io/v1
-      kind: ScheduledBackup
-      name: timescaledb-weekly-backup
-      namespace: postgres
-      state: absent
-      wait: true
-      wait_timeout: 120
-    ignore_errors: true
+    - name: Scale down CNPG operator
+      ansible.builtin.shell: |
+        kubectl scale deployment -n postgres -l app.kubernetes.io/name=cloudnative-pg --replicas=0 2>/dev/null || true
+        sleep 5
+      ignore_errors: true
 
-  - name: Wait briefly for cluster pods to terminate
-    kubernetes.core.k8s_info:
-      kind: Pod
-      namespace: postgres
-      label_selectors:
-        - "cnpg.io/cluster=timescaledb-cluster-pg17"
-    register: postgres_pods
-    until: postgres_pods.resources | length == 0
-    retries: 5
-    delay: 5
-    ignore_errors: true
+    - name: Delete CNPG operator deployment
+      kubernetes.core.k8s:
+        api_version: apps/v1
+        kind: Deployment
+        name: postgres-operator-cloudnative-pg
+        namespace: postgres
+        state: absent
+        wait: false
+      ignore_errors: true
 
-  - name: Force delete any stuck cluster pods
-    ansible.builtin.shell:
-      cmd: kubectl delete pods -n postgres -l cnpg.io/cluster=timescaledb-cluster-pg17 --force --grace-period=0
-    ignore_errors: true
+    - name: Delete CNPG webhooks (to prevent blocking API calls)
+      ansible.builtin.shell: |
+        kubectl delete validatingwebhookconfigurations -l app.kubernetes.io/name=cloudnative-pg 2>/dev/null || true
+        kubectl delete mutatingwebhookconfigurations -l app.kubernetes.io/name=cloudnative-pg 2>/dev/null || true
+        kubectl get validatingwebhookconfigurations,mutatingwebhookconfigurations -o name 2>/dev/null | grep -E 'cnpg|cloudnative-pg' | xargs -r kubectl delete 2>/dev/null || true
+      ignore_errors: true
 
-  - name: Delete PostgreSQL PVCs
-    kubernetes.core.k8s:
-      api_version: v1
-      kind: PersistentVolumeClaim
-      namespace: postgres
-      state: absent
-      label_selectors:
-        - "cnpg.io/cluster=timescaledb-cluster-pg17"
-      wait: false
-    ignore_errors: true
+    - name: Delete CNPG custom resources in dependency order
+      ansible.builtin.shell: |
+        # Delete backups and scheduled backups first
+        kubectl delete scheduledbackups.postgresql.cnpg.io -n postgres --all --timeout=30s 2>/dev/null || true
+        kubectl delete backups.postgresql.cnpg.io -n postgres --all --timeout=30s 2>/dev/null || true
 
-  - name: Delete ImageCatalog
-    kubernetes.core.k8s:
-      api_version: postgresql.cnpg.io/v1
-      kind: ImageCatalog
-      name: cloudnative-pg-timescaledb-pg17
-      namespace: postgres
-      state: absent
-      wait: true
-      wait_timeout: 60
-    ignore_errors: true
+        # Delete dependent resources
+        kubectl delete poolers.postgresql.cnpg.io -n postgres --all --timeout=30s 2>/dev/null || true
+        kubectl delete databases.postgresql.cnpg.io -n postgres --all --timeout=30s 2>/dev/null || true
+        kubectl delete publications.postgresql.cnpg.io -n postgres --all --timeout=30s 2>/dev/null || true
+        kubectl delete subscriptions.postgresql.cnpg.io -n postgres --all --timeout=30s 2>/dev/null || true
 
-  - name: Delete Postgres Operator Application
-    kubernetes.core.k8s:
-      api_version: argoproj.io/v1alpha1
-      kind: Application
-      name: postgres-operator
-      namespace: argocd
-      state: absent
-      wait: false
-    ignore_errors: true
+        # Delete cluster last (it owns the pods and PVCs)
+        kubectl delete clusters.postgresql.cnpg.io -n postgres --all --timeout=30s 2>/dev/null || true
+      ignore_errors: true
 
-  - name: Delete Postgres CRDs Application
-    kubernetes.core.k8s:
-      api_version: argoproj.io/v1alpha1
-      kind: Application
-      name: postgres-crds
-      namespace: argocd
-      state: absent
-      wait: false
-    ignore_errors: true
+    - name: Wait for cluster pods to terminate
+      ansible.builtin.shell: |
+        for i in {1..15}; do
+          pod_count=$(kubectl get pods -n postgres -l cnpg.io/cluster=cyphria-postgres-cluster 2>/dev/null | grep -v NAME | wc -l)
+          if [ "$pod_count" -eq 0 ]; then
+            echo "All cluster pods terminated successfully"
+            exit 0
+          fi
+          echo "Waiting for cluster pods to terminate (attempt $i/15, remaining: $pod_count)..."
+          sleep 4
+        done
+        exit 1
+      register: pod_wait
+      failed_when: false
+      changed_when: false
 
-  - name: Delete orphaned operator deployment
-    kubernetes.core.k8s:
-      api_version: apps/v1
-      kind: Deployment
-      name: postgres-operator-cloudnative-pg
-      namespace: postgres
-      state: absent
-      wait: false
-    ignore_errors: true
+    - name: Force delete stuck cluster pods (fallback)
+      ansible.builtin.shell: |
+        kubectl delete pods -n postgres -l cnpg.io/cluster=cyphria-postgres-cluster --force --grace-period=0 2>/dev/null || true
+      ignore_errors: true
+      when: pod_wait.rc != 0
 
-  - name: Delete orphaned webhook service
-    kubernetes.core.k8s:
-      api_version: v1
-      kind: Service
-      name: cnpg-webhook-service
-      namespace: postgres
-      state: absent
-    ignore_errors: true
+    - name: Delete postgres namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: postgres
+        state: absent
+        wait: false
+      ignore_errors: true
 
-  - name: Wait briefly for resources to terminate
-    ansible.builtin.pause:
-      seconds: 10
+    - name: Wait for namespace deletion
+      ansible.builtin.shell: |
+        for i in {1..15}; do
+          if ! kubectl get namespace postgres 2>/dev/null; then
+            echo "Namespace deleted successfully"
+            exit 0
+          fi
+          echo "Waiting for namespace deletion (attempt $i/15)..."
+          sleep 4
+        done
+        exit 1
+      register: ns_wait
+      failed_when: false
+      changed_when: false
 
-  - name: Delete CNPG CRDs
-    kubernetes.core.k8s:
-      api_version: apiextensions.k8s.io/v1
-      kind: CustomResourceDefinition
-      name: "{{ item }}"
-      state: absent
-      wait: false
-    loop:
-      - backups.postgresql.cnpg.io
-      - clusterimagecatalogs.postgresql.cnpg.io
-      #- clusters.postgresql.cnpg.io
-      - databases.postgresql.cnpg.io
-      - imagecatalogs.postgresql.cnpg.io
-      - poolers.postgresql.cnpg.io
-      - publications.postgresql.cnpg.io
-      - scheduledbackups.postgresql.cnpg.io
-      - subscriptions.postgresql.cnpg.io
-    ignore_errors: true
+    # Fallback - force cleanup if namespace is stuck
+    - name: Force cleanup stuck namespace (fallback)
+      ansible.builtin.shell: |
+        echo "Namespace is stuck, applying force cleanup..."
 
-  - name: Clear PersistentVolume claimRef
-    ansible.builtin.shell:
-      cmd: kubectl patch pv hard-drive-pv -p '{"spec":{"claimRef":null}}'
-    ignore_errors: true
+        # Remove finalizers from any remaining CNPG resources
+        kubectl api-resources --api-group=postgresql.cnpg.io --namespaced -o name 2>/dev/null | while read resource_type; do
+          kubectl get ${resource_type} -n postgres -o name 2>/dev/null | while read resource; do
+            kubectl patch ${resource} -n postgres -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+          done
+        done
+
+        # Remove finalizers from stuck pods/pvcs
+        kubectl get pods,pvc -n postgres -o name 2>/dev/null | xargs -r -I {} kubectl patch {} -n postgres -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Remove namespace finalizer
+        kubectl patch namespace postgres -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Final verification
+        sleep 5
+        if kubectl get namespace postgres 2>/dev/null; then
+          echo "WARNING: Namespace still exists after force cleanup"
+        else
+          echo "Namespace successfully deleted"
+        fi
+      ignore_errors: true
+      when: ns_wait.rc != 0
+
+    - name: Delete CNPG CRDs (cluster scoped resources)
+      ansible.builtin.shell: |
+        kubectl get crd -o name 2>/dev/null | grep postgresql.cnpg.io | while read crd; do
+          # Try graceful deletion first
+          kubectl delete ${crd} --timeout=30s 2>/dev/null || {
+            # If stuck, remove finalizer and force delete
+            kubectl patch ${crd} -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+            kubectl delete ${crd} 2>/dev/null || true
+          }
+        done
+      ignore_errors: true
+
+    - name: Clean up orphaned PersistentVolumes
+      ansible.builtin.shell: |
+        # Clean up PVs bound to postgres namespace
+        kubectl get pv -o json 2>/dev/null | jq -r '.items[] | select(.spec.claimRef.namespace=="postgres") | .metadata.name' 2>/dev/null | while read pv; do
+          [ -n "$pv" ] && kubectl delete pv ${pv} 2>/dev/null || true
+        done
+
+        # Also clear the hard-drive-pv claimRef if it exists
+        if kubectl get pv hard-drive-pv 2>/dev/null; then
+          kubectl patch pv hard-drive-pv -p '{"spec":{"claimRef":null}}' --type=merge 2>/dev/null || true
+        fi
+      ignore_errors: true
