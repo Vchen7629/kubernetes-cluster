@@ -13,5 +13,6 @@ resources:
   - network-policy/ingress-from-kube-apiserver.yaml
   - network-policy/ingress-from-observability.yaml
 
-  # observability (dashboard)
-  - observability/cert-manager-dashboard.yaml
+  # observability
+  - observability/dashboard.yaml
+  - observability/service-monitor.yaml

@@ -1,0 +1,20 @@
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: cert-manager-service-monitor
+  namespace: victoria-metrics
+  labels:
+    app.kubernetes.io/instance: victoria-metrics
+    kubernetes.io/description: VMServiceScrape to scrape metrics for cert manager
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: argo-cd
+  namespaceSelector:
+    matchNames:
+      - cert-manager
+  endpoints:
+    - port: metrics
+      path: /metrics # argocd application controller metrics
+      interval: 30s
