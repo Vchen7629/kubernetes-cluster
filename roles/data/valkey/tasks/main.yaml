@@ -1,6 +1,6 @@
 - name: Role Facts
   ansible.builtin.include_role:
-    name: valkey
+    name: data/valkey
     tasks_from: facts
 
 - name: Create namespaces
