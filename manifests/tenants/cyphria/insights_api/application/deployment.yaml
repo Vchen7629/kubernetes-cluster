@@ -5,7 +5,7 @@ metadata:
   name: cyphria-insights-api-deployment
   labels:
     app.kubernetes.io/name: cyphria-insights-api
-    kubernetes.io/description: "deployment for cyphria insights api docker container, specifies resources"
+    kubernetes.io/description: "deployment for cyphria insights api docker container, resources, and env variables"
 spec:
   selector:
     matchLabels:
@@ -24,3 +24,61 @@ spec:
             requests:
               cpu: 250m
               memory: 512Mi
+          env:
+            # Non-sensitive config from ConfigMap
+            - name: PRODUCTION_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: PRODUCTION_MODE
+            - name: FASTAPI_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: FASTAPI_PORT
+            - name: API_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: API_VERSION
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: DB_NAME
+            - name: CACHE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: CACHE_HOST
+            - name: CACHE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: CACHE_PORT
+            - name: MAX_CONNECTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: cyphria-insights-api-config
+                  key: MAX_CONNECTIONS
+            # Sensitive data from Secrets
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cyphria-user-secret
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: cyphria-user-secret
+                  key: password

@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   # Application related resources
   - application/deployment.yaml
+  - application/configmap.yaml
   - application/service.yaml
   - application/autoscaler.yaml
 
