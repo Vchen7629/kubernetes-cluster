@@ -46,8 +46,10 @@
     - bootstrap/argocd
     - observability/metrics_server
     - platform/cert_manager
-    - networking/nginx
+    - platform/airflow
     - networking/cloudflare_tunnel
     - networking/external_dns
+    - data/postgres
+    - data/valkey
     - tenants/cyphria/frontend
   tags: charts
