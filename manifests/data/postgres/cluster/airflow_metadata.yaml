@@ -1,0 +1,46 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: airflow-metadata-postgres-cluster
+  namespace: postgres
+  annotations:
+    kubernetes.io/description: cluster yaml file to bootstrap minimal cnpg cluster for airflow metadata
+spec:
+  instances: 1
+
+  # Creating the database with the user secret
+  bootstrap:
+    initdb:
+      database: airflow
+      owner: airflow_user
+      postInitApplicationSQLRefs:
+        configMapRefs:
+          - name: airflow-init-schema
+            key: schema.sql
+
+  # Minimal storage configuration
+  storage:
+    pvcTemplate:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: local-path
+      volumeMode: Filesystem
+
+  postgresql:
+    # Allow connections to airflow database
+    pg_hba:
+      - hostssl airflow airflow_user 10.0.0.0/16 scram-sha-256
+
+  resources:
+    limits:
+      memory: "512Mi"
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+
+  monitoring:
+    enablePodMonitor: true

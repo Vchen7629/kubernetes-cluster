@@ -5,9 +5,13 @@ metadata:
   name: airflow-init-schema
   namespace: postgres
 data:
-  init.sql: |-
-    -- Create Airflow metadata database and user;
-    CREATE USER airflow_user WITH PASSWORD 'adskjkaddwasd-2323!!';
-    REVOKE ALL ON DATABASE airflow FROM cyphria_user;
+  schema.sql: |-
+    -- Airflow will create its own tables on first run
+    -- This file can be used for any pre-initialization needed
+    -- For now, just ensure the airflow_user has proper permissions
 
-    CREATE DATABASE airflow OWNER airflow_user
+    -- Grant all privileges on the database to airflow_user (already owner, but being explicit)
+    GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow_user;
+
+    -- Grant schema usage
+    GRANT ALL ON SCHEMA public TO airflow_user;

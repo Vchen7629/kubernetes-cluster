@@ -2,18 +2,11 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: timescaledb-cluster-pg17
+  name: cyphria-postgres-cluster
+  annotations:
+    kubernetes.io/description: cluster yaml file to bootstrap cnpg cluster for cyphria
 spec:
   instances: 1
-  # referencing imageCatalog to use timescale extension with postgres
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ImageCatalog
-    name: cloudnative-pg-timescaledb-pg17
-    major: 17
-  # timescale/timescaledb image uses UID/GID 70 for postgres user
-  postgresUID: 70
-  postgresGID: 70
   # Database PVC (HDD)
   storage:
     pvcTemplate:
@@ -37,22 +30,18 @@ spec:
   # Creating the database with the user secret
   bootstrap:
     initdb:
-      database: app
-      owner: postgres
+      database: cyphria
+      owner: cyphria_user
       postInitApplicationSQLRefs:
         configMapRefs:
           - name: cyphria-init-schema
-            key: init.sql
-          - name: airflow-init-schema
-            key: init.sql
+            key: schema.sql
 
   postgresql:
-    # only allow connections over ssl/tls, to app database,
-    # app_user user, from the ip range, and using password
+    # only allow connections over ssl/tls, to cyphria database,
+    # from the ip range, and using password authentication
     pg_hba:
-      - hostssl app tiamat 10.0.0.0/16 scram-sha-256
-    shared_preload_libraries:
-      - "timescaledb"
+      - hostssl cyphria cyphria_user 10.0.0.0/16 scram-sha-256
     parameters:
       max_wal_size: "4GB"
       max_wal_senders: "3"
