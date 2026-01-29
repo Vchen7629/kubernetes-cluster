@@ -20,7 +20,7 @@
         # - frontend
         # - metrics_server
         # - argo_cd
-        - cilium
+        - networking/cilium
       loop_control:
         loop_var: reset
 
@@ -29,8 +29,8 @@
         name: "{{ reset }}"
         tasks_from: reset
       loop:
-        - cluster
-        - k3s
+        - bootstrap/cluster
+        - bootstrap/k3s
       loop_control:
         loop_var: reset
 
@@ -47,8 +47,8 @@
         name: "{{ reset }}"
         tasks_from: reset
       loop:
-        - cluster
-        - k3s
+        - bootstrap/cluster
+        - bootstrap/k3s
       loop_control:
         loop_var: reset
 
