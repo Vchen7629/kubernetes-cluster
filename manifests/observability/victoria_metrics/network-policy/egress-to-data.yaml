@@ -18,3 +18,22 @@ spec:
               protocol: TCP
             - port: "9187" # Database metrics
               protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmagent-to-valkey-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmagent
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: valkey
+      toPorts:
+        - ports:
+            - port: "9121"
+              protocol: TCP
