@@ -54,6 +54,15 @@
     - webhook_result.resources[0].status.readyReplicas is defined
     - webhook_result.resources[0].status.readyReplicas > 0
 
+- name: Wait for webhook CA bundle to be injected
+  ansible.builtin.shell:
+    cmd: kubectl get validatingwebhookconfigurations cert-manager-webhook -o jsonpath='{.webhooks[0].clientConfig.caBundle}'
+  register: ca_bundle
+  retries: 30
+  delay: 2
+  until: ca_bundle.stdout != ""
+  changed_when: false
+
 - name: Deploy Cert Issuer
   kubernetes.core.k8s:
     state: present
