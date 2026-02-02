@@ -15,7 +15,7 @@ resources:
   # network policies (egress)
   - network-policy/egress-to-argocd-repo-server.yaml
   - network-policy/egress-to-insights-api.yaml
-  - network-policy/egress-to-argocd-kubedns.yaml
+  - network-policy/egress-to-kubedns.yaml
 
 images:
   - name: ghcr.io/vchen7629/cyphria-frontend
