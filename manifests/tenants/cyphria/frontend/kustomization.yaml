@@ -9,8 +9,8 @@ resources:
   - application/service.yaml
   - application/autoscaler.yaml
 
-  # network routes
-  - ingress.yaml
+  # application routes
+  - routes/ingress.yaml
 
   # network policies (egress)
   - network-policy/egress-to-argocd-repo-server.yaml
