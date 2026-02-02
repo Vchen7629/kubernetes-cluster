@@ -18,10 +18,38 @@
             kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
             wait: true
 
+    - name: Apply gateway-api crds manifest
+      ansible.builtin.shell:
+        cmd: |
+          export KUBECONFIG='{{ k3s_project.cluster.kubeconfig }}'
+          curl -fsSL '{{ cilium_project.release.gateway_api.url }}/{{ cilium_project.release.gateway_api.file }}' | kubectl apply -f - 2>&1
+        executable: /bin/bash
+      register: gateway_result
+      retries: 3
+      delay: 2
+      until: gateway_result.rc == 0
+      changed_when: "'created' in gateway_result.stdout or 'configured' in gateway_result.stdout"
+
+    - name: Wait for Gateway CRDs to be established
+      ansible.builtin.shell:
+        cmd: kubectl wait --for condition=established --timeout=60s crd/gateways.gateway.networking.k8s.io
+      register: crd_wait
+      retries: 3
+      delay: 2
+      until: crd_wait.rc == 0
+      changed_when: false
+
+    - name: Create gateway
+      when: cilium_vars.kubernetes.hubble.ui.enabled is truthy
+      kubernetes.core.k8s:
+        definition: "{{ lookup('ansible.builtin.template', 'gateway.j2') | from_yaml }}"
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        wait: true
+
     - name: Update chart setup fact
       ansible.builtin.set_fact:
         cilium_setup: false
-    
+
     - name: Update chart postinstall fact
       ansible.builtin.set_fact:
         cilium_postinstall: true

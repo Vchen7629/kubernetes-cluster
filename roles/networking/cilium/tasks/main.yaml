@@ -21,11 +21,20 @@
 - name: Cilium Installation
   when: inventory_hostname in k3s_map.server.hosts
   block:
-    - name: Wait for K3s API server
+    - name: Wait for K3s API server port
       ansible.builtin.wait_for:
         port: "{{ k3s_vars.server.api.port }}"
         timeout: 30
       any_errors_fatal: true
+
+    - name: Wait for K3s API server to be ready
+      ansible.builtin.command:
+        cmd: kubectl get --raw /readyz
+      register: api_ready
+      retries: 30
+      delay: 2
+      until: api_ready.rc == 0
+      changed_when: false
 
     - name: Download archive
       ansible.builtin.get_url:
@@ -72,15 +81,6 @@
     - name: Chart Setup
       run_once: true
       block:
-        - name: Apply gateway-api crds manifest
-          kubernetes.core.k8s:
-            kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
-            src: '{{ cilium_project.release.gateway_api.url }}/{{ cilium_project.release.gateway_api.file }}'
-          register: cilium_result
-          delay: 1
-          retries: 3
-          until: cilium_result is not failed
-        
         - name: Set chart setup fact
           ansible.builtin.set_fact:
             cilium_setup: true
@@ -187,10 +187,3 @@
         cmd: kubectl get nodes -o wide
       register: nodes_status
       changed_when: false
-
-    - name: Create gateway
-      when: cilium_vars.kubernetes.hubble.ui.enabled is truthy
-      kubernetes.core.k8s:
-        definition: "{{ lookup('ansible.builtin.template', 'gateway.j2') | from_yaml }}"
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
-        wait: true

@@ -65,17 +65,6 @@ resources:
     cpu: {{ cilium_vars.kubernetes.agent.resources.requests.cpu }}
     memory: {{ cilium_vars.kubernetes.agent.resources.requests.memory }}
 rollOutCiliumPods: true
-{% if cilium_map.metrics.enabled is truthy and cilium_setup is defined and not cilium_setup %}
-prometheus:
-  serviceMonitor:
-    trustCRDsExist: true
-envoy:
-  prometheus:
-    serviceMonitor:
-      enabled: true
-      interval: {{ cilium_map.metrics.scrape.interval }}
-      namespace: victoria-metrics
-{% endif %}
 envoyConfig:
   enabled: true
 gatewayAPI:
@@ -86,12 +75,6 @@ hubble:
       enabled: {{ cilium_vars.kubernetes.dashboards.enabled | lower }}
     enabled:
       {{ cilium_vars.kubernetes.hubble.metrics | to_nice_yaml | trim | indent(6) }}
-{% if cilium_map.metrics.enabled is truthy and cilium_setup is defined and not cilium_setup %}
-    serviceMonitor:
-      enabled: true
-    interval: {{ cilium_map.metrics.scrape.interval }}
-    namespace: {{ cilium_vars.kubernetes.namespace }}
-{% endif %}
   peerService:
     clusterDomain: {{ k3s_vars.cluster.domain }}
 {% if cilium_vars.kubernetes.hubble.relay.enabled is truthy %}
@@ -99,14 +82,6 @@ hubble:
     enabled: true
     podDisruptionBudget:
       enabled: true
-{% if cilium_map.metrics.enabled is truthy and cilium_setup is defined and not cilium_setup %}
-    prometheus:
-      enabled: true
-      serviceMonitor:
-        enabled: true
-        interval: {{ cilium_map.metrics.scrape.interval }}
-        namespace: {{ cilium_vars.kubernetes.namespace }}
-{% endif %}
     resources:
       limits:
 {% if cilium_vars.kubernetes.hubble.relay.resources.limits.cpu is truthy %}
