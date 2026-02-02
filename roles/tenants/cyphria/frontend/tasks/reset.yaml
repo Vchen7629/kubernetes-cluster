@@ -1,15 +1,157 @@
-- name: Delete Frontend DNS
-  kubernetes.core.k8s:
-    state: absent
-    api_version: externaldns.k8s.io/v1alpha1
-    kind:  DNSEndpoint
-    name: cyphria-frontend-dns
-    namespace: frontend
+---
+- name: Role Facts
+  ansible.builtin.import_role:
+    name: bootstrap/k3s
+    tasks_from: facts
 
-- name: Uninstall frontend application in argocd
-  kubernetes.core.k8s:
-    api_version: argoproj.io/v1alpha1
-    state: absent
-    kind: Application
-    name: cyphria-frontend
-    namespace: argocd
+- name: Role Reset
+  when: inventory_hostname in k3s_map.server.hosts
+  block:
+    - name: Delete ArgoCD Application (stops reconciliation)
+      kubernetes.core.k8s:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
+        name: cyphria-frontend
+        namespace: argocd
+        state: absent
+        wait: true
+        wait_timeout: 120
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Scale down frontend deployment
+      ansible.builtin.shell: |
+        kubectl scale deployment cyphria-frontend-deployment -n cyphria-frontend --replicas=0 2>/dev/null || true
+        sleep 5
+      environment:
+        KUBECONFIG: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Delete HTTPRoute ingress
+      kubernetes.core.k8s:
+        api_version: gateway.networking.k8s.io/v1
+        kind: HTTPRoute
+        name: frontend-ingress-route
+        namespace: cyphria-frontend
+        state: absent
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Delete CiliumNetworkPolicy custom resources
+      ansible.builtin.shell: |
+        kubectl delete ciliumnetworkpolicies.cilium.io -n cyphria-frontend --all --timeout=30s 2>/dev/null || true
+      environment:
+        KUBECONFIG: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Delete HorizontalPodAutoscaler
+      kubernetes.core.k8s:
+        api_version: autoscaling/v2
+        kind: HorizontalPodAutoscaler
+        name: frontend-hpa
+        namespace: cyphria-frontend
+        state: absent
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Delete Service
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Service
+        name: cyphria-frontend-service
+        namespace: cyphria-frontend
+        state: absent
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Delete Deployment
+      kubernetes.core.k8s:
+        api_version: apps/v1
+        kind: Deployment
+        name: cyphria-frontend-deployment
+        namespace: cyphria-frontend
+        state: absent
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        wait: true
+        wait_timeout: 60
+      ignore_errors: true
+
+    - name: Delete ConfigMap
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: ConfigMap
+        name: cyphria-frontend-config
+        namespace: cyphria-frontend
+        state: absent
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Delete Frontend DNS Endpoint
+      kubernetes.core.k8s:
+        api_version: externaldns.k8s.io/v1alpha1
+        kind: DNSEndpoint
+        name: cyphria-frontend-dns
+        namespace: frontend
+        state: absent
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Delete application namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: cyphria-frontend
+        state: absent
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        wait: false
+      ignore_errors: true
+
+    - name: Wait for application namespace deletion
+      ansible.builtin.shell: |
+        for i in {1..15}; do
+          if ! kubectl get namespace cyphria-frontend 2>/dev/null; then
+            echo "Namespace deleted successfully"
+            exit 0
+          fi
+          echo "Waiting for namespace deletion (attempt $i/15)..."
+          sleep 4
+        done
+        exit 1
+      environment:
+        KUBECONFIG: '{{ k3s_project.cluster.kubeconfig }}'
+      register: ns_wait
+      failed_when: false
+      changed_when: false
+      ignore_errors: true
+
+    - name: Force cleanup stuck namespace (fallback)
+      ansible.builtin.shell: |
+        echo "Namespace is stuck, applying force cleanup..."
+
+        # Remove finalizers from stuck resources
+        kubectl get pods,pvc,secrets,configmaps,services,deployments,hpa -n cyphria-frontend -o name 2>/dev/null | \
+          xargs -r -I {} kubectl patch {} -n cyphria-frontend -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Remove namespace finalizer
+        kubectl patch namespace cyphria-frontend -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+
+        # Final verification
+        sleep 5
+        if kubectl get namespace cyphria-frontend 2>/dev/null; then
+          echo "WARNING: Namespace still exists after force cleanup"
+        else
+          echo "Namespace successfully deleted"
+        fi
+      environment:
+        KUBECONFIG: '{{ k3s_project.cluster.kubeconfig }}'
+      when: ns_wait.rc != 0
+      ignore_errors: true
+
+    - name: Delete DNS namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: frontend
+        state: absent
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
