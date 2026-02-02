@@ -16,7 +16,7 @@ resources:
   - schemas/airflow.yaml
 
   # secrets
-  - secrets/user.yaml
+  - secrets/cyphria-user.yaml
   - secrets/airflow.yaml
 
   # network policies (egress)
@@ -33,7 +33,5 @@ resources:
   - network-policy/ingress-from-platform.yaml
 
   # observability (dashboard)
-  - observability/postgres-dashboard.yaml
+  - observability/dashboard.yaml
 
-  # observability (config-map)
-  - observability/timescaledb-monitoring-config-map.yaml
