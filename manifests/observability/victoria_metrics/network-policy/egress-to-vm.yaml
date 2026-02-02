@@ -45,3 +45,23 @@ spec:
               protocol: TCP
             - port: "8428" # VMSingle
               protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: victoria-metrics-operator-to-vm-access
+  namespace: victoria-metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: victoria-metrics-operator
+  egress:
+    # Allow operator to call its own webhook
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: victoria-metrics-operator
+      toPorts:
+        - ports:
+            - port: "9443"
+              protocol: TCP
