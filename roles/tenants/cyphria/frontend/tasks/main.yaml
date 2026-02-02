@@ -10,7 +10,7 @@
 
 - name: Include tunnel facts variables
   ansible.builtin.include_vars:
-    file: "../roles/cloudflare_tunnel/credentials/temp.yaml"
+    file: "../../../../networking/cloudflare_tunnel/credentials/temp.yaml"
 
 - name: Set Account ID Fact
   vars:
@@ -19,11 +19,21 @@
     api_key: "{{ cloudflare_env_data['cloudflare-token'] }}"
     email: "{{ cloudflare_env_data['email'] }}"
     zone_id: "{{ cloudflare_env_data['zone-id'] }}"
+
+- name: Create namespaces
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition: 
+      - apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: frontend
     
 - name: Deploy frontend crds (deployment, service, hpa, network-policies)
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('ansible.builtin.template', 'deploy_crds') | from_yaml }}"
+    definition: "{{ lookup('ansible.builtin.template', 'deploy_crds.yaml') | from_yaml }}"
     kubeconfig: /etc/rancher/k3s/k3s.yaml
 
 - name: Deploy DNS Endpoint for external-dns
