@@ -19,7 +19,7 @@ spec:
               cpu: '{{ valkey_vars.kubernetes.valkey.resources.requests.cpu }}'
               memory: '{{ valkey_vars.kubernetes.valkey.resources.requests.memory }}'
           metrics:
-            enabled: '{{ valkey_vars.kubernetes.metrics.enabled }}'  
+            enabled: {{ valkey_vars.kubernetes.metrics.enabled }}
             resources:
               limits: 
                 memory: '{{ valkey_vars.kubernetes.metrics.resources.limits.memory }}'

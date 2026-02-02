@@ -6,7 +6,8 @@ metadata:
   namespace: victoria-metrics
   labels:
     app.kubernetes.io/instance: victoria-metrics
-    kubernetes.io/description: VMServiceScrape to scrape metrics for kubernetes metrics server
+  annotations:
+    kubernetes.io/description: "VMServiceScrape to scrape metrics for kubernetes metrics server"
 spec:
   selector:
     matchLabels:

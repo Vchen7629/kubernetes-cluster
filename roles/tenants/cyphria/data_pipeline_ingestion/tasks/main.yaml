@@ -29,5 +29,5 @@
 - name: Deploy data ingestion crds (deployment, service, hpa, network-policies)
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('ansible.builtin.template', 'deploy_crds') | from_yaml }}"
+    definition: "{{ lookup('ansible.builtin.template', 'deploy_crds.yaml') | from_yaml }}"
     kubeconfig: /etc/rancher/k3s/k3s.yaml

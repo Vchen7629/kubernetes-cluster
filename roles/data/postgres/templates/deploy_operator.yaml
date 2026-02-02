@@ -13,7 +13,7 @@ spec:
     helm:
       valuesObject:
         monitoring:
-          podMonitorEnabled: true
+          podMonitorEnabled: false
         config:
           clusterWide: false
 
