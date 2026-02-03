@@ -3,7 +3,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: postgres-db-airflow-access
-  namespace: backend
+  namespace: postgres
   annotations:
     kubernetes.io/description: Allows airflow access to postgres for metdata access
 spec:

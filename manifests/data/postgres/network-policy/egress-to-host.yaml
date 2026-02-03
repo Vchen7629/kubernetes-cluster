@@ -3,7 +3,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: postgres-db-kube-api-access
-  namespace: backend
+  namespace: postgres
 spec:
   endpointSelector:
     matchExpressions:

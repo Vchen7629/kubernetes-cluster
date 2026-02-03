@@ -3,7 +3,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: postgres-db-cnpg-operator-access
-  namespace: backend
+  namespace: postgres
 spec:
   endpointSelector:
     matchExpressions:
@@ -18,7 +18,7 @@ spec:
     - toEndpoints:
         - matchLabels:
             app.kubernetes.io/name: cloudnative-pg
-            io.kubernetes.pod.namespace: backend
+            io.kubernetes.pod.namespace: postgres
       toPorts:
         - ports:
             - port: "8000"
