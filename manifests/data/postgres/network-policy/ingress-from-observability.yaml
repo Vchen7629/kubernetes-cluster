@@ -52,7 +52,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: postgres-db-monitoring
-  namespace: backend
+  namespace: postgres
 spec:
   endpointSelector:
     matchExpressions:
