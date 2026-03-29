@@ -83,4 +83,4 @@ argocd_vars:
     repository:
       name: argo-cd
       org: argoproj
-    version: v3.1.8
+    version: v3.3.6
