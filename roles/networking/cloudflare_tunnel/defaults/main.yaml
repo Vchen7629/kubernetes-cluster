@@ -3,7 +3,7 @@ cloudflared_vars:
     helm:
       chart:
         name: cloudflared
-        version: v1.7.3
+        version: v1.7.5
       repository:
         url: https://charts.kubito.dev
     resources:

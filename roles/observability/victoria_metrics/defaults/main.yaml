@@ -4,7 +4,7 @@ vm_vars:
     helm:
       chart:
         name: victoria-metrics-k8s-stack
-        version: "0.61.9"
+        version: "0.72.5"
       repository:
         name: victoriametrics
         url: https://victoriametrics.github.io/helm-charts/
