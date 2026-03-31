@@ -101,6 +101,7 @@
   gather_facts: true
   roles:
     - platform/airflow
+    - tenants/mosaic/shared
     - tenants/mosaic/audio_transcription
     - tenants/mosaic/conversation_briefing
     - tenants/mosaic/face_detection
