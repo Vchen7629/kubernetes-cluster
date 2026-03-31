@@ -1,11 +1,12 @@
 ---
+# required dependencies for kubernetes to function
 - name: OS configuration
   hosts: cluster
   become: true
   gather_facts: true
   roles:
     - bootstrap/cluster
-  tags: cluster
+  tags: [bootstrap, all]
 
 #- name: Provision Load Balancer
 #  hosts: cluster
@@ -23,9 +24,10 @@
     - 1
     - 2
     - 5
-  tags: kubernetes
+  tags: [bootstrap, all]
 
-- name: ArgoCD deployed cluster applications provisioning
+# these services are used by all tenants
+- name: Core services Deployment
   hosts: server
   become: true
   gather_facts: true
@@ -36,32 +38,70 @@
         tasks_from: postinstall
       loop:
         - bootstrap/argocd
-        - observability/metrics_server
         - networking/cilium
       loop_control:
         loop_var: postinstall
   roles:
     - networking/cilium
     - bootstrap/argocd
-    - observability/victoria_metrics
     - platform/cert_manager
-    - observability/metrics_server
-    - networking/cloudflare_tunnel
-    - networking/external_dns
-    - data/postgres
-    - data/valkey
-  tags: charts
+  tags: [core, all]
 
-- name: ArgoCD deployed cyphria tenant applications provisioning
+- name: Observability services Deployment
+  hosts: server
+  become: true
+  gather_facts: true
+  post_tasks:
+    - name: Perform post-install tasks
+      ansible.builtin.include_role:
+        name: observability/metrics_server
+        tasks_from: postinstall
+  roles:
+    - observability/victoria_metrics
+    - observability/metrics_server
+  tags: [core, observability, all]
+
+- name: Networking services deployment
   hosts: server
   become: true
   gather_facts: true
   roles:
+    - networking/cloudflare_tunnel
+    - networking/external_dns
+  tags: [core, networking, all]
+
+# data layer
+- name: Data layer deployment
+  hosts: server
+  become: true
+  gather_facts: true
+  roles:
+    - data/postgres
+    - data/valkey
+  tags: [data, cyphria, mosaic, cinesense, splice, all]
+
+# Tenant platform services
+- name: Cyphria services
+  hosts: server
+  become: true
+  gather_facts: true
+  roles:
+    - platform/airflow
     - tenants/cyphria/frontend
     - tenants/cyphria/insights_api
     - tenants/cyphria/data_pipeline_ingestion
     - tenants/cyphria/data_pipeline_llm_summary
     - tenants/cyphria/data_pipeline_ranking_calculator
     - tenants/cyphria/data_pipeline_sentiment_analysis
+  tags: [cyphria, tenants, all]
+
+- name: Mosaic services
+  hosts: server
+  become: true
+  gather_facts: true
+  roles:
     - platform/airflow
-  tags: cyphria
+    - tenants/mosaic/audio_transcription
+    - tenants/mosaic/conversation_briefing
+    - tenants/mosaic/face_detection
+  tags: [mosaic, tenants, all]
