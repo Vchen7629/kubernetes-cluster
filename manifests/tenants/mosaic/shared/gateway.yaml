@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: mosaic-grpc-gateway
+  namespace: mosaic-grpc-gateway
+spec:
+  gatewayClassName: cilium
+  listeners:
+  - name: grpc
+    port: 443
+    protocol: HTTPS
+    hostname: "*.mosaic.com"
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: mosaic-tls-cert
