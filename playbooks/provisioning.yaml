@@ -41,10 +41,13 @@
         - networking/cilium
       loop_control:
         loop_var: postinstall
+
+    - name: Deploy cert-manager (after Gateway API CRDs are installed)
+      ansible.builtin.include_role:
+        name: platform/cert_manager
   roles:
     - networking/cilium
     - bootstrap/argocd
-    - platform/cert_manager
   tags: [core, all_services]
 
 - name: Observability services Deployment
@@ -86,6 +89,7 @@
   become: true
   gather_facts: true
   roles:
+    - tenants/cyphria/shared
     - platform/airflow
     - tenants/cyphria/frontend
     - tenants/cyphria/insights_api

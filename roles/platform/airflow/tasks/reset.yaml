@@ -1,18 +1,69 @@
 ---
-- name: Fully reset Airflow
+- name: Delete ArgoCD Application (stops reconciliation)
+  kubernetes.core.k8s:
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: airflow
+    namespace: argocd
+    state: absent
+    wait: true
+    wait_timeout: 60
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+  ignore_errors: true
+
+- name: delete postgres crds
   block:
-    - name: Delete ArgoCD Application (stops reconciliation)
+    - name: Delete CNPG cluster (operator handles graceful shutdown)
       kubernetes.core.k8s:
-        api_version: argoproj.io/v1alpha1
-        kind: Application
-        name: airflow
-        namespace: argocd
+        api_version: postgresql.cnpg.io/v1
+        kind: Cluster
+        name: airflow-metadata-postgres-cluster
+        namespace: postgres
         state: absent
-        wait: true
-        wait_timeout: 60
-        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        wait: false
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+      ignore_errors: true
+    
+    - name: Wait for CNPG cluster deletion
+      ansible.builtin.shell: |
+        for i in {1..30}; do
+          if ! kubectl get cluster airflow-metadata-postgres-cluster -n postgres 2>/dev/null; then
+            echo "Cluster deleted successfully"
+            exit 0
+          fi
+          echo "Waiting for cluster deletion (attempt $i/30)..."
+          sleep 10
+        done
+        exit 1
+      environment:
+        KUBECONFIG: "{{ k3s_project.cluster.kubeconfig }}"
+      register: cluster_wait
+      failed_when: false
+      changed_when: false
+      ignore_errors: true
+    
+    - name: Delete Airflow schema configmap
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: ConfigMap
+        name: airflow-init-schema
+        namespace: postgres
+        state: absent
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+      ignore_errors: true
+    
+    - name: Delete airflow database user secret
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Secret
+        name: airflow-metadata-secret
+        namespace: postgres
+        state: absent
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
+- name: Reset Airflow service
+  block:
     - name: Delete CiliumNetworkPolicy custom resources
       ansible.builtin.shell: |
         kubectl delete ciliumnetworkpolicies.cilium.io -n airflow --all --timeout=30s 2>/dev/null || true

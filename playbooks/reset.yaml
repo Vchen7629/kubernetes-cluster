@@ -42,6 +42,7 @@
         - tenants/cyphria/insights_api
         - tenants/cyphria/frontend
         - platform/airflow
+        - tenants/cyphria/shared
       loop_control:
         loop_var: reset
   tags: [cyphria, tenants, all_services]
