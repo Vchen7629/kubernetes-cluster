@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kafka-crds
+  name: external-dns-crds
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -14,7 +14,7 @@ spec:
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: kafka
+    namespace: external-dns
   
   syncPolicy:
     automated:

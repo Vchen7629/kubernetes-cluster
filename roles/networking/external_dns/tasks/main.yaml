@@ -51,3 +51,8 @@
     definition: "{{ lookup('ansible.builtin.template', 'cluster_issuer.j2') | from_yaml }}"
     kubeconfig: /etc/rancher/k3s/k3s.yaml
 
+- name: Deploy CRDs
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'deploy_crds.j2') | from_yaml }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
