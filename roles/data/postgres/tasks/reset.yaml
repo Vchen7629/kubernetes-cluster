@@ -147,8 +147,10 @@
           [ -n "$pv" ] && kubectl delete pv ${pv} 2>/dev/null || true
         done
 
-        # Also clear the hard-drive-pv claimRef if it exists
-        if kubectl get pv hard-drive-pv 2>/dev/null; then
-          kubectl patch pv hard-drive-pv -p '{"spec":{"claimRef":null}}' --type=merge 2>/dev/null || true
-        fi
+        # Clear claimRefs on named PVs so they can be reused
+        for pv in hard-drive-pv mosaic-postgres-pv; do
+          if kubectl get pv ${pv} 2>/dev/null; then
+            kubectl patch pv ${pv} -p '{"spec":{"claimRef":null}}' --type=merge 2>/dev/null || true
+          fi
+        done
       ignore_errors: true

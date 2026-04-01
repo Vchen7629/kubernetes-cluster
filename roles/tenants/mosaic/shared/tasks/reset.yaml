@@ -78,11 +78,11 @@
         kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
-    - name: Clean up orphaned PersistentVolumes from CNPG
+    - name: Release mosaic-postgres-pv claimRef so it can be rebound
       ansible.builtin.shell: |
-        kubectl get pv -o json 2>/dev/null | jq -r '.items[] | select(.spec.claimRef.namespace=="postgres") | .metadata.name' 2>/dev/null | while read pv; do
-          [ -n "$pv" ] && kubectl delete pv ${pv} 2>/dev/null || true
-        done
+        if kubectl get pv mosaic-postgres-pv 2>/dev/null; then
+          kubectl patch pv mosaic-postgres-pv -p '{"spec":{"claimRef":null}}' --type=merge 2>/dev/null || true
+        fi
       environment:
         KUBECONFIG: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
