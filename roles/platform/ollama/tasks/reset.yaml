@@ -1,0 +1,84 @@
+- name: Remove Ollama CRDs
+  block:
+    - name: Delete ArgoCD Application (stops reconciliation)
+      kubernetes.core.k8s:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
+        name: ollama-crds
+        namespace: argocd
+        state: absent
+        wait: true
+        wait_timeout: 60
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Delete CiliumNetworkPolicy custom resources
+      ansible.builtin.shell: |
+        kubectl delete ciliumnetworkpolicies.cilium.io -n ollama --all --timeout=30s 2>/dev/null || true
+      environment:
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+- name: Reset Ollama service deployment
+  block:
+    - name: Scale down ollama deployment to drain requests
+      kubernetes.core.k8s:
+        api_version: apps/v1
+        kind: Deployment
+        name: ollama-deployment
+        namespace: ollama
+        state: present
+        definition:
+          spec:
+            replicas: 0
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Wait for ollama pods to terminate
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: ollama
+        label_selectors:
+          - app.kubernetes.io/name=ollama
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      register: ollama_pods
+      retries: 18
+      delay: 10
+      until: ollama_pods.resources | length == 0
+      ignore_errors: true
+
+    - name: Delete ArgoCD Application (stops reconciliation)
+      kubernetes.core.k8s:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
+        name: ollama-deployment
+        namespace: argocd
+        state: absent
+        wait: true
+        wait_timeout: 60
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Delete ollama PersistentVolumeClaim (model storage)
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: PersistentVolumeClaim
+        name: ollama-deployment
+        namespace: ollama
+        state: absent
+        wait: true
+        wait_timeout: 60
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true
+
+    - name: Delete ollama namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: ollama
+        state: absent
+        wait: true
+        wait_timeout: 60
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      ignore_errors: true

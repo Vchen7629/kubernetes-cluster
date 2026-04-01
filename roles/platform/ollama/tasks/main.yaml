@@ -1,0 +1,16 @@
+- name: Role Facts
+  ansible.builtin.include_role:
+    name: platform/ollama
+    tasks_from: facts
+
+- name: Deploy crds
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'deploy_crds.yaml') | from_yaml }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Deploy service
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'deploy_service.yaml') | from_yaml }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml

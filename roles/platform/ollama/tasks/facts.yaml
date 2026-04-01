@@ -1,0 +1,3 @@
+- name: Load ollama defaults
+  ansible.builtin.include_vars:
+    file: "{{ role_path }}/defaults/main.yaml"

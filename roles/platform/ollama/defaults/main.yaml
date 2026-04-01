@@ -1,0 +1,25 @@
+ollama_vars:
+  kubernetes:
+    controller:
+      replicas: 1
+      resources:
+        limits:
+          cpu: null
+          memory: 4096Mi
+        requests:
+          cpu: 500m
+          memory: 2048Mi
+    helm:
+      chart:
+        name: ollama
+        version: 1.54.0
+      repository:
+        url: https://otwld.github.io/ollama-helm/
+    namespace: ollama
+    models:
+      pull: qwen2.5:3b
+    gpu: 
+      enabled: true
+    persistence:
+      enabled: true
+      size: 30Gi

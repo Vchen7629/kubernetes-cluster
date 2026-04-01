@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: 
+  name: ollama-crds
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec: 
+  project: default
+  source:
+    repoURL: https://github.com/Vchen7629/kubernetes-cluster.git
+    targetRevision: main
+    path: manifests/platform/ollama
+    
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: '{{ ollama_vars.kubernetes.namespace }}'
+  
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=false

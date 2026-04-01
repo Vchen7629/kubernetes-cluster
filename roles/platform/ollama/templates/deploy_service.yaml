@@ -1,0 +1,57 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ollama-deployment
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - chart: '{{ ollama_vars.kubernetes.helm.chart.name }}'
+      repoURL: '{{ ollama_vars.kubernetes.helm.repository.url }}'
+      targetRevision: '{{ ollama_vars.kubernetes.helm.chart.version }}'
+
+      helm:
+        valuesObject:
+          replicaCount: {{ ollama_vars.kubernetes.controller.replicas }}
+
+          ollama:
+            gpu:
+              enabled: {{ ollama_vars.kubernetes.gpu.enabled }}
+
+            models:
+              pull:
+                - {{ ollama_vars.kubernetes.models.pull }}
+
+          persistentVolume:
+            enabled: {{ ollama_vars.kubernetes.persistence.enabled }}
+            size: {{ ollama_vars.kubernetes.persistence.size }}
+
+          service:
+            type: ClusterIP
+            port: 11434
+
+          tolerations:
+            - key: "nvidia.com/gpu"
+              operator: "Equal"
+              value: "present"
+              effect: "NoSchedule"
+
+          nodeSelector:
+            kubernetes.io/hostname: tiamat
+
+          resources:
+            limits:
+              memory: '{{ ollama_vars.kubernetes.controller.resources.limits.memory }}'
+            requests:
+              cpu: '{{ ollama_vars.kubernetes.controller.resources.requests.cpu }}'
+              memory: '{{ ollama_vars.kubernetes.controller.resources.requests.memory }}'
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: '{{ ollama_vars.kubernetes.namespace }}'
+
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
