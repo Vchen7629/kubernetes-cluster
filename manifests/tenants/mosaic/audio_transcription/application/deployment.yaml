@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosaic-audio-transcription-deployment
+  labels:
+    app.kubernetes.io/name: mosaic-audio-transcription
+    kubernetes.io/description: "deployment for mosaic audio transcription service docker container, resources, and env variables"
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mosaic-audio-transcription
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mosaic-audio-transcription
+    spec:
+      containers:
+        - name: mosaic-audio-transcription
+          image: ghcr.io/vchen7629/mosaic-conversation_briefing
+          resources:                                                                                                                                                                                 
+            requests:                                                                                                                                                                                
+              memory: "550Mi"
+              cpu: "0.05m"
+            limits:
+              memory: "1200Mi"
+          env:
+            # Non-sensitive config from ConfigMap
+            - name: SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: mosaic-audio-transcription-config
+                  key: SERVER_PORT
+            - name: METRICS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: mosaic-audio-transcription-config
+                  key: METRICS_PORT
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mosaic-audio-transcription-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: mosaic-audio-transcription-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: mosaic-audio-transcription-config
+                  key: DB_NAME
+            - name: VALKEY_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mosaic-audio-transcription-config
+                  key: VALKEY_HOST
+            - name: VALKEY_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: mosaic-audio-transcription-config
+                  key: VALKEY_PORT 
+            # Sensitive data from Secrets
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: database-user-secret
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: database-user-secret
+                  key: password
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 9091
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 3

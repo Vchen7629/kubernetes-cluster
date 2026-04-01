@@ -1,0 +1,13 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: audio-transcription-grpc
+spec:
+  parentRefs:
+  - name: mosaic-gateway
+  hostnames:
+  - "audio-transcription.mosaic.com"
+  rules:
+  - backendRefs:
+    - name: audio-transcription-service
+      port: 50051
