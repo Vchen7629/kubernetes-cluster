@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: ollama-ingress-from-mosaic-conversation-briefing
+  annotations:
+    kubernetes.io/description: allows mosaic conversation-briefing to access ollama for inference
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: ollama
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-conversation-briefing
+      toPorts:
+        - ports:
+            - port: "11434"
+              protocol: TCP
+              
