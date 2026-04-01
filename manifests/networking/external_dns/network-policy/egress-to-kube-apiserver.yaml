@@ -3,7 +3,6 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: external-dns-to-kube-apiserver-access
-  namespace: external-dns
 spec:
   endpointSelector:
     matchLabels:
