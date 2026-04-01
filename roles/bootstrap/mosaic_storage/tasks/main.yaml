@@ -1,0 +1,49 @@
+---
+- name: Storage provisioning
+  block:
+    - name: Check if nvme1n1 has a partition table
+      ansible.builtin.command:
+        cmd: blkid -o value -s TYPE /dev/nvme1n1
+      changed_when: false
+      failed_when: false
+      register: nvme1n1_type
+
+    - name: Create GPT partition table on nvme1n1
+      ansible.builtin.command:
+        cmd: parted -s /dev/nvme1n1 mklabel gpt
+      when: nvme1n1_type.stdout == ""
+      changed_when: true
+
+    - name: Check existing partitions on nvme1n1
+      ansible.builtin.command:
+        cmd: parted -s /dev/nvme1n1 print
+      changed_when: false
+      register: nvme1n1_partitions
+
+    - name: Create mosaic postgres partition (100Gi)
+      ansible.builtin.command:
+        cmd: parted -s /dev/nvme1n1 mkpart mosaic-postgres ext4 1MiB 100GiB
+      when: "'mosaic-postgres' not in nvme1n1_partitions.stdout"
+      changed_when: true
+
+    - name: Format mosaic partition as ext4
+      community.general.filesystem:
+        fstype: ext4
+        dev: /dev/nvme1n1p1
+        state: present
+
+    - name: Create mount directory
+      ansible.builtin.file:
+        path: /mnt/k8s-data/mosaic-postgres
+        state: directory
+        owner: root
+        group: root
+        mode: "755"
+
+    - name: Mount mosaic partition
+      ansible.posix.mount:
+        path: /mnt/k8s-data/mosaic-postgres
+        src: /dev/nvme1n1p1
+        fstype: ext4
+        opts: defaults,noatime
+        state: mounted

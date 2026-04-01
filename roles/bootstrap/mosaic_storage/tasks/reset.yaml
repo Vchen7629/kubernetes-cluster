@@ -1,0 +1,6 @@
+- name: Unmount mosaic postgres partition
+  when: inventory_hostname == 'tiamat'
+  ansible.posix.mount:
+    path: /mnt/k8s-data/mosaic-postgres
+    state: unmounted
+  ignore_errors: true
