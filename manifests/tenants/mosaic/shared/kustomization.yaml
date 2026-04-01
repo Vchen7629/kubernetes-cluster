@@ -9,5 +9,6 @@ resources:
   - database/connection_user_secret.yaml
   - database/schema.yaml
   - database/storage-class.yaml
+  - database/persistent-volume.yaml
 
   - gateway.yaml
