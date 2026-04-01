@@ -48,6 +48,7 @@ argocd_vars:
             memory: 80
       resources:
         limits:
+          cpu:
           memory: 750Mi
         requests:
           cpu: 10m
