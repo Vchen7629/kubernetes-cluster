@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosaic-conversation-briefing-config
+  annotations:
+    kubernetes.io/description: Non-sensitive application environment configuration values
+data:
+  SERVER_PORT: "30030"
+  METRICS_PORT: "9090"
+  OLLAMA_BASE_URL: "http://ollama.ollama.svc.cluster.local:11434"
+  PROD_MODE: "true"

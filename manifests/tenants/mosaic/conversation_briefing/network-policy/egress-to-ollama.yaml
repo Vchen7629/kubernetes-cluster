@@ -1,0 +1,18 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-conversation-briefing-to-ollama-access
+  annotations:
+    kubernetes.io/description: network policy allowing conversation-briefing to access ollama for briefing generation
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: mosaic-conversation-briefing
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: ollama
+      toPorts:
+        - ports:
+            - port: "11434"
+              protocol: TCP

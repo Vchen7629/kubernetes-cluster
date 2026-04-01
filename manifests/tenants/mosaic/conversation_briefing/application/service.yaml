@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: conversation-briefing-service
+  annotations:
+    kubernetes.io/description: "Exposes an port for the pod for rest of cluster access to this service"
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: mosaic-conversation-briefing
+  ports:
+    - port: 9090
+      targetPort: 9090
+      protocol: TCP
+      name: metrics
+    - port: 30030
+      targetPort: 30030
+      protocol: TCP
+      name: grpc

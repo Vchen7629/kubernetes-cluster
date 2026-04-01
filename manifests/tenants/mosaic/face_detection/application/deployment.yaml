@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: mosaic-face-detection
-          image: ghcr.io/vchen7629/cyphria-face_detection
+          image: ghcr.io/vchen7629/mosaic-face_detection
           resources:
             limits:
               cpu: 2000m
