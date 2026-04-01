@@ -8,6 +8,7 @@ resources:
   - network-policy/egress-to-host.yaml
   - network-policy/egress-to-kube-apiserver.yaml
   - network-policy/egress-to-kube-dns.yaml
+  - network-policy/egress-to-mosaic.yaml
   - network-policy/egress-to-redis.yaml
   - network-policy/egress-to-repo-server.yaml
   - network-policy/egress-to-world.yaml
