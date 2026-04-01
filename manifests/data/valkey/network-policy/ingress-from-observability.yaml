@@ -3,7 +3,6 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: valkey-from-vm-scrape
-  namespace: valkey
   annotations:
     kubernetes.io/description: allows victoriametrics vmagent to scrape valkey metrics
 spec:

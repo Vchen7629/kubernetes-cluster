@@ -1,0 +1,59 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: valkey-from-audio-transcription-access
+  annotations:
+    kubernetes.io/description: allows audio transcription to send requests to valkey to fetch data
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: valkey
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-audio-transcription
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: valkey-from-conversation-briefing-access
+  annotations:
+    kubernetes.io/description: allows conversation briefing to send requests to valkey to fetch data
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: valkey
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-conversation-briefing
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: valkey-from-face-detection-access
+  annotations:
+    kubernetes.io/description: allows face detection to send requests to valkey to fetch data
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: valkey
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-face-detection
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
