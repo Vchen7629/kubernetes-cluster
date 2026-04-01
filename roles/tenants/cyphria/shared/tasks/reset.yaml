@@ -1,0 +1,78 @@
+---
+- name: Role Facts
+  ansible.builtin.import_role:
+    name: bootstrap/k3s
+    tasks_from: facts
+
+- name: Delete ArgoCD applications and cleanup CRDs
+  when: inventory_hostname in k3s_map.server.hosts
+  block:
+    - name: Delete ArgoCD Application (stops reconciliation)
+      kubernetes.core.k8s:
+        api_version: argoproj.io/v1alpha1
+        kind: Application
+        name: cyphria-shared-crds
+        namespace: argocd
+        state: absent
+        wait: true
+        wait_timeout: 120
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+      ignore_errors: true
+
+    - name: Delete CNPG cluster (operator handles graceful shutdown)
+      kubernetes.core.k8s:
+        api_version: postgresql.cnpg.io/v1
+        kind: Cluster
+        name: cyphria-postgres-cluster
+        namespace: postgres
+        state: absent
+        wait: false
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+      ignore_errors: true
+
+    - name: Wait for CNPG cluster deletion
+      ansible.builtin.shell: |
+        for i in {1..30}; do
+          if ! kubectl get cluster cyphria-postgres-cluster -n postgres 2>/dev/null; then
+            echo "Cluster deleted successfully"
+            exit 0
+          fi
+          echo "Waiting for cluster deletion (attempt $i/30)..."
+          sleep 10
+        done
+        exit 1
+      environment:
+        KUBECONFIG: "{{ k3s_project.cluster.kubeconfig }}"
+      register: cluster_wait
+      failed_when: false
+      changed_when: false
+      ignore_errors: true
+
+    - name: Delete cyphria schema configmap
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: ConfigMap
+        name: cyphria-init-schema
+        namespace: postgres
+        state: absent
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+      ignore_errors: true
+
+    - name: Delete cyphria database user secret
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Secret
+        name: cyphria-user-secret
+        namespace: postgres
+        state: absent
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+      ignore_errors: true
+
+    - name: Clean up orphaned PersistentVolumes from CNPG
+      ansible.builtin.shell: |
+        kubectl get pv -o json 2>/dev/null | jq -r '.items[] | select(.spec.claimRef.namespace=="postgres") | .metadata.name' 2>/dev/null | while read pv; do
+          [ -n "$pv" ] && kubectl delete pv ${pv} 2>/dev/null || true
+        done
+      environment:
+        KUBECONFIG: "{{ k3s_project.cluster.kubeconfig }}"
+      ignore_errors: true
