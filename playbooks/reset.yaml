@@ -1,5 +1,109 @@
 ---
-- name: Reset Cluster - Server Apps
+- name: Reset Mosaic services
+  hosts: server
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Get packages information
+      ansible.builtin.package_facts:
+
+    - name: Reset application roles
+      ansible.builtin.include_role:
+        name: "{{ reset }}"
+        tasks_from: reset
+      loop:
+        - tenants/mosaic/face_detection
+        - tenants/mosaic/conversation_briefing
+        - tenants/mosaic/audio_transcription
+        - tenants/mosaic/shared
+        - platform/ollama
+        - platform/nvidia_device_plugin
+      loop_control:
+        loop_var: reset
+  tags: [mosaic, tenants, all]
+
+- name: Reset Cyphria services
+  hosts: server
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Get packages information
+      ansible.builtin.package_facts:
+
+    - name: Reset application roles
+      ansible.builtin.include_role:
+        name: "{{ reset }}"
+        tasks_from: reset
+      loop:
+        - tenants/cyphria/data_pipeline_sentiment_analysis
+        - tenants/cyphria/data_pipeline_ranking_calculator
+        - tenants/cyphria/data_pipeline_llm_summary
+        - tenants/cyphria/data_pipeline_ingestion
+        - tenants/cyphria/insights_api
+        - tenants/cyphria/frontend
+        - platform/airflow
+      loop_control:
+        loop_var: reset
+  tags: [cyphria, tenants, all]
+
+- name: Reset Networking services
+  hosts: server
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Get packages information
+      ansible.builtin.package_facts:
+
+    - name: Reset application roles
+      ansible.builtin.include_role:
+        name: "{{ reset }}"
+        tasks_from: reset
+      loop:
+        - networking/external_dns
+        - networking/cloudflare_tunnel
+      loop_control:
+        loop_var: reset
+  tags: [cyphria, cinesense, all]
+
+- name: Reset Data layer
+  hosts: server
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Get packages information
+      ansible.builtin.package_facts:
+
+    - name: Reset application roles
+      ansible.builtin.include_role:
+        name: "{{ reset }}"
+        tasks_from: reset
+      loop:
+        - data/valkey
+        - data/postgres
+      loop_control:
+        loop_var: reset
+  tags: [data, cyphria, mosaic, cinesense, splice, all]
+
+- name: Reset Observability services
+  hosts: server
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Get packages information
+      ansible.builtin.package_facts:
+
+    - name: Reset application roles
+      ansible.builtin.include_role:
+        name: "{{ reset }}"
+        tasks_from: reset
+      loop:
+        - observability/metrics_server
+        - observability/victoria_metrics
+      loop_control:
+        loop_var: reset
+  tags: [core, observability, all]
+
+- name: Reset Core services
   hosts: server
   become: true
   gather_facts: true
@@ -13,25 +117,31 @@
         tasks_from: reset
       loop:
         - platform/cert_manager
-        - networking/cloudflare_tunnel
-        - networking/external_dns
-        - observability/victoria_metrics
-        - data/postgres
-        - observability/metrics_server
         - bootstrap/argocd
         - networking/cilium
       loop_control:
         loop_var: reset
+  tags: [core, all]
+
+- name: Reset Cluster - Server
+  hosts: server
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Get packages information
+      ansible.builtin.package_facts:
 
     - name: Reset cluster roles
       ansible.builtin.include_role:
         name: "{{ reset }}"
         tasks_from: reset
       loop:
-        - bootstrap/cluster
+        - bootstrap/helm
         - bootstrap/k3s
+        - bootstrap/cluster
       loop_control:
         loop_var: reset
+  tags: [bootstrap, all]
 
 - name: Reset Cluster - Agent
   hosts: agent
@@ -46,10 +156,11 @@
         name: "{{ reset }}"
         tasks_from: reset
       loop:
-        - bootstrap/cluster
         - bootstrap/k3s
+        - bootstrap/cluster
       loop_control:
         loop_var: reset
+  tags: [bootstrap, all]
 
 - name: Post Tasks
   hosts: cluster
