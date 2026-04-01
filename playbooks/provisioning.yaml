@@ -61,15 +61,6 @@
     - observability/metrics_server
   tags: [core, observability, all]
 
-- name: Networking services deployment
-  hosts: server
-  become: true
-  gather_facts: true
-  roles:
-    - networking/cloudflare_tunnel
-    - networking/external_dns
-  tags: [core, networking, all]
-
 # data layer
 - name: Data layer deployment
   hosts: server
@@ -81,6 +72,15 @@
   tags: [data, cyphria, mosaic, cinesense, splice, all]
 
 # Tenant platform services
+- name: Networking services deployment (used by cyphria, cinesense)
+  hosts: server
+  become: true
+  gather_facts: true
+  roles:
+    - networking/cloudflare_tunnel
+    - networking/external_dns
+  tags: [cyphria, cinesense, all]
+
 - name: Cyphria services
   hosts: server
   become: true
@@ -100,7 +100,8 @@
   become: true
   gather_facts: true
   roles:
-    - platform/airflow
+    - platform/nvidia_device_plugin
+    - platform/ollama
     - tenants/mosaic/shared
     - tenants/mosaic/audio_transcription
     - tenants/mosaic/conversation_briefing
