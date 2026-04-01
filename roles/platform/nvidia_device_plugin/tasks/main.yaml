@@ -1,0 +1,10 @@
+- name: Role Facts
+  ansible.builtin.include_role:
+    name: platform/nvidia_device_plugin
+    tasks_from: facts
+
+- name: Deploy to argocd
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'argocd-deployment.yaml') | from_yaml }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml

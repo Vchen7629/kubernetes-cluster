@@ -1,0 +1,3 @@
+- name: Load nvidia device plugin defaults
+  ansible.builtin.include_vars:
+    file: "{{ role_path }}/defaults/main.yaml"

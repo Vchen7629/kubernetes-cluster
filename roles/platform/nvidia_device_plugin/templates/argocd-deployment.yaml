@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nvidia-device-plugin
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - chart: '{{ nvidia_device_plugin_vars.kubernetes.helm.chart.name }}'
+      repoURL: '{{ nvidia_device_plugin_vars.kubernetes.helm.repository.url }}'
+      targetRevision: '{{ nvidia_device_plugin_vars.kubernetes.helm.chart.version }}'
+
+      helm:
+        valuesObject:
+          tolerations:
+            - key: "nvidia.com/gpu"
+              operator: "Equal"
+              value: "present"
+              effect: "NoSchedule"
+
+          nodeSelector:
+            kubernetes.io/hostname: tiamat
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: '{{ nvidia_device_plugin_vars.kubernetes.namespace }}'
+
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
