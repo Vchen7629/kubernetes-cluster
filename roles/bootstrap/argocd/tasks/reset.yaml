@@ -1,3 +1,4 @@
+---
 - name: Fully reset ArgoCD
   block:
     - name: Get all ArgoCD Applications
@@ -143,6 +144,6 @@
 
     - name: Remove Helm repository
       kubernetes.core.helm_repository:
-        name: '{{ argocd_vars.kubernetes.helm.repository.org }}'
+        name: "{{ argocd_vars.kubernetes.helm.repository.org }}"
         repo_state: absent
       ignore_errors: true

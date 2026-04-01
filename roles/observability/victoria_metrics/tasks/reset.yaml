@@ -1,3 +1,4 @@
+---
 - name: Fully reset Victoria-metrics
   block:
     - name: Delete ArgoCD Applications (stops reconciliation)

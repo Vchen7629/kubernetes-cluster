@@ -1,11 +1,17 @@
+---
 airflow_vars:
   kubernetes:
     controller:
       replicas: 1
     helm:
       chart:
-        name: apache-airflow
-        version: v1.18.1
+        name: airflow
+        version: 1.20.0
       repository:
         url: https://airflow.apache.org/
     namespace: airflow
+    dags:
+      git:
+        repo: "https://github.com/cyphria/Cyphria.git"
+        branch: "main"
+        subPath: "backend/data_pipeline/orchestrator/src/dags"

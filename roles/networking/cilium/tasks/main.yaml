@@ -1,7 +1,7 @@
 ---
 - name: Role Facts
   ansible.builtin.include_role:
-    name: '{{ role }}'
+    name: "{{ role }}"
     tasks_from: facts
   loop:
     - bootstrap/k3s
@@ -14,7 +14,7 @@
 
 - name: Restart K3s after cleanup
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: k3s
     state: restarted
 
@@ -38,13 +38,13 @@
 
     - name: Download archive
       ansible.builtin.get_url:
-        url: '{{ item.url }}'
+        url: "{{ item.url }}"
         checksum: sha256:{{ item.url }}.sha256sum
         dest: /tmp
         owner: root
         group: root
-        mode: '644'
-      loop: '{{ cilium_resources.release }}'
+        mode: "644"
+      loop: "{{ cilium_resources.release }}"
       register: cilium_result
       delay: 1
       retries: 3
@@ -54,24 +54,24 @@
     - name: Install binary
       ansible.builtin.unarchive:
         src: /tmp/{{ item.file }}
-        dest: '{{ k3s_map.node.directory.bin }}'
+        dest: "{{ k3s_map.node.directory.bin }}"
         owner: root
         group: root
-        mode: '755'
+        mode: "755"
         remote_src: true
-      loop: '{{ cilium_resources.release }}'
-    
+      loop: "{{ cilium_resources.release }}"
+
     - name: Remove archive
       ansible.builtin.file:
         path: /tmp/{{ item.file }}
         state: absent
-      loop: '{{ cilium_resources.release }}'
+      loop: "{{ cilium_resources.release }}"
       check_mode: false
-    
+
     - name: Add repository
       kubernetes.core.helm_repository:
-        name: '{{ cilium_vars.kubernetes.helm.repository.org }}'
-        repo_url: '{{ cilium_map.helm.repository.url }}'
+        name: "{{ cilium_vars.kubernetes.helm.repository.org }}"
+        repo_url: "{{ cilium_map.helm.repository.url }}"
         force_update: true
       register: cilium_result
       delay: 1
@@ -92,9 +92,9 @@
         - name: Get secret info
           kubernetes.core.k8s_info:
             kind: Secret
-            kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+            kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
             name: hubble-server-certs
-            namespace: '{{ cilium_vars.kubernetes.namespace }}'
+            namespace: "{{ cilium_vars.kubernetes.namespace }}"
             wait_timeout: 10
             wait: true
           register: cilium_secret
@@ -105,14 +105,14 @@
             definition:
               metadata:
                 annotations:
-                  meta.helm.sh/release-name: '{{ cilium_vars.kubernetes.helm.chart.name }}'
-                  meta.helm.sh/release-namespace: '{{ cilium_vars.kubernetes.namespace }}'
+                  meta.helm.sh/release-name: "{{ cilium_vars.kubernetes.helm.chart.name }}"
+                  meta.helm.sh/release-namespace: "{{ cilium_vars.kubernetes.namespace }}"
                 labels:
                   app.kubernetes.io/managed-by: Helm
             kind: Secret
-            kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
-            name: '{{ item }}'
-            namespace: '{{ cilium_vars.kubernetes.namespace }}'
+            kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+            name: "{{ item }}"
+            namespace: "{{ cilium_vars.kubernetes.namespace }}"
             state: patched
             wait: true
           loop:
@@ -124,12 +124,12 @@
 
         - name: Install chart
           kubernetes.core.helm:
-            chart_ref: '{{ cilium_map.helm.chart.reference }}'
-            chart_version: '{{ cilium_vars.kubernetes.helm.chart.version }}'
-            kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
-            name: '{{ cilium_vars.kubernetes.helm.chart.name }}'
-            namespace: '{{ cilium_vars.kubernetes.namespace }}'
-            timeout: '{{ cilium_map.helm.timeout }}'
+            chart_ref: "{{ cilium_map.helm.chart.reference }}"
+            chart_version: "{{ cilium_vars.kubernetes.helm.chart.version }}"
+            kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+            name: "{{ cilium_vars.kubernetes.helm.chart.name }}"
+            namespace: "{{ cilium_vars.kubernetes.namespace }}"
+            timeout: "{{ cilium_map.helm.timeout }}"
             values: "{{ lookup('ansible.builtin.template', 'values.j2') | from_yaml }}"
             create_namespace: true
             update_repo_cache: true
@@ -144,14 +144,14 @@
             definition:
               metadata:
                 annotations:
-                  meta.helm.sh/release-name: null
-                  meta.helm.sh/release-namespace: null
+                  meta.helm.sh/release-name:
+                  meta.helm.sh/release-namespace:
                 labels:
-                  app.kubernetes.io/managed-by: null
+                  app.kubernetes.io/managed-by:
             kind: Secret
-            kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
-            name: '{{ item }}'
-            namespace: '{{ cilium_vars.kubernetes.namespace }}'
+            kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+            name: "{{ item }}"
+            namespace: "{{ cilium_vars.kubernetes.namespace }}"
             state: patched
             wait: true
           loop:
@@ -160,11 +160,11 @@
           when:
             - cilium_secret.resources is iterable
             - cilium_secret.resources | length > 0
-        
+
         - name: Create loadbalancer ip pool
           kubernetes.core.k8s:
             definition: "{{ lookup('ansible.builtin.template', 'loadbalancer_ip_pool.j2') | from_yaml }}"
-            kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+            kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
             wait: true
 
     - name: Wait for Cilium pods to be ready

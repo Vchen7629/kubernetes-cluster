@@ -9,13 +9,13 @@
         - name: Create hubble certificate
           kubernetes.core.k8s:
             definition: "{{ lookup('ansible.builtin.template', 'hubble_certificate.j2') | from_yaml }}"
-            kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+            kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
             wait: true
 
         - name: Create hubble cluster issuer
           kubernetes.core.k8s:
             definition: "{{ lookup('ansible.builtin.template', 'hubble_cluster_issuer.j2') | from_yaml }}"
-            kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+            kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
             wait: true
 
     - name: Apply gateway-api crds manifest
@@ -31,7 +31,7 @@
       changed_when: "'created' in gateway_result.stdout or 'configured' in gateway_result.stdout"
 
     - name: Wait for Gateway CRDs to be established
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: kubectl wait --for condition=established --timeout=60s crd/gateways.gateway.networking.k8s.io
       register: crd_wait
       retries: 3
@@ -43,7 +43,7 @@
       when: cilium_vars.kubernetes.hubble.ui.enabled is truthy
       kubernetes.core.k8s:
         definition: "{{ lookup('ansible.builtin.template', 'gateway.j2') | from_yaml }}"
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
         wait: true
 
     - name: Update chart setup fact
@@ -56,12 +56,12 @@
 
     - name: Update chart postinstall values
       kubernetes.core.helm:
-        chart_ref: '{{ cilium_map.helm.chart.reference }}'
-        chart_version: '{{ cilium_vars.kubernetes.helm.chart.version }}'
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
-        name: '{{ cilium_vars.kubernetes.helm.chart.name }}'
-        namespace: '{{ cilium_vars.kubernetes.namespace }}'
-        timeout: '{{ cilium_map.helm.timeout }}'
+        chart_ref: "{{ cilium_map.helm.chart.reference }}"
+        chart_version: "{{ cilium_vars.kubernetes.helm.chart.version }}"
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+        name: "{{ cilium_vars.kubernetes.helm.chart.name }}"
+        namespace: "{{ cilium_vars.kubernetes.namespace }}"
+        timeout: "{{ cilium_map.helm.timeout }}"
         values: "{{ lookup('ansible.builtin.template', 'values.j2') | from_yaml }}"
         wait: true
       register: cilium_result

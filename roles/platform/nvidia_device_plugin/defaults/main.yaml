@@ -1,3 +1,4 @@
+---
 nvidia_device_plugin_vars:
   kubernetes:
     helm:

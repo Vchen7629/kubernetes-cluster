@@ -1,10 +1,11 @@
+---
 certmanager_vars:
   kubernetes:
     controller:
       replicas: 1
       resources:
         limits:
-          cpu: null
+          cpu:
           memory: 128Mi
         requests:
           cpu: 10m

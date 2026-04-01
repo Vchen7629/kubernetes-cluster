@@ -1,17 +1,18 @@
+---
 - name: Role Facts
   ansible.builtin.include_role:
     name: bootstrap/k3s
     tasks_from: facts
-    
+
 - name: Role Provisioning
   when: inventory_hostname in k3s_map.server.hosts
   block:
     - name: Validate service state
       ansible.builtin.wait_for:
-        port: '{{ k3s_vars.server.api.port }}'
+        port: "{{ k3s_vars.server.api.port }}"
         timeout: 30
       any_errors_fatal: true
-    
+
     - name: Ensure Postgres namespace exists
       kubernetes.core.k8s:
         api_version: v1
@@ -25,7 +26,7 @@
         state: directory
         owner: 70
         group: 70
-        mode: '0700'
+        mode: "0700"
       become: true
 
     - name: Deploy PersistentVolume
@@ -39,10 +40,9 @@
         state: present
         definition: "{{ lookup('ansible.builtin.template', 'deploy_operator.yaml') | from_yaml }}"
         kubeconfig: /etc/rancher/k3s/k3s.yaml
-    
+
     - name: Deploy CRDS
       kubernetes.core.k8s:
         state: present
         definition: "{{ lookup('ansible.builtin.template', 'deploy_crds.yaml') | from_yaml }}"
         kubeconfig: /etc/rancher/k3s/k3s.yaml
-    

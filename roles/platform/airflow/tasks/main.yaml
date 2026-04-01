@@ -1,13 +1,9 @@
-- name: Role Facts
-  ansible.builtin.include_role:
-    name: platform/airflow
-    tasks_from: facts
-
+---
 - name: Create namespaces
   kubernetes.core.k8s:
     state: present
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    definition: 
+    definition:
       - apiVersion: v1
         kind: Namespace
         metadata:

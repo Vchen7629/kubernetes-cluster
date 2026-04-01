@@ -1,6 +1,7 @@
+---
 - name: Remove packages
   ansible.builtin.apt:
-    name: '{{ item }}'
+    name: "{{ item }}"
     state: absent
     autoremove: true
     clean: true

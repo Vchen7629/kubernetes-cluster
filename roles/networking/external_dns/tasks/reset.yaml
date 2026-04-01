@@ -1,3 +1,4 @@
+---
 - name: Delete Cloudflare secret for external-dns
   kubernetes.core.k8s:
     state: absent
@@ -8,7 +9,7 @@
       metadata:
         name: cloudflare-api
         namespace: external-dns
-        
+
 - name: Delete external-dns namespace
   kubernetes.core.k8s:
     state: absent

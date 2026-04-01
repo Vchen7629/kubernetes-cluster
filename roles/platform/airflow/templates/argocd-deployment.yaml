@@ -10,23 +10,46 @@ spec:
       repoURL: '{{ airflow_vars.kubernetes.helm.repository.url }}'
       targetRevision: '{{ airflow_vars.kubernetes.helm.chart.version }}'
     
-      helm: 
+      helm:
         valuesObject:
           executor: "LocalExecutor"
-          webserver: 
+          webserver:
             replicas: 1
           scheduler:
             replicas: 1
           postgresql:
             enabled: false
 
-          # login credentials to the cnpg postgres
-          data:
-            metadataSecretName: airflow-metadata-secret              
+          # Keep DAGs paused on creation to prevent auto-execution
+          env:
+            - name: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
+              value: "True"
+            - name: AIRFLOW__CORE__LOAD_EXAMPLES
+              value: "False"
+            # Reference CNPG-generated connection string directly
+            - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-metadata-postgres-cluster-app
+                  key: fqdn-uri
+            - name: AIRFLOW_CONN_AIRFLOW_DB
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-metadata-postgres-cluster-app
+                  key: fqdn-uri
+
+          # Git-sync configuration for DAGs from GitHub
+          dags:
+            gitSync:
+              enabled: true
+              repo: "{{ airflow_vars.kubernetes.dags.git.repo }}"
+              branch: "{{ airflow_vars.kubernetes.dags.git.branch }}"
+              subPath: "{{ airflow_vars.kubernetes.dags.git.subPath }}"
+              wait: 60  # seconds between syncs
 
   destination:
-  server: https://kubernetes.default.svc
-  namespace: '{{ certmanager_vars.kubernetes.namespace }}'
+    server: https://kubernetes.default.svc
+    namespace: "{{ airflow_vars.kubernetes.namespace }}"
 
   syncPolicy:
     automated:

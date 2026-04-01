@@ -1,3 +1,4 @@
+---
 - name: Deploy ranking calculator crds (deployment, service, network-policies)
   kubernetes.core.k8s:
     state: present

@@ -1,3 +1,4 @@
+---
 - name: Delete api key secret for data ingestion
   kubernetes.core.k8s:
     state: absent

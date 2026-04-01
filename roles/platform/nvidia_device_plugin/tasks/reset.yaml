@@ -1,3 +1,4 @@
+---
 - name: Fully reset nvidia-device-plugin
   block:
     - name: Delete ArgoCD Application (stops reconciliation)

@@ -1,3 +1,4 @@
+---
 k3s_vars:
   cluster:
     controlplane:
@@ -9,9 +10,9 @@ k3s_vars:
     service:
       host: 127.0.0.1
       port: 6444
-    tls_san: 
+    tls_san:
       - 10.0.0.167 # wlol in ip a
-  network: 
+  network:
     interface: wlo1
   release:
     kubepug:
@@ -33,4 +34,3 @@ k3s_vars:
       port: 6443
   service:
     debug: false
-  

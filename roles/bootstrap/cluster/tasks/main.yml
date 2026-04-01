@@ -1,3 +1,4 @@
+---
 - name: Role Validation
   ansible.builtin.import_tasks:
     file: validation.yml
@@ -5,13 +6,13 @@
 
 - name: Cluster Provisioning
   block:
-    - name: cluster configuration
+    - name: Cluster configuration
       ansible.builtin.import_tasks:
         file: configuration.yml
-    
-    - name: upgrade cluster
+
+    - name: Upgrade cluster
       ansible.builtin.import_tasks:
         file: upgrade.yml
 
-- name: flush handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers

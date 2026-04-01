@@ -1,3 +1,4 @@
+---
 - name: Fully reset PostgreSQL (CNPG)
   block:
     - name: Delete ArgoCD Applications (stops reconciliation)

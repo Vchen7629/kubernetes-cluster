@@ -1,3 +1,4 @@
+---
 cloudflared_vars:
   kubernetes:
     helm:
@@ -8,7 +9,7 @@ cloudflared_vars:
         url: https://charts.kubito.dev
     resources:
       limits:
-        cpu: null
+        cpu:
         memory: 256Mi
       requests:
         cpu: 25m

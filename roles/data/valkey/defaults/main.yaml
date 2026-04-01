@@ -1,3 +1,4 @@
+---
 valkey_vars:
   kubernetes:
     valkey:
@@ -12,7 +13,7 @@ valkey_vars:
       resources:
         limits:
           memory: 128Mi
-        requests: 
+        requests:
           cpu: 20m
           memory: 64Mi
     helm:

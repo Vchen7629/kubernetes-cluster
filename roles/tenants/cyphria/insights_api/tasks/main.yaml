@@ -1,3 +1,4 @@
+---
 - name: Deploy insights api crds (deployment, service, hpa, network-policies)
   kubernetes.core.k8s:
     state: present

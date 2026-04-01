@@ -1,10 +1,11 @@
+---
 ollama_vars:
   kubernetes:
     controller:
       replicas: 1
       resources:
         limits:
-          cpu: null
+          cpu:
           memory: 4096Mi
         requests:
           cpu: 500m
@@ -18,7 +19,7 @@ ollama_vars:
     namespace: ollama
     models:
       pull: qwen2.5:3b
-    gpu: 
+    gpu:
       enabled: true
     persistence:
       enabled: true

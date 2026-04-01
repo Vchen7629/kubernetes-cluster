@@ -4,7 +4,7 @@ cilium_vars:
     agent:
       resources:
         limits:
-          cpu: null
+          cpu:
           memory: 256Mi
         requests:
           cpu: 10m
@@ -16,12 +16,12 @@ cilium_vars:
         aggregation: low
         interval: 15s
       preallocate_maps: true # reduces latency but increases memory
-      masquerade: false  # Disable to prevent host network interference
-      tproxy: false  # Disable advanced features initially
+      masquerade: false # Disable to prevent host network interference
+      tproxy: false # Disable advanced features initially
     cgroup:
       resources:
         limits:
-          cpu: null
+          cpu:
           memory: 128Mi
         requests:
           cpu: 10m
@@ -33,7 +33,7 @@ cilium_vars:
     cni:
       resources:
         limits:
-          cpu: null
+          cpu:
           memory: 128Mi
         requests:
           cpu: 10m
@@ -44,7 +44,7 @@ cilium_vars:
     envoy:
       resources:
         limits:
-          cpu: null
+          cpu:
           memory: 128Mi
         requests:
           cpu: 10m
@@ -76,7 +76,7 @@ cilium_vars:
         replicas: 1
         resources:
           limits:
-            cpu: null
+            cpu:
             memory: 128Mi
           requests:
             cpu: 10m
@@ -88,7 +88,7 @@ cilium_vars:
         backend:
           resources:
             limits:
-              cpu: null
+              cpu:
               memory: 128Mi
             requests:
               cpu: 10m
@@ -96,7 +96,7 @@ cilium_vars:
         frontend:
           resources:
             limits:
-              cpu: null
+              cpu:
               memory: 128Mi
             requests:
               cpu: 10m
@@ -130,7 +130,7 @@ cilium_vars:
         timeout_seconds: 10
       resources:
         limits:
-          cpu: null
+          cpu:
           memory: 128Mi
         requests:
           cpu: 10m

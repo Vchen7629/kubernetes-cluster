@@ -1,7 +1,8 @@
+---
 argocd_vars:
   kubernetes:
     helm:
-      chart:  
+      chart:
         name: argo-cd
         version: v9.0.0
       repository:
@@ -13,71 +14,70 @@ argocd_vars:
       replicas: 1
       resources:
         limits:
-          cpu: null
+          cpu:
           memory: 2Gi
         requests:
           cpu: 10m
           memory: 1Gi
-    dex: 
+    dex:
       resources:
-        limits: 
-          cpu: null
+        limits:
+          cpu:
           memory: 256Mi
-        requests: 
+        requests:
           cpu: 10m
           memory: 256Mi
     redis:
       ha:
         enabled: false # turn this on if we have 3+ worker nodes
       resources:
-        limits: 
-          cpu: null
+        limits:
+          cpu:
           memory: 512Mi
-        requests: 
+        requests:
           cpu: 50m
           memory: 512Mi
     repo_server:
-      autoscaling: 
-        enabled: true
-        min_replicas: 1
-        max_replicas: 3
-        target: 
-          utilization_percentage:
-            cpu: null
-            memory: 80
-      resources:
-        limits:
-          cpu: null
-          memory: 750Mi
-        requests: 
-          cpu: 10m
-          memory: 512Mi
-    server: 
       autoscaling:
         enabled: true
         min_replicas: 1
         max_replicas: 3
-        target: 
+        target:
           utilization_percentage:
-            cpu: null
+            cpu:
+            memory: 80
+      resources:
+        limits:
+          memory: 750Mi
+        requests:
+          cpu: 10m
+          memory: 512Mi
+    server:
+      autoscaling:
+        enabled: true
+        min_replicas: 1
+        max_replicas: 3
+        target:
+          utilization_percentage:
+            cpu:
             memory: 80
       credentials:
         admin:
           password: testing
-        user: 
+        user:
           name: zephyrus
           password: 5526
       resources:
         limits:
-          cpu: null
+          cpu:
           memory: 256Mi
-        requests: 
+        requests:
           cpu: 10m
           memory: 256Mi
 
   kubeconfig:
     path: /etc/rancher/k3s/k3s.yaml
-  release: 
+  release:
     checksum: cli_checksums.txt
     file: argocd-linux-amd64
     repository:

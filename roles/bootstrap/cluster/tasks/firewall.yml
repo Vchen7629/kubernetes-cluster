@@ -1,3 +1,4 @@
+---
 - name: Populate service facts
   ansible.builtin.service_facts:
 
@@ -12,7 +13,7 @@
       changed_when: false
       register: firewall_status
 
-    - name: disable firewall
+    - name: Disable firewall
       ansible.builtin.command:
         cmd: ufw disable
       when: "'Status: active' in firewall_status.stdout"

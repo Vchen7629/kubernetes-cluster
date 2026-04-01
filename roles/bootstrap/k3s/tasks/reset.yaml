@@ -1,4 +1,5 @@
-- name: role facts
+---
+- name: Role facts
   ansible.builtin.import_tasks:
     file: facts.yaml
 
@@ -8,7 +9,7 @@
       ansible.builtin.systemd:
         name: k3s-agent
         state: stopped
-        enabled: no
+        enabled: false
       ignore_errors: true
       become: true
 
@@ -16,7 +17,7 @@
       ansible.builtin.systemd:
         name: k3s
         state: stopped
-        enabled: no
+        enabled: false
       ignore_errors: true
       become: true
 
@@ -32,7 +33,7 @@
         - k3s-agent
       failed_when: false
       ignore_errors: true
-    
+
     - name: Clear old k3s-agent state
       ansible.builtin.shell: |
         set -euxo pipefail
@@ -41,7 +42,7 @@
       args:
         executable: /bin/bash
       become: true
-    
+
     - name: Kill lingering K3s and container processes
       ansible.builtin.shell: |
         set -e
@@ -54,7 +55,7 @@
         executable: /bin/bash
       become: true
       failed_when: false
-    
+
     - name: Remove leftover CNI interfaces
       ansible.builtin.shell: |
         ip link delete cni0 2>/dev/null || true
@@ -84,10 +85,10 @@
         done
       ignore_errors: true
       become: true
-    
+
     - name: Remove Calico data directories
       ansible.builtin.file:
-        path: '{{ item }}'
+        path: "{{ item }}"
         state: absent
       loop:
         - /var/lib/calico
@@ -122,17 +123,17 @@
         - /run/k3s
       register: result
       ignore_errors: true
-    
+
     - name: Server Reset
       when: inventory_hostname in k3s_map.server.hosts
       block:
         - name: Remove server files
           ansible.builtin.file:
-            path: '{{ item }}'
+            path: "{{ item }}"
             state: absent
-          loop: 
+          loop:
             - /usr/local/bin/kubepug
-        
+
         - name: Remove variable from env file
           ansible.builtin.lineinfile:
             path: /etc/environment
@@ -142,7 +143,7 @@
 
         - name: Remove generic files
           ansible.builtin.file:
-            path: '{{ item }}'
+            path: "{{ item }}"
             state: absent
           loop:
             - /usr/local/bin/k3s
@@ -155,9 +156,9 @@
             - /etc/systemd/system/{{ k3s_map.service.name }}.service
             - /etc/systemd/system/{{ k3s_map.service.name }}.service.env
 
-        - name: remove local kubeconfig files
+        - name: Remove local kubeconfig files
           ansible.builtin.file:
-            path: '{{ k3s_vars.cluster.kubeconfig.path }}/{{ item }}'
+            path: "{{ k3s_vars.cluster.kubeconfig.path }}/{{ item }}"
             state: absent
           delegate_to: localhost
           loop:

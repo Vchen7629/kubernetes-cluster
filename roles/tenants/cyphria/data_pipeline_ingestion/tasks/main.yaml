@@ -1,6 +1,7 @@
+---
 - name: Set Reddit client credentials
   vars:
-    env_data: "{{ lookup('ansible.builtin.template', 'reddit_env.yaml' ) | from_yaml }}"
+    env_data: "{{ lookup('ansible.builtin.template', 'reddit_env.yaml') | from_yaml }}"
   ansible.builtin.set_fact:
     reddit_api_client_id: "{{ env_data['REDDIT_API_CLIENT_ID'] }}"
     reddit_api_client_secret: "{{ env_data['REDDIT_API_CLIENT_SECRET'] }}"

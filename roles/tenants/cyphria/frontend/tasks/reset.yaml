@@ -16,7 +16,7 @@
         state: absent
         wait: true
         wait_timeout: 120
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
     - name: Scale down frontend deployment
@@ -24,7 +24,7 @@
         kubectl scale deployment cyphria-frontend-deployment -n cyphria-frontend --replicas=0 2>/dev/null || true
         sleep 5
       environment:
-        KUBECONFIG: '{{ k3s_project.cluster.kubeconfig }}'
+        KUBECONFIG: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
     - name: Delete HTTPRoute ingress
@@ -34,14 +34,14 @@
         name: frontend-ingress-route
         namespace: cyphria-frontend
         state: absent
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
     - name: Delete CiliumNetworkPolicy custom resources
       ansible.builtin.shell: |
         kubectl delete ciliumnetworkpolicies.cilium.io -n cyphria-frontend --all --timeout=30s 2>/dev/null || true
       environment:
-        KUBECONFIG: '{{ k3s_project.cluster.kubeconfig }}'
+        KUBECONFIG: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
     - name: Delete HorizontalPodAutoscaler
@@ -51,7 +51,7 @@
         name: frontend-hpa
         namespace: cyphria-frontend
         state: absent
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
     - name: Delete Service
@@ -61,7 +61,7 @@
         name: cyphria-frontend-service
         namespace: cyphria-frontend
         state: absent
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
     - name: Delete Deployment
@@ -71,7 +71,7 @@
         name: cyphria-frontend-deployment
         namespace: cyphria-frontend
         state: absent
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
         wait: true
         wait_timeout: 60
       ignore_errors: true
@@ -83,7 +83,7 @@
         name: cyphria-frontend-config
         namespace: cyphria-frontend
         state: absent
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
     - name: Delete Frontend DNS Endpoint
@@ -93,7 +93,7 @@
         name: cyphria-frontend-dns
         namespace: frontend
         state: absent
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
     - name: Delete application namespace
@@ -102,7 +102,7 @@
         kind: Namespace
         name: cyphria-frontend
         state: absent
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
         wait: false
       ignore_errors: true
 
@@ -118,7 +118,7 @@
         done
         exit 1
       environment:
-        KUBECONFIG: '{{ k3s_project.cluster.kubeconfig }}'
+        KUBECONFIG: "{{ k3s_project.cluster.kubeconfig }}"
       register: ns_wait
       failed_when: false
       changed_when: false
@@ -143,7 +143,7 @@
           echo "Namespace successfully deleted"
         fi
       environment:
-        KUBECONFIG: '{{ k3s_project.cluster.kubeconfig }}'
+        KUBECONFIG: "{{ k3s_project.cluster.kubeconfig }}"
       when: ns_wait.rc != 0
       ignore_errors: true
 
@@ -153,5 +153,5 @@
         kind: Namespace
         name: frontend
         state: absent
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true

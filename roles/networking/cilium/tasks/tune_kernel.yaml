@@ -6,35 +6,35 @@
   ansible.builtin.file:
     path: /etc/sysctl.d
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Configure kernel network buffers for Cilium
   become: true
-  ansible.builtin.sysctl:
+  ansible.posix.sysctl:
     name: "{{ item.key }}"
     value: "{{ item.value }}"
     state: present
-    reload: yes
+    reload: true
     sysctl_file: /etc/sysctl.d/99-cilium-buffers.conf
   loop:
     # Netlink socket buffers (prevents "no buffer space available")
-    - { key: 'net.core.rmem_max', value: '16777216' }  # 16MB receive buffer
-    - { key: 'net.core.wmem_max', value: '16777216' }  # 16MB send buffer
-    - { key: 'net.core.rmem_default', value: '262144' }  # 256KB default receive
-    - { key: 'net.core.wmem_default', value: '262144' }  # 256KB default send
+    - { key: "net.core.rmem_max", value: "16777216" } # 16MB receive buffer
+    - { key: "net.core.wmem_max", value: "16777216" } # 16MB send buffer
+    - { key: "net.core.rmem_default", value: "262144" } # 256KB default receive
+    - { key: "net.core.wmem_default", value: "262144" } # 256KB default send
 
     # Network device backlog (helps with burst traffic)
-    - { key: 'net.core.netdev_max_backlog', value: '16384' }
-    - { key: 'net.core.netdev_budget', value: '600' }
+    - { key: "net.core.netdev_max_backlog", value: "16384" }
+    - { key: "net.core.netdev_budget", value: "600" }
 
     # Neighbor table (ARP cache) - important for pod networking
-    - { key: 'net.ipv4.neigh.default.gc_thresh1', value: '8192' }
-    - { key: 'net.ipv4.neigh.default.gc_thresh2', value: '16384' }
-    - { key: 'net.ipv4.neigh.default.gc_thresh3', value: '32768' }
+    - { key: "net.ipv4.neigh.default.gc_thresh1", value: "8192" }
+    - { key: "net.ipv4.neigh.default.gc_thresh2", value: "16384" }
+    - { key: "net.ipv4.neigh.default.gc_thresh3", value: "32768" }
 
     # Connection tracking (conntrack table sizes)
-    - { key: 'net.netfilter.nf_conntrack_max', value: '262144' }
-    - { key: 'net.nf_conntrack_max', value: '262144' }
+    - { key: "net.netfilter.nf_conntrack_max", value: "262144" }
+    - { key: "net.nf_conntrack_max", value: "262144" }
   register: sysctl_result
 
 - name: Display current kernel buffer settings

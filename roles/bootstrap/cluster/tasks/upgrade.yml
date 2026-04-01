@@ -1,4 +1,5 @@
-- name: upgrade distribution packages
+---
+- name: Upgrade distribution packages
   ansible.builtin.apt:
     state: fixed
     upgrade: dist
@@ -6,4 +7,3 @@
     clean: true
     purge: true
     update-cache: true
-

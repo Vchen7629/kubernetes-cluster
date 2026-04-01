@@ -1,6 +1,7 @@
+---
 - name: Role Facts
   ansible.builtin.include_role:
-    name: '{{ role }}'
+    name: "{{ role }}"
     tasks_from: facts
   loop:
     - networking/external_dns
@@ -10,17 +11,16 @@
 
 - name: Set Account ID Fact
   vars:
-    cloudflare_env_data: "{{ lookup('ansible.builtin.template', 'env.yaml' ) | from_yaml }}"
+    cloudflare_env_data: "{{ lookup('ansible.builtin.template', 'env.yaml') | from_yaml }}"
   ansible.builtin.set_fact:
     api_token: "{{ cloudflare_env_data['cloudflare-token'] }}"
     email: "{{ cloudflare_env_data['email'] }}"
-
 
 - name: Create ArgoCD namespace
   kubernetes.core.k8s:
     state: present
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    definition: 
+    definition:
       - apiVersion: v1
         kind: Namespace
         metadata:
@@ -33,12 +33,12 @@
       apiVersion: v1
       kind: Secret
       type: Opaque
-      metadata: 
+      metadata:
         name: cloudflare-api-token-secret
         namespace: external-dns
-      stringData: 
+      stringData:
         api-token: "{{ api_token }}"
-  
+
 - name: Deploy to argocd
   kubernetes.core.k8s:
     state: present

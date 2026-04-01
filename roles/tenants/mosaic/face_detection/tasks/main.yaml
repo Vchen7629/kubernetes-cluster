@@ -1,3 +1,4 @@
+---
 - name: Deploy face_detection crds
   kubernetes.core.k8s:
     state: present

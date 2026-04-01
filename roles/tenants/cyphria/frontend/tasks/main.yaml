@@ -1,6 +1,7 @@
+---
 - name: Role Facts
   ansible.builtin.include_role:
-    name: '{{ role }}'
+    name: "{{ role }}"
     tasks_from: facts
   loop:
     - networking/external_dns
@@ -14,7 +15,7 @@
 
 - name: Set Account ID Fact
   vars:
-    cloudflare_env_data: "{{ lookup('ansible.builtin.template', 'env.yaml' ) | from_yaml }}"
+    cloudflare_env_data: "{{ lookup('ansible.builtin.template', 'env.yaml') | from_yaml }}"
   ansible.builtin.set_fact:
     api_key: "{{ cloudflare_env_data['cloudflare-token'] }}"
     email: "{{ cloudflare_env_data['email'] }}"
@@ -24,12 +25,12 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: /etc/rancher/k3s/k3s.yaml
-    definition: 
+    definition:
       - apiVersion: v1
         kind: Namespace
         metadata:
           name: frontend
-    
+
 - name: Deploy frontend crds (deployment, service, hpa, network-policies)
   kubernetes.core.k8s:
     state: present

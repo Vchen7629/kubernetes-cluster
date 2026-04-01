@@ -1,4 +1,4 @@
-
+---
 - name: Uninstall prometheus operator in argocd
   kubernetes.core.k8s:
     api_version: argoproj.io/v1alpha1

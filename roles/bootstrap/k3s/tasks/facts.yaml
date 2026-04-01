@@ -1,9 +1,10 @@
-- name: setting up map facts
+---
+- name: Setting up map facts
   ansible.builtin.set_fact:
     k3s_map:
       agent:
-        ha: '{{ groups.agent | length > 2 }}'
-        hosts: '{{ groups.agent }}'
+        ha: "{{ groups.agent | length > 2 }}"
+        hosts: "{{ groups.agent }}"
       cluster:
         dns: 10.43.0.10
         label: default
@@ -67,41 +68,40 @@
             operator: Exists
             effect: NoSchedule
       server: # this is from the hosts.yaml file in inventory folder
-        default_host: '{{ groups.server[0] }}'
-        ha: '{{ groups.server | length > 2 }}'
-        hosts: '{{ groups.server }}'
-        non_ha: '{{ groups.server | length == 1}}'
+        default_host: "{{ groups.server[0] }}"
+        ha: "{{ groups.server | length > 2 }}"
+        hosts: "{{ groups.server }}"
+        non_ha: "{{ groups.server | length == 1 }}"
       service:
         name: "k3s{{ '-agent' if inventory_hostname not in groups.server }}"
   run_once: true
 
-- name: set project fact
+- name: Set project fact
   ansible.builtin.set_fact:
     k3s_project:
       cluster:
-        config: '{{ k3s_map.node.directory.config }}/config.yaml'
+        config: "{{ k3s_map.node.directory.config }}/config.yaml"
         token: "{{ hostvars[k3s_map.server.default_host].k3s_project.cluster.token | default('') }}"
         tolerations: ""
         kubeconfig: /etc/rancher/k3s/k3s.yaml
-        config_kubelet: '/etc/rancher/k3s/kubelet.yaml'
+        config_kubelet: "/etc/rancher/k3s/kubelet.yaml"
       node:
         binary: /usr/local/bin/k3s
       release:
-        kubepug: 
-          checksum: 'https://github.com/kubepug/kubepug/releases/download/v1.7.1/kubepug_1.7.1_checksums.txt'
-          file: 'https://github.com/kubepug/kubepug/releases/download/v1.7.1/kubepug_linux_amd64.tar.gz'
+        kubepug:
+          checksum: "https://github.com/kubepug/kubepug/releases/download/v1.7.1/kubepug_1.7.1_checksums.txt"
+          file: "https://github.com/kubepug/kubepug/releases/download/v1.7.1/kubepug_linux_amd64.tar.gz"
 
 - name: Set Node fact
   ansible.builtin.set_fact:
     k3s_node:
       ip: '{{ ansible_facts["default_ipv4"]["address"] }}'
-      binary: '{{ k3s_map.node.directory.bin }}/k3s'
+      binary: "{{ k3s_map.node.directory.bin }}/k3s"
       service:
         name: "{{ 'agent' if inventory_hostname not in k3s_map.server.hosts else 'server' }}"
         type: "{{ 'agent' if inventory_hostname not in groups.server else 'server' }}"
 
-
 - name: Set variables fact
   ansible.builtin.set_fact:
-    k3s_vars: '{{ k3s_vars }}'
+    k3s_vars: "{{ k3s_vars }}"
   run_once: true

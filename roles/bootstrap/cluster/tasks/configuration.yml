@@ -1,33 +1,34 @@
+---
 - name: OS configuration
   block:
-    - name: get host fqdn
+    - name: Get host fqdn
       ansible.builtin.command:
         cmd: hostname --fqdn
       changed_when: false
       register: host_fqdn
 
-    - name: get all host fqdns
+    - name: Get all host fqdns
       ansible.builtin.command:
         cmd: hostname --all-fqdns
       changed_when: false
       register: host_all_fqdns
-    
-    - name: set host facts
+
+    - name: Set host facts
       ansible.builtin.set_fact:
         cluster_host:
           extension: "{{ host_all_fqdns.stdout | split | first | split('.') | last | default('local') }}"
           fqdn: "{{ host_fqdn.stdout | split | first }}"
           ipv4: "{{ ansible_facts['default_ipv4']['address'] }}"
           name: "{{ ansible_host }}"
-    
-    - name: set host fqdn
+
+    - name: Set host fqdn
       ansible.builtin.replace:
         path: /etc/hosts
         regexp: ^127.0.1.1\s.+\s{{ cluster_host['name'] }}$
         replace: 127.0.0.1 {{ cluster_host['fqdn'] }} {{ cluster_host['name'] }}
       notify: Reboot
       when: host_fqdn.stdout != cluster_host['fqdn']
-    
+
     - name: Set root full name
       ansible.builtin.command:
         cmd: chfn -f "{{ cluster_host['name'] }}" root
@@ -40,7 +41,7 @@
         replace: defaults,noatime\t0
       notify: Reboot
 
-    - name: disable cloud-init service
+    - name: Disable cloud-init service
       ansible.builtin.file:
         path: /etc/cloud/cloud-init.disabled
         access_time: preserve
@@ -48,18 +49,18 @@
         state: touch
         owner: root
         group: root
-        mode: '700'
-      notify: Reboot   
+        mode: "700"
+      notify: Reboot
 
-    - name: disable firewall
+    - name: Disable firewall
       ansible.builtin.systemd_service:
         name: ufw.service
         state: stopped
         enabled: false
 
-    - name: disable snapd services
+    - name: Disable snapd services
       ansible.builtin.systemd_service:
-        name: '{{ item }}'
+        name: "{{ item }}"
         state: stopped
         enabled: false
       loop:
@@ -68,7 +69,7 @@
         - snapd.seeded.service
         - snapd.socket
 
-    - name: load kernel modules for kubernetes
+    - name: Load kernel modules for kubernetes
       ansible.builtin.copy:
         content: |
           - br_netfilter
@@ -76,5 +77,5 @@
         dest: /etc/modules-load.d/kubernetes.conf
         owner: root
         group: root
-        mode: '644'
+        mode: "644"
       notify: Reboot

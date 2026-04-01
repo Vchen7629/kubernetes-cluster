@@ -1,6 +1,7 @@
+---
 - name: Set llm api key credentials
   vars:
-    env_data: "{{ lookup('ansible.builtin.template', 'api_key.yaml' ) | from_yaml }}"
+    env_data: "{{ lookup('ansible.builtin.template', 'api_key.yaml') | from_yaml }}"
   ansible.builtin.set_fact:
     api_key: "{{ env_data['API_KEY'] }}"
 
