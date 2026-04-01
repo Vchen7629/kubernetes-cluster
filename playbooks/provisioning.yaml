@@ -6,9 +6,9 @@
   gather_facts: true
   roles:
     - bootstrap/cluster
-  tags: [bootstrap, all]
+  tags: [bootstrap, all_services]
 
-#- name: Provision Load Balancer
+# - name: Provision Load Balancer
 #  hosts: cluster
 #  become: true
 #  gather_facts: true
@@ -24,7 +24,7 @@
     - 1
     - 2
     - 5
-  tags: [bootstrap, all]
+  tags: [bootstrap, all_services]
 
 # these services are used by all tenants
 - name: Core services Deployment
@@ -45,7 +45,7 @@
     - networking/cilium
     - bootstrap/argocd
     - platform/cert_manager
-  tags: [core, all]
+  tags: [core, all_services]
 
 - name: Observability services Deployment
   hosts: server
@@ -59,7 +59,7 @@
   roles:
     - observability/victoria_metrics
     - observability/metrics_server
-  tags: [core, observability, all]
+  tags: [core, observability, all_services]
 
 # data layer
 - name: Data layer deployment
@@ -69,7 +69,7 @@
   roles:
     - data/postgres
     - data/valkey
-  tags: [data, cyphria, mosaic, cinesense, splice, all]
+  tags: [data, cyphria, mosaic, cinesense, splice, all_services]
 
 # Tenant platform services
 - name: Networking services deployment (used by cyphria, cinesense)
@@ -79,7 +79,7 @@
   roles:
     - networking/cloudflare_tunnel
     - networking/external_dns
-  tags: [cyphria, cinesense, all]
+  tags: [cyphria, cinesense, all_services]
 
 - name: Cyphria services
   hosts: server
@@ -93,7 +93,7 @@
     - tenants/cyphria/data_pipeline_llm_summary
     - tenants/cyphria/data_pipeline_ranking_calculator
     - tenants/cyphria/data_pipeline_sentiment_analysis
-  tags: [cyphria, tenants, all]
+  tags: [cyphria, tenants, all_services]
 
 - name: Mosaic services
   hosts: server
@@ -106,4 +106,4 @@
     - tenants/mosaic/audio_transcription
     - tenants/mosaic/conversation_briefing
     - tenants/mosaic/face_detection
-  tags: [mosaic, tenants, all]
+  tags: [mosaic, tenants, all_services]

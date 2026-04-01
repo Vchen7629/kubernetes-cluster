@@ -20,7 +20,7 @@
         - platform/nvidia_device_plugin
       loop_control:
         loop_var: reset
-  tags: [mosaic, tenants, all]
+  tags: [mosaic, tenants, all_services]
 
 - name: Reset Cyphria services
   hosts: server
@@ -44,7 +44,7 @@
         - platform/airflow
       loop_control:
         loop_var: reset
-  tags: [cyphria, tenants, all]
+  tags: [cyphria, tenants, all_services]
 
 - name: Reset Networking services
   hosts: server
@@ -63,7 +63,7 @@
         - networking/cloudflare_tunnel
       loop_control:
         loop_var: reset
-  tags: [cyphria, cinesense, all]
+  tags: [cyphria, cinesense, all_services]
 
 - name: Reset Data layer
   hosts: server
@@ -82,7 +82,7 @@
         - data/postgres
       loop_control:
         loop_var: reset
-  tags: [data, cyphria, mosaic, cinesense, splice, all]
+  tags: [data, cyphria, mosaic, cinesense, splice, all_services]
 
 - name: Reset Observability services
   hosts: server
@@ -101,7 +101,7 @@
         - observability/victoria_metrics
       loop_control:
         loop_var: reset
-  tags: [core, observability, all]
+  tags: [core, observability, all_services]
 
 - name: Reset Core services
   hosts: server
@@ -121,7 +121,7 @@
         - networking/cilium
       loop_control:
         loop_var: reset
-  tags: [core, all]
+  tags: [core, all_services]
 
 - name: Reset Cluster - Server
   hosts: server
@@ -141,7 +141,7 @@
         - bootstrap/cluster
       loop_control:
         loop_var: reset
-  tags: [bootstrap, all]
+  tags: [bootstrap, all_services]
 
 - name: Reset Cluster - Agent
   hosts: agent
@@ -160,7 +160,7 @@
         - bootstrap/cluster
       loop_control:
         loop_var: reset
-  tags: [bootstrap, all]
+  tags: [bootstrap, all_services]
 
 - name: Post Tasks
   hosts: cluster
