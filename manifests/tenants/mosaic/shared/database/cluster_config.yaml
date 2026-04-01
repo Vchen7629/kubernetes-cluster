@@ -1,0 +1,60 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: mosaic-postgres-cluster
+  namespace: postgres
+  annotations:
+    kubernetes.io/description: cluster yaml file to bootstrap cnpg cluster for mosaic
+spec:
+  instances: 1
+  # Database PVC (HDD)
+  storage:
+    pvcTemplate:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Gi
+      storageClassName: mosaic-storage
+      volumeMode: Filesystem
+  # WAL PVC (SSD)
+  walStorage:
+    pvcTemplate:
+      accessModes:
+        - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: local-path
+      volumeMode: Filesystem
+  # Creating the database with the user secret
+  bootstrap:
+    initdb:
+      database: mosaic
+      owner: mosaic_user
+      secret:
+        name: database-user-secret
+      postInitApplicationSQLRefs:
+        configMapRefs:
+          - name: mosaic-init-schema
+            key: schema.sql
+
+  postgresql:
+    # only allow connections over ssl/tls, to mosaic database,
+    # from the ip range, and using password authentication
+    pg_hba:
+      - hostssl mosaic mosaic_user 10.0.0.0/16 scram-sha-256
+    parameters:
+      max_wal_size: "4GB"
+      max_wal_senders: "3"
+      wal_level: "replica"
+
+  resources:
+    limits:
+      memory: 3G
+    requests:
+      cpu: "1"
+      memory: 512Mi
+
+  monitoring:
+    enablePodMonitor: true
