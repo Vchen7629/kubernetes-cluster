@@ -104,6 +104,7 @@
   become: true
   gather_facts: true
   roles:
+    - bootstrap/mosaic_storage
     - platform/nvidia_device_plugin
     - platform/ollama
     - tenants/mosaic/shared

@@ -18,6 +18,7 @@
         - tenants/mosaic/shared
         - platform/ollama
         - platform/nvidia_device_plugin
+        - bootstrap/mosaic_storage
       loop_control:
         loop_var: reset
   tags: [mosaic, tenants, all_services]
