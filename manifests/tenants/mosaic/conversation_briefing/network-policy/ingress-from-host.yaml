@@ -1,0 +1,19 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-conversation-briefing-ingress-from-host
+  annotations:
+    kubernetes.io/description: allows kubelet grpc health checks (liveness/readiness probes) for conversation briefing pods
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: mosaic-conversation-briefing
+  ingress:
+    # Allow grpc health checks from kubelet (host)
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "30030"
+              protocol: TCP

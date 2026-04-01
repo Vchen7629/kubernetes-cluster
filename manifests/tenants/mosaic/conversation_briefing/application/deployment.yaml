@@ -57,3 +57,9 @@ spec:
                 secretKeyRef:
                   name: mosaic-cache-url
                   key: cache_url
+          readinessProbe:
+            grpc:
+              port: 30030
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
