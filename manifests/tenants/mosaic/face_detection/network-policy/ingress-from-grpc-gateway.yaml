@@ -1,0 +1,19 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-face-detection-grpc-ingress
+  annotations:
+    kubernetes.io/description: allows grpc gateway to call the face detection grpc endpoint
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: mosaic-face-detection
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-grpc-gateway
+      toPorts:
+        - ports:
+            - port: "40040"
+              protocol: TCP

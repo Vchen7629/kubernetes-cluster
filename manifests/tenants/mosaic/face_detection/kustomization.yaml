@@ -1,0 +1,16 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: mosaic-face-detection
+
+resources:
+  - application/configmap.yaml
+  - application/deployment.yaml
+  - application/service.yaml
+
+  - grpc/route.yaml
+
+  - network-policy/egress-to-data.yaml
+  - network-policy/ingress-from-grpc-gateway.yaml
+  - network-policy/ingress-from-observability.yaml

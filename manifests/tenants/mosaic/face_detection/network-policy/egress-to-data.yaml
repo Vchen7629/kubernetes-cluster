@@ -1,0 +1,38 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-face-detection-to-postgres-access
+  annotations:
+    kubernetes.io/description: network policy allowing face-detection to query postgres for data
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: mosaic-face-detection
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: postgres
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+  
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-face-detection-to-valkey-access
+  annotations:
+    kubernetes.io/description: network policy allowing face-detection to use valkey as cache
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: mosaic-face-detection
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: valkey
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP

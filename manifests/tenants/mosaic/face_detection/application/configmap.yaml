@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosaic-face-detection-config
+  annotations:
+    kubernetes.io/description: Non-sensitive application environment configuration values
+data:
+  SERVER_PORT: "40040"
+  METRICS_PORT: "9092"
+  MODELS_DIR: "models"
+  REC_POOL_SIZE: "5"
+  PROD_MODE: "true"
