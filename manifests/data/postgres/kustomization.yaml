@@ -3,22 +3,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # cluster related
-  - cluster/cyphria.yaml
-  - cluster/airflow_metadata.yaml
-
-  # storage related
-  - storage/storage-class.yaml
-  - storage/backup.yaml
-
-  # create db schemas
-  - schemas/cyphria.yaml
-  - schemas/airflow.yaml
-
-  # secrets
-  - secrets/cyphria-user.yaml
-  - secrets/airflow.yaml
-
   # network policies (egress)
   - network-policy/egress-to-cnpg-operator.yaml
   - network-policy/egress-to-host.yaml

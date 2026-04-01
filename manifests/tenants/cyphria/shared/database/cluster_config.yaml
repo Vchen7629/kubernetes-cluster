@@ -46,20 +46,6 @@ spec:
       max_wal_size: "4GB"
       max_wal_senders: "3"
       wal_level: "replica"
-  # backup to hard drive
-  backup:
-    barmanObjectStore:
-      destinationPath: s3://your-bucket-name/postgres-backups
-      s3Credentials:
-        accessKeyId:
-          name: aws-creds
-          key: ACCESS_KEY_ID
-        secretAccessKey:
-          name: aws-creds
-          key: SECRET_ACCESS_KEY
-      wal:
-        compression: gzip
-    retentionPolicy: "90d"
 
   resources:
     limits:

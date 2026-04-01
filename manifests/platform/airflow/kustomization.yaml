@@ -7,3 +7,8 @@ resources:
   - network-policy/egress-to-cyphria.yaml
   - network-policy/egress-to-data.yaml
   - network-policy/egress-to-kube-dns.yaml
+
+  # airflow specific postgres manifests
+  - database/cluster_config.yaml
+  - database/connection_user_secret.yaml
+  - database/schema.yaml
