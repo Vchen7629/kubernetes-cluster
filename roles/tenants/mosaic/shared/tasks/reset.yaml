@@ -4,14 +4,14 @@
     name: bootstrap/k3s
     tasks_from: facts
 
-- name: Role Reset
+- name: Delete ArgoCD applications and cleanup CRDs
   when: inventory_hostname in k3s_map.server.hosts
   block:
     - name: Delete ArgoCD Application (stops reconciliation)
       kubernetes.core.k8s:
         api_version: argoproj.io/v1alpha1
         kind: Application
-        name: mosaic-grpc-gateway
+        name: mosaic-shared-crds
         namespace: argocd
         state: absent
         wait: true
@@ -19,17 +19,88 @@
         kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
       ignore_errors: true
 
-    - name: Delete application namespace
+    - name: Delete CNPG cluster (operator handles graceful shutdown)
+      kubernetes.core.k8s:
+        api_version: postgresql.cnpg.io/v1
+        kind: Cluster
+        name: mosaic-postgres-cluster
+        namespace: postgres
+        state: absent
+        wait: false
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Wait for CNPG cluster deletion
+      ansible.builtin.shell: |
+        for i in {1..30}; do
+          if ! kubectl get cluster mosaic-postgres-cluster -n postgres 2>/dev/null; then
+            echo "Cluster deleted successfully"
+            exit 0
+          fi
+          echo "Waiting for cluster deletion (attempt $i/30)..."
+          sleep 10
+        done
+        exit 1
+      environment:
+        KUBECONFIG: '{{ k3s_project.cluster.kubeconfig }}'
+      register: cluster_wait
+      failed_when: false
+      changed_when: false
+      ignore_errors: true
+
+    - name: Delete mosaic schema configmap
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: ConfigMap
+        name: mosaic-init-schema
+        namespace: postgres
+        state: absent
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Delete mosaic database user secret
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Secret
+        name: database-user-secret
+        namespace: postgres
+        state: absent
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Delete mosaic cache url secret
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Secret
+        name: mosaic-cache-url
+        namespace: valkey
+        state: absent
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+    - name: Clean up orphaned PersistentVolumes from CNPG
+      ansible.builtin.shell: |
+        kubectl get pv -o json 2>/dev/null | jq -r '.items[] | select(.spec.claimRef.namespace=="postgres") | .metadata.name' 2>/dev/null | while read pv; do
+          [ -n "$pv" ] && kubectl delete pv ${pv} 2>/dev/null || true
+        done
+      environment:
+        KUBECONFIG: '{{ k3s_project.cluster.kubeconfig }}'
+      ignore_errors: true
+
+- name: Cleanup namespaces
+  when: inventory_hostname in k3s_map.server.hosts
+  block:
+    - name: Delete mosaic-grpc-gateway namespace
       kubernetes.core.k8s:
         api_version: v1
         kind: Namespace
         name: mosaic-grpc-gateway
         state: absent
-        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
         wait: false
+        kubeconfig: '{{ k3s_project.cluster.kubeconfig }}'
       ignore_errors: true
 
-    - name: Wait for application namespace deletion
+    - name: Wait for mosaic-grpc-gateway namespace deletion
       ansible.builtin.shell: |
         for i in {1..15}; do
           if ! kubectl get namespace mosaic-grpc-gateway 2>/dev/null; then
@@ -49,12 +120,10 @@
 
     - name: Force cleanup stuck namespace (fallback)
       ansible.builtin.shell: |
-        echo "Namespace is stuck, applying force cleanup..."
-
-        # Remove namespace finalizer
+        kubectl get ciliumnetworkpolicies.cilium.io -n mosaic-grpc-gateway -o name 2>/dev/null | while read resource; do
+          kubectl patch ${resource} -n mosaic-grpc-gateway -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
+        done
         kubectl patch namespace mosaic-grpc-gateway -p '{"metadata":{"finalizers":[]}}' --type=merge 2>/dev/null || true
-
-        # Final verification
         sleep 5
         if kubectl get namespace mosaic-grpc-gateway 2>/dev/null; then
           echo "WARNING: Namespace still exists after force cleanup"

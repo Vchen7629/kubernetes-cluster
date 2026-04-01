@@ -1,4 +1,14 @@
-- name: Deploy grpc gateway crd
+- name: Create namespace
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition: 
+      - apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: mosaic-grpc-gateway
+
+- name: Deploy mosaic shared crds
   kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('ansible.builtin.template', 'deploy_crds.yaml') | from_yaml }}"
