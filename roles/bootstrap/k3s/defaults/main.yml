@@ -22,6 +22,11 @@ k3s_vars:
         name: kubepug
         org: kubepug
       version: v1.7.1
+  nodes:
+    gpu:
+      hosts:
+        - tiamat
+      taint: "nvidia.com/gpu=present:NoSchedule"
   server:
     api:
       host: 10.0.0.167

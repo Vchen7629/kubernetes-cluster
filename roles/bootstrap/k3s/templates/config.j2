@@ -40,3 +40,7 @@ tls-san:
 {% if k3s_project.cluster.token | length > 0 %}
 token: {{ k3s_project.cluster.token }}
 {% endif %}
+{% if inventory_hostname in k3s_vars.nodes.gpu.hosts %}
+node-taint:
+  - {{ k3s_vars.nodes.gpu.taint }}
+{% endif %}
