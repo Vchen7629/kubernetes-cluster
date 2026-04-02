@@ -19,6 +19,16 @@
         kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
+    - name: Delete VMPodScrape from victoria-metrics namespace
+      kubernetes.core.k8s:
+        api_version: operator.victoriametrics.com/v1beta1
+        kind: VMPodScrape
+        name: mosaic-postgres-cluster-scrape
+        namespace: victoria-metrics
+        state: absent
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+      ignore_errors: true
+
     - name: Delete CNPG cluster (operator handles graceful shutdown)
       kubernetes.core.k8s:
         api_version: postgresql.cnpg.io/v1
