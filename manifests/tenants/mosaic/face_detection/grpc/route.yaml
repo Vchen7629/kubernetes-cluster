@@ -4,7 +4,8 @@ metadata:
   name: face-detection-grpc
 spec:
   parentRefs:
-  - name: mosaic-gateway
+  - name: mosaic-grpc-gateway
+    namespace: mosaic-grpc-gateway
   hostnames:
   - "face-detection.mosaic.com"
   rules:
