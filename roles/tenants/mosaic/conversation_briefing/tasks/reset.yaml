@@ -19,6 +19,16 @@
         kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
+    - name: Delete VMServiceScrape from victoria-metrics namespace
+      kubernetes.core.k8s:
+        api_version: operator.victoriametrics.com/v1beta1
+        kind: VMServiceScrape
+        name: mosaic-conversation-briefing-service-monitor
+        namespace: victoria-metrics
+        state: absent
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+      ignore_errors: true
+
     - name: Delete CiliumNetworkPolicy custom resources
       ansible.builtin.shell: |
         kubectl delete ciliumnetworkpolicies.cilium.io -n mosaic-conversation-briefing --all --timeout=30s 2>/dev/null || true

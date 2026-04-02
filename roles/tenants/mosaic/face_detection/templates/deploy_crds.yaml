@@ -14,11 +14,9 @@ spec:
     
   destination:
     server: https://kubernetes.default.svc
-    namespace: mosaic-face-detection
   
   syncPolicy:
     automated:
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
       - ApplyOutOfSyncOnly=false
