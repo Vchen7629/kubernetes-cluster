@@ -2,6 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-audio-transcription-grpc-ingress
+  namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: allows grpc gateway to call the audio-transcription grpc endpoint
 spec:

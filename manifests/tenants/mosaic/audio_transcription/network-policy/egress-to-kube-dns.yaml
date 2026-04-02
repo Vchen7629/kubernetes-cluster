@@ -2,6 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-audio-transcription-to-kube-dns-access
+  namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: allow audio-transcription to perform DNS lookups via kube-dns
 spec:

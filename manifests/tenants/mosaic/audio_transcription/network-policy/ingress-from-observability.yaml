@@ -2,6 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-audio-transcription-api-metrics
+  namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: allows vm to scrape the metrics endpoint for audio transcription service
 spec:

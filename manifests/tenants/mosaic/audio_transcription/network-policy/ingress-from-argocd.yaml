@@ -3,6 +3,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-audio-transcription-ingress-from-argocd
+  namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: allows argocd to access the audio transcription service for health checks and sync operations
 spec:

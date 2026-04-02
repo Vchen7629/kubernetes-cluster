@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mosaic-audio-transcription-config
+  namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: Non-sensitive application environment configuration values
 data:

@@ -2,6 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-audio-transcription-to-postgres-access
+  namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: network policy allowing audio-transcrimosaic-audio-transcription to query postgres for data
 spec:

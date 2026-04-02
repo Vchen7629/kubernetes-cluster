@@ -3,6 +3,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-audio-transcription-ingress-from-host
+  namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: allows kubelet grpc health checks (liveness/readiness probes) for audio transcription pods
 spec:

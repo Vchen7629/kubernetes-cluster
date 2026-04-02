@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mosaic-audio-transcription-deployment
+  namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: "deployment for mosaic audio transcription service docker container, resources, and env variables"
   labels:
