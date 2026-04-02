@@ -3,6 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mosaic-face-detection-config
+  namespace: mosaic-face-detection
   annotations:
     kubernetes.io/description: Non-sensitive application environment configuration values
 data:

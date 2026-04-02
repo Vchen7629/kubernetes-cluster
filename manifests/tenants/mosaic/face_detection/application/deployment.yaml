@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mosaic-face-detection-deployment
+  namespace: mosaic-face-detection
   annotations:
     kubernetes.io/description: "deployment for mosaic face detection service docker container, resources, and env variables"
   labels:

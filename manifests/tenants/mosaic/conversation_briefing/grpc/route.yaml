@@ -2,6 +2,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: GRPCRoute
 metadata:
   name: conversation-briefing-grpc
+  namespace: mosaic-conversation-briefing
 spec:
   parentRefs:
   - name: mosaic-grpc-gateway
