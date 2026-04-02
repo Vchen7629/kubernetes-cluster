@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: mosaic-tls-cert
+  namespace: mosaic-grpc-gateway
+spec:
+  secretName: mosaic-tls-cert
+  issuerRef:
+    name: cert-manager-cluster-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - "*.mosaic.com"

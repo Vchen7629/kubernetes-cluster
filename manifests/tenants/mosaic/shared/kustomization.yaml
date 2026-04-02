@@ -9,4 +9,6 @@ resources:
   - database/storage-class.yaml
   - database/persistent-volume.yaml
 
-  - gateway.yaml
+  - networking/grpc-gateway.yaml
+  
+  - platform/tls-cert.yaml
