@@ -103,7 +103,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(process_cpu_seconds_total{job=\"face_detection\"}[2m])",
+              "expr": "rate(process_cpu_seconds_total{job=\"face-detection-service\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -169,7 +169,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "process_resident_memory_bytes{job=\"face_detection\"}",
+              "expr": "process_resident_memory_bytes{job=\"face-detection-service\"}",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -231,7 +231,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "go_goroutines{job=\"face_detection\"}",
+              "expr": "go_goroutines{job=\"face-detection-service\"}",
               "legendFormat": "goroutines",
               "refId": "A"
             }
@@ -409,7 +409,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(process_cpu_seconds_total{job=\"face_detection\"}[2m])",
+              "expr": "rate(process_cpu_seconds_total{job=\"face-detection-service\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -496,7 +496,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "process_resident_memory_bytes{job=\"face_detection\"}",
+              "expr": "process_resident_memory_bytes{job=\"face-detection-service\"}",
               "legendFormat": "rss",
               "refId": "A"
             }

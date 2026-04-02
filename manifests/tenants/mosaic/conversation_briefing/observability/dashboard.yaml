@@ -100,7 +100,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "process_resident_memory_bytes{job=\"conversation_briefing\"}",
+              "expr": "process_resident_memory_bytes{job=\"conversation-briefing-service\"}",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -162,7 +162,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "go_goroutines{job=\"conversation_briefing\"}",
+              "expr": "go_goroutines{job=\"conversation-briefing-service\"}",
               "legendFormat": "goroutines",
               "refId": "A"
             }
@@ -337,7 +337,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(process_cpu_seconds_total{job=\"conversation_briefing\"}[2m])",
+              "expr": "rate(process_cpu_seconds_total{job=\"conversation-briefing-service\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -424,7 +424,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "process_resident_memory_bytes{job=\"conversation_briefing\"}",
+              "expr": "process_resident_memory_bytes{job=\"conversation-briefing-service\"}",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -486,7 +486,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(process_cpu_seconds_total{job=\"conversation_briefing\"}[2m])",
+              "expr": "rate(process_cpu_seconds_total{job=\"conversation-briefing-service\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }

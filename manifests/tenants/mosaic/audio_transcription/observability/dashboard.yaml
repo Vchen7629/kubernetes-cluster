@@ -100,7 +100,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(process_cpu_seconds_total{job=\"audio_transcription\"}[2m])",
+              "expr": "rate(process_cpu_seconds_total{job=\"audio-transcription-service\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -165,7 +165,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "process_resident_memory_bytes{job=\"audio_transcription\"}",
+              "expr": "process_resident_memory_bytes{job=\"audio-transcription-service\"}",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -340,7 +340,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(process_cpu_seconds_total{job=\"audio_transcription\"}[2m])",
+              "expr": "rate(process_cpu_seconds_total{job=\"audio-transcription-service\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -427,7 +427,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "process_resident_memory_bytes{job=\"audio_transcription\"}",
+              "expr": "process_resident_memory_bytes{job=\"audio-transcription-service\"}",
               "legendFormat": "rss",
               "refId": "A"
             }
