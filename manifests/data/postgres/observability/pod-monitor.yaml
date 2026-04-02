@@ -1,0 +1,19 @@
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: postgres-operator-scrape
+  namespace: victoria-metrics
+  labels:
+    app.kubernetes.io/instance: victoria-metrics
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cloudnative-pg
+  namespaceSelector:
+    matchNames:
+      - postgres
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
