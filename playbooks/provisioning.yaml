@@ -48,6 +48,7 @@
   roles:
     - networking/cilium
     - bootstrap/argocd
+    - platform/cert_manager
   tags: [core, all_services]
 
 - name: Observability services Deployment
