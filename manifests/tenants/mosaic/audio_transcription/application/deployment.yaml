@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: mosaic-audio-transcription
-          image: ghcr.io/vchen7629/mosaic-conversation_briefing
+          image: ghcr.io/vchen7629/mosaic-audio_transcription
           resources:                                                                                                                                                                                 
             requests:                                                                                                                                                                                
               memory: "550Mi"

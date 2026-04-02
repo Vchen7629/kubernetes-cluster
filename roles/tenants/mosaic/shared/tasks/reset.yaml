@@ -58,22 +58,12 @@
         kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
-    - name: Delete mosaic database user secret
+    - name: Delete mosaic postgres credentials secret
       kubernetes.core.k8s:
         api_version: v1
         kind: Secret
-        name: database-user-secret
+        name: mosaic-postgres-cluster-app
         namespace: postgres
-        state: absent
-        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
-      ignore_errors: true
-
-    - name: Delete mosaic cache url secret
-      kubernetes.core.k8s:
-        api_version: v1
-        kind: Secret
-        name: mosaic-cache-url
-        namespace: valkey
         state: absent
         kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
