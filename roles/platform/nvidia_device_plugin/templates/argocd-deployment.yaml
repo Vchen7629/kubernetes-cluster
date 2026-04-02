@@ -21,6 +21,8 @@ spec:
           nodeSelector:
             kubernetes.io/hostname: tiamat-rog-strix-g15ce-g15ce
 
+          deviceDiscoveryStrategy: nvml
+
   destination:
     server: https://kubernetes.default.svc
     namespace: '{{ nvidia_device_plugin_vars.kubernetes.namespace }}'

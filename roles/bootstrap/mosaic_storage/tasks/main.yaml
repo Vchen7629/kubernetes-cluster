@@ -3,7 +3,7 @@
   block:
     - name: Check if nvme1n1 has a partition table
       ansible.builtin.command:
-        cmd: blkid -o value -s TYPE /dev/nvme1n1
+        cmd: parted -s /dev/nvme1n1 print
       changed_when: false
       failed_when: false
       register: nvme1n1_type
@@ -11,7 +11,7 @@
     - name: Create GPT partition table on nvme1n1
       ansible.builtin.command:
         cmd: parted -s /dev/nvme1n1 mklabel gpt
-      when: nvme1n1_type.stdout == ""
+      when: "'unrecognised disk label' in nvme1n1_type.stderr"
       changed_when: true
 
     - name: Check existing partitions on nvme1n1
@@ -25,6 +25,7 @@
         cmd: parted -s /dev/nvme1n1 mkpart mosaic-postgres ext4 1MiB 100GiB
       when: "'mosaic-postgres' not in nvme1n1_partitions.stdout"
       changed_when: true
+      failed_when: false
 
     - name: Format mosaic partition as ext4
       community.general.filesystem:

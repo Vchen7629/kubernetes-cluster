@@ -26,6 +26,20 @@
         state: present
         update_cache: true
 
+    - name: Ensure containerd config drop-in directory exists
+      ansible.builtin.file:
+        path: /var/lib/rancher/k3s/agent/etc/containerd/config-v3.toml.d
+        state: directory
+        mode: "0755"
+
+    - name: Set nvidia as default containerd runtime for k3s
+      ansible.builtin.copy:
+        dest: /var/lib/rancher/k3s/agent/etc/containerd/config-v3.toml.d/nvidia-default.toml
+        content: |
+          [plugins.'io.containerd.cri.v1.runtime'.containerd]
+            default_runtime_name = "nvidia"
+        mode: "0644"
+
     - name: Restart k3s so it auto-detects NVIDIA runtime
       ansible.builtin.service:
         name: k3s

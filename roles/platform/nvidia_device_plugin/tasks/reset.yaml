@@ -1,6 +1,13 @@
 ---
 - name: Fully reset nvidia-device-plugin
   block:
+    - name: Remove nvidia default runtime config
+      ansible.builtin.file:
+        path: /var/lib/rancher/k3s/agent/etc/containerd/config-v3.toml.d/nvidia-default.toml
+        state: absent
+      become: true
+      ignore_errors: true
+
     - name: Remove nvidia-container-toolkit package
       ansible.builtin.apt:
         name: nvidia-container-toolkit
