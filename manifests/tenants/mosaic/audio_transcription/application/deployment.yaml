@@ -65,12 +65,12 @@ spec:
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: database-user-secret
+                  name: mosaic-postgres-cluster-app
                   key: username
             - name: DB_PASS
               valueFrom:
                 secretKeyRef:
-                  name: database-user-secret
+                  name: mosaic-postgres-cluster-app
                   key: password
           readinessProbe:
             httpGet:

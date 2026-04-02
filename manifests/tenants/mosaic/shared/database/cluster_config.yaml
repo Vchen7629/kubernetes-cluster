@@ -31,9 +31,7 @@ spec:
   bootstrap:
     initdb:
       database: mosaic
-      owner: mosaic_user
-      secret:
-        name: database-user-secret
+      owner: app
       postInitApplicationSQLRefs:
         configMapRefs:
           - name: mosaic-init-schema
@@ -43,7 +41,7 @@ spec:
     # only allow connections over ssl/tls, to mosaic database,
     # from the ip range, and using password authentication
     pg_hba:
-      - hostssl mosaic mosaic_user 10.0.0.0/16 scram-sha-256
+      - hostssl mosaic app 10.0.0.0/16 scram-sha-256
     parameters:
       max_wal_size: "4GB"
       max_wal_senders: "3"
