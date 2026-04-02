@@ -10,5 +10,7 @@ resources:
   - database/persistent-volume.yaml
 
   - networking/grpc-gateway.yaml
+
+  - observability/pod-monitor.yaml
   
   - platform/tls-cert.yaml

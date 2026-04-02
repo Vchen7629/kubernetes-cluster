@@ -1,0 +1,19 @@
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: mosaic-postgres-cluster-scrape
+  namespace: victoria-metrics
+  labels:
+    app.kubernetes.io/instance: victoria-metrics
+spec:
+  selector:
+    matchLabels:
+      cnpg.io/cluster: mosaic-postgres-cluster
+  namespaceSelector:
+    matchNames:
+      - postgres
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
