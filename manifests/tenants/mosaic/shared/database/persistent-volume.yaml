@@ -20,4 +20,4 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values:
-                - tiamat
+                - tiamat-rog-strix-g15ce-g15ce
