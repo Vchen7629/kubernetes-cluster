@@ -1,6 +1,13 @@
 ---
 - name: Fully reset nvidia-device-plugin
   block:
+    - name: Remove nvidia-container-toolkit package
+      ansible.builtin.apt:
+        name: nvidia-container-toolkit
+        state: absent
+      become: true
+      ignore_errors: true
+
     - name: Delete ArgoCD Application (stops reconciliation)
       kubernetes.core.k8s:
         api_version: argoproj.io/v1alpha1
