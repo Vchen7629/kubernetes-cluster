@@ -75,4 +75,4 @@ spec:
               port: 9091
             initialDelaySeconds: 60
             periodSeconds: 10
-            failureThreshold: 3
+            failureThreshold: 6

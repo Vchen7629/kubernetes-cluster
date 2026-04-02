@@ -69,6 +69,6 @@ spec:
           readinessProbe:
             grpc:
               port: 40040
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
             periodSeconds: 10
-            failureThreshold: 3
+            failureThreshold: 6
