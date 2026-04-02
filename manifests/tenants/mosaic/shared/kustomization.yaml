@@ -3,8 +3,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - cache/connection_url_secret.yaml
-  
   - database/cluster_config.yaml
   - database/credentials.yaml
   - database/schema.yaml

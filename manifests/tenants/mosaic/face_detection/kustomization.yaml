@@ -18,3 +18,4 @@ resources:
   - network-policy/ingress-from-observability.yaml
 
   - secrets/db-credentials.yaml
+  - secrets/cache-url.yaml
