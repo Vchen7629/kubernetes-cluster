@@ -1,0 +1,19 @@
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: mosaic-conversation-briefing-service-monitor
+  namespace: victoria-metrics
+  labels:
+    app.kubernetes.io/instance: victoria-metrics
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mosaic-conversation-briefing
+  namespaceSelector:
+    matchNames:
+      - mosaic-conversation-briefing
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
