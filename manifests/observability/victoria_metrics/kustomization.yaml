@@ -6,6 +6,7 @@ resources:
   # network policies (egress)
   - network-policy/egress-to-bootstrap.yaml
   - network-policy/egress-to-cyphria.yaml
+  - network-policy/egress-to-mosaic.yaml
   - network-policy/egress-to-data.yaml
   - network-policy/egress-to-grafana.yaml
   - network-policy/egress-to-host.yaml

@@ -1,0 +1,62 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmagent-to-mosaic-audio-transcription-access
+  namespace: victoria-metrics
+  annotations:
+    kubernetes.io/description: allows vmagent to scrape mosaic audio transcription metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmagent
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-audio-transcription
+      toPorts:
+        - ports:
+            - port: "9091"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmagent-to-mosaic-face-detection-access
+  namespace: victoria-metrics
+  annotations:
+    kubernetes.io/description: allows vmagent to scrape mosaic face detection metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmagent
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-face-detection
+      toPorts:
+        - ports:
+            - port: "9092"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vmagent-to-mosaic-conversation-briefing-access
+  namespace: victoria-metrics
+  annotations:
+    kubernetes.io/description: allows vmagent to scrape mosaic conversation briefing metrics
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vmagent
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-conversation-briefing
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
