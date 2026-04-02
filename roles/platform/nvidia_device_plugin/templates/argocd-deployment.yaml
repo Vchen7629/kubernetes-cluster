@@ -19,7 +19,7 @@ spec:
               effect: "NoSchedule"
 
           nodeSelector:
-            kubernetes.io/hostname: tiamat
+            kubernetes.io/hostname: tiamat-rog-strix-g15ce-g15ce
 
   destination:
     server: https://kubernetes.default.svc
