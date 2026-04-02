@@ -12,6 +12,7 @@ spec:
     # Allow host access and scraping host-network pods
     - toEntities:
         - remote-node
+        - host
       toPorts:
         - ports:
             - port: "9100" # node-exporter
