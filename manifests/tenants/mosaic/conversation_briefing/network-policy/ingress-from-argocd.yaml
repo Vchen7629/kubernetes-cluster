@@ -3,6 +3,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-conversation-briefing-ingress-from-argocd
+  namespace: mosaic-conversation-briefing
   annotations:
     kubernetes.io/description: allows argocd to access the conversation briefing service for health checks and sync operations
 spec:

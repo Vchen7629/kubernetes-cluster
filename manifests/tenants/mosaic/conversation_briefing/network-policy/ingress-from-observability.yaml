@@ -3,6 +3,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-conversation-briefing-api-metrics
+  namespace: mosaic-conversation-briefing
   annotations:
     kubernetes.io/description: allows vm to scrape the metrics endpoint for conversation briefing service
 spec:

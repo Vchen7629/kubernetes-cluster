@@ -3,6 +3,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-conversation-briefing-grpc-ingress
+  namespace: mosaic-conversation-briefing
   annotations:
     kubernetes.io/description: allows grpc gateway to call the conversation-briefing grpc endpoint
 spec:

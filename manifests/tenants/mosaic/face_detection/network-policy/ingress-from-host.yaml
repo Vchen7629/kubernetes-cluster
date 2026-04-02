@@ -3,6 +3,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-face-detection-ingress-from-host
+  namespace: mosaic-face-detection
   annotations:
     kubernetes.io/description: allows kubelet grpc health checks (liveness/readiness probes) for face detection pods
 spec:

@@ -3,6 +3,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-conversation-briefing-ingress-from-host
+  namespace: mosaic-conversation-briefing
   annotations:
     kubernetes.io/description: allows kubelet grpc health checks (liveness/readiness probes) for conversation briefing pods
 spec:

@@ -3,6 +3,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-face-detection-ingress-from-argocd
+  namespace: mosaic-face-detection
   annotations:
     kubernetes.io/description: allows argocd to access the face detection service for health checks and sync operations
 spec:

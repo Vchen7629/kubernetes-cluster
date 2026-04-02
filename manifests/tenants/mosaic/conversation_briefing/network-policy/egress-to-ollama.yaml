@@ -2,6 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-conversation-briefing-to-ollama-access
+  namespace: mosaic-conversation-briefing
   annotations:
     kubernetes.io/description: network policy allowing conversation-briefing to access ollama for briefing generation
 spec:

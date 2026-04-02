@@ -2,6 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-face-detection-to-kube-dns-access
+  namespace: mosaic-face-detection
   annotations:
     kubernetes.io/description: allow face-detection to perform DNS lookups via kube-dns
 spec:

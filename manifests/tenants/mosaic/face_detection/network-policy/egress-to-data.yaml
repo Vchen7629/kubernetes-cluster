@@ -2,6 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-face-detection-to-postgres-access
+  namespace: mosaic-face-detection
   annotations:
     kubernetes.io/description: network policy allowing face-detection to query postgres for data
 spec:
@@ -22,6 +23,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-face-detection-to-valkey-access
+  namespace: mosaic-face-detection
   annotations:
     kubernetes.io/description: network policy allowing face-detection to use valkey as cache
 spec:

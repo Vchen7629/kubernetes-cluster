@@ -2,6 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-conversation-briefing-to-kube-dns-access
+  namespace: mosaic-conversation-briefing
   annotations:
     kubernetes.io/description: allow conversation-briefing to perform DNS lookups via kube-dns
 spec:
