@@ -43,4 +43,6 @@ token: {{ k3s_project.cluster.token }}
 {% if inventory_hostname in k3s_vars.nodes.gpu.hosts %}
 node-taint:
   - {{ k3s_vars.nodes.gpu.taint }}
+node-label:
+  - nvidia.com/gpu.present=true
 {% endif %}
