@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: audio-transcription-service
   namespace: mosaic-audio-transcription
+  labels:
+    app.kubernetes.io/name: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: "Exposes an port for the pod for rest of cluster access to this service"
 spec:
