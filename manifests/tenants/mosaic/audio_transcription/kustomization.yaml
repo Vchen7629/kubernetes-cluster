@@ -16,6 +16,7 @@ resources:
   - network-policy/ingress-from-host.yaml
   - network-policy/ingress-from-observability.yaml
 
+  - observability/dashboard.yaml
   - observability/service-monitor.yaml
 
   - secrets/db-credentials.yaml
