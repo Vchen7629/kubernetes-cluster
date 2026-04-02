@@ -51,6 +51,8 @@ spec:
                 configMapKeyRef:
                   name: mosaic-audio-transcription-config
                   key: DB_NAME
+            - name: DB_USER
+              value: "app"
             - name: VALKEY_HOST
               valueFrom:
                 configMapKeyRef:
@@ -62,15 +64,10 @@ spec:
                   name: mosaic-audio-transcription-config
                   key: VALKEY_PORT 
             # Sensitive data from Secrets
-            - name: DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: mosaic-postgres-cluster-app
-                  key: username
             - name: DB_PASS
               valueFrom:
                 secretKeyRef:
-                  name: mosaic-postgres-cluster-app
+                  name: mosaic-db-credentials
                   key: password
           readinessProbe:
             httpGet:

@@ -32,6 +32,8 @@ spec:
     initdb:
       database: mosaic
       owner: app
+      secret:
+        name: mosaic-postgres-cluster-app
       postInitApplicationSQLRefs:
         configMapRefs:
           - name: mosaic-init-schema

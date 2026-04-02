@@ -16,3 +16,5 @@ resources:
   - network-policy/ingress-from-grpc-gateway.yaml
   - network-policy/ingress-from-host.yaml
   - network-policy/ingress-from-observability.yaml
+
+  - secrets/db-credentials.yaml
