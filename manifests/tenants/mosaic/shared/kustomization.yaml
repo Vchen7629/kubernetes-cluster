@@ -6,7 +6,6 @@ resources:
   - cache/connection_url_secret.yaml
   
   - database/cluster_config.yaml
-  - database/connection_user_secret.yaml
   - database/schema.yaml
   - database/storage-class.yaml
   - database/persistent-volume.yaml
