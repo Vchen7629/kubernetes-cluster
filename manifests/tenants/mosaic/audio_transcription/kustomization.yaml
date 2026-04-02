@@ -12,6 +12,7 @@ resources:
   - grpc/route.yaml
 
   - network-policy/egress-to-data.yaml
+  - network-policy/egress-to-kube-dns.yaml
   - network-policy/ingress-from-argocd.yaml
   - network-policy/ingress-from-grpc-gateway.yaml
   - network-policy/ingress-from-host.yaml
