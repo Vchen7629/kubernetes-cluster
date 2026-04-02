@@ -2,7 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: mosaic-conversation-briefing-to-postgres-access
-  namespace: mosaic-audio-transcription
+  namespace: mosaic-conversation-briefing
   annotations:
     kubernetes.io/description: network policy allowing conversation-briefing to query postgres for data
 spec:
