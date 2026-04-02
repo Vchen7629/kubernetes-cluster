@@ -2,9 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mosaic-conversation-briefing-deployment
+  annotations:
+    kubernetes.io/description: "deployment for mosaic conversation briefing service docker container, resources, and env variables"
   labels:
     app.kubernetes.io/name: mosaic-conversation-briefing
-    kubernetes.io/description: "deployment for mosaic conversation briefing service docker container, resources, and env variables"
 spec:
   selector:
     matchLabels:
