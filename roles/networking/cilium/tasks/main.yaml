@@ -187,3 +187,30 @@
         cmd: kubectl get nodes -o wide
       register: nodes_status
       changed_when: false
+
+    - name: Restart system pods that may have started before Cilium was ready
+      ansible.builtin.command:
+        cmd: kubectl rollout restart deployment/{{ item.name }} -n {{ item.namespace }}
+      loop:
+        - name: local-path-provisioner
+          namespace: kube-system
+        - name: coredns
+          namespace: kube-system
+      changed_when: true
+
+    - name: Wait for system pods to be ready after restart
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: kube-system
+        label_selectors:
+          - "{{ item }}"
+        kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
+      register: system_pods
+      retries: 20
+      delay: 10
+      until:
+        - system_pods.resources | length > 0
+        - system_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length == system_pods.resources | length
+      loop:
+        - app=local-path-provisioner
+        - k8s-app=kube-dns
