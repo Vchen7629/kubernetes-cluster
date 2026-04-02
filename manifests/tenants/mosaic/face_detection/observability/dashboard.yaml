@@ -112,10 +112,6 @@ data:
           "type": "gauge"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
           "fieldConfig": {
             "defaults": {
               "color": {
