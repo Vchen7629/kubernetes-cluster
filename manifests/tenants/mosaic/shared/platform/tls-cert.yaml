@@ -9,4 +9,4 @@ spec:
     name: cert-manager-cluster-issuer
     kind: ClusterIssuer
   dnsNames:
-    - "*.mosaic.com"
+    - "api.verturus.com"
