@@ -1,10 +1,18 @@
 ---
-- name: Uninstall cloudflared in argocd
+- name: Uninstall cloudflared argocd app
   kubernetes.core.k8s:
     api_version: argoproj.io/v1alpha1
     state: absent
     kind: Application
     name: "cloudflared-{{ cf_tunnel_name }}"
+    namespace: argocd
+
+- name: Uninstall cloudflared manifests argocd app
+  kubernetes.core.k8s:
+    api_version: argoproj.io/v1alpha1
+    state: absent
+    kind: Application
+    name: "{{ cf_tunnel_name }}-cloudflare-tunnel-crds"
     namespace: argocd
 
 - name: Include tunnel facts variables

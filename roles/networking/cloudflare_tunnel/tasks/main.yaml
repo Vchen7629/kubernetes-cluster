@@ -86,7 +86,7 @@
           type: CNAME
           name: "{{ cf_tunnel_hostname }}"
           content: "{{ tunnel_id }}.cfargotunnel.com"
-          proxied: false
+          proxied: true
         return_content: true
       delegate_to: localhost
       become: false
@@ -121,9 +121,16 @@
       delegate_to: localhost
       become: false
       run_once: true
-
-    - name: Deploy to argocd
+    
+    - name: Deploy to mosaic specific cloudflare tunnel crds
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('ansible.builtin.template', 'deployment.j2') | from_yaml }}"
+        definition: "{{ lookup('ansible.builtin.template', 'deploy_mosaic_crds.yaml') | from_yaml }}"
         kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+    - name: Deploy cloudflared secret and configmap
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ item }}"
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+      loop: "{{ lookup('ansible.builtin.template', 'deployment.j2') | from_yaml_all | list }}"

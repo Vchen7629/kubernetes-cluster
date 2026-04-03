@@ -1,62 +1,41 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: tunnel-secret
+  namespace: "cloudflare-tunnel-{{ cf_tunnel_name }}"
+type: Opaque
+stringData:
+  tunnel-config.json: >
+    {
+      "AccountTag": "{{ account_tag }}",
+      "TunnelSecret": "{{ tunnel_secret }}",
+      "TunnelID": "{{ tunnel_id }}",
+      "TunnelName": "{{ cf_tunnel_name }}"
+    }
+---
+apiVersion: v1
+kind: ConfigMap
 metadata:
   name: "cloudflared-{{ cf_tunnel_name }}"
-  namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-spec:
-  project: default
-  source: 
-    chart: '{{ cloudflared_vars.kubernetes.helm.chart.name }}'
-    repoURL: '{{ cloudflared_vars.kubernetes.helm.repository.url }}'
-    targetRevision: '{{ cloudflared_vars.kubernetes.helm.chart.version }}'
-
-    helm:
-      valuesObject:
-        metrics:
-          enabled: {{ cloudflared_vars.kubernetes.metrics.enable }}
-          port: '{{ cloudflared_vars.kubernetes.metrics.port }}'
-
-        managed:
-          enabled: false
-
-        local:  
-          enabled: true
-          auth:
-            tunnelID: "{{ tunnel_id }}"
-            accountTag: "{{ account_tag }}"
-            tunnelName: "{{ cf_tunnel_name }}"
-            tunnelSecret: "{{ tunnel_secret }}"
-
-          ingress:
-            - hostname: '{{ cf_tunnel_hostname }}'
-              service: '{{ cf_tunnel_service }}'
+  namespace: "cloudflare-tunnel-{{ cf_tunnel_name }}"
+data:
+  config.yaml: |
+    logDirectory: /var/log/cloudflared
+    tunnel: {{ tunnel_id }}
+    credentials-file: /etc/cloudflared/tunnel-config.json
+    protocol: http2
+    warp-routing:
+      enabled: false
+    ingress:
+      - hostname: '{{ cf_tunnel_hostname }}'
+        service: '{{ cf_tunnel_service }}'
 {% if cf_tunnel_origin_request %}
-              originRequest:
+        originRequest:
 {% for key, value in cf_tunnel_origin_request.items() %}
-                {{ key }}: {{ value }}
+          {{ key }}: {{ value }}
 {% endfor %}
 {% endif %}
-
-            - hostname: '*.{{ cf_tunnel_hostname }}'
-              service: '{{ cf_tunnel_service }}'
-            
-            - service: http_status:404
-              
-        resources:
-          limits:
-            memory: '{{ cloudflared_vars.kubernetes.resources.limits.memory }}'
-          requests:
-            cpu: '{{ cloudflared_vars.kubernetes.resources.requests.cpu }}'
-            memory: '{{ cloudflared_vars.kubernetes.resources.requests.memory }}'
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: "cloudflare-tunnel-{{ cf_tunnel_name }}"
-
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+      - hostname: '*.{{ cf_tunnel_hostname }}'
+        service: '{{ cf_tunnel_service }}'
+      - service: http_status:404

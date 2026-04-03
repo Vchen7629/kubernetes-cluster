@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "{{ cf_tunnel_name }}-cloudflare-tunnel-crds"
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Vchen7629/kubernetes-cluster.git
+    targetRevision: main
+    path: "manifests/networking/{{ cf_tunnel_name }}_cloudflare_tunnel"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "cloudflare-tunnel-{{ cf_tunnel_name }}"
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=false
