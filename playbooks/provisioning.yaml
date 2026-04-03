@@ -109,11 +109,10 @@
   gather_facts: true
   vars:
     cf_tunnel_name: mosaic
-    cf_tunnel_hostname: api.mosaic.yourdomain.com
-    cf_tunnel_service: https://cilium-gateway-mosaic-grpc-gateway.mosaic-grpc-gateway.svc.cluster.local:443
+    cf_tunnel_hostname: api.verturus.com
+    cf_tunnel_service: http://cilium-gateway-mosaic-grpc-gateway.mosaic-grpc-gateway.svc.cluster.local:80
     cf_tunnel_origin_request:
       http2Origin: true
-      noTLSVerify: true
   roles:
     - networking/cloudflare_tunnel
     - bootstrap/mosaic_storage

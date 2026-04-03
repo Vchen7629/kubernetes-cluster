@@ -70,7 +70,7 @@
         - networking/external_dns
       loop_control:
         loop_var: reset
-  tags: [cyphria, cinesense, all_services]
+  tags: [mosaic, cyphria, cinesense, tenants all_services]
 
 - name: Reset Data layer
   hosts: server
@@ -89,7 +89,7 @@
         - data/postgres
       loop_control:
         loop_var: reset
-  tags: [data, cyphria, mosaic, cinesense, splice, all_services]
+  tags: [data, all_services]
 
 - name: Reset Observability services
   hosts: server
