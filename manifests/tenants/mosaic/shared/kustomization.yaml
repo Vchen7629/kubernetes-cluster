@@ -11,7 +11,8 @@ resources:
 
   - grpc/gateway.yaml
 
-  - network-policy/egress-to-all.yaml
+  - network-policy/egress-to-cloudflare.yaml
+  - network-policy/egress-to-grpc-gateway.yaml
   - network-policy/egress-to-kube-dns.yaml
   - network-policy/ingress-from-networking.yaml
   - network-policy/ingress-from-observability.yaml
