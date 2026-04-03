@@ -14,7 +14,25 @@ spec:
     - fromEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: mosaic-grpc-gateway
-      fromEntities:
+      toPorts:
+        - ports:
+            - port: "40040"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-face-detection-envoy-l7lb-ingress
+  namespace: mosaic-face-detection
+  annotations:
+    kubernetes.io/description: allows cillium envoy l7lb to call the face-detection
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: mosaic-face-detection
+  ingress:
+    - fromEntities:
         - ingress
       toPorts:
         - ports:

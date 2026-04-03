@@ -14,7 +14,25 @@ spec:
     - fromEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: mosaic-grpc-gateway
-      fromEntities:
+      toPorts:
+        - ports:
+            - port: "50051"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-audio-transcription-envoy-l7lb-ingress
+  namespace: mosaic-audio-transcription
+  annotations:
+    kubernetes.io/description: allows cillium envoy l7lb to call the audio-transcription
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: mosaic-audio-transcription
+  ingress:
+    - fromEntities:
         - ingress
       toPorts:
         - ports:
