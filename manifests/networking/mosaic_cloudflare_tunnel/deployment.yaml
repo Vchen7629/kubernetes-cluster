@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared-mosaic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared-mosaic
+  template:
+    metadata:
+      labels:
+        app: cloudflared-mosaic
+    spec:
+      containers:
+        - name: cloudflared-mosaic
+          image: "cloudflare/cloudflared:2026.2.0"
+          imagePullPolicy: IfNotPresent
+          args:
+            - tunnel
+            - --no-autoupdate
+            - --metrics
+            - "0.0.0.0:20241"
+            - --loglevel
+            - info
+            - --config
+            - /etc/cloudflared/config.yaml
+            - run
+          ports:
+            - name: metrics
+              containerPort: 20241
+              protocol: TCP
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              cpu: 25m
+              memory: 128Mi
+          volumeMounts:
+            - mountPath: /etc/cloudflared/tunnel-config.json
+              name: tunnel-secret-volume
+              subPath: tunnel-config.json
+            - mountPath: /etc/cloudflared/config.yaml
+              name: cloudflared-config-volume
+              subPath: config.yaml
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: tunnel-secret-volume
+          secret:
+            defaultMode: 420
+            optional: false
+            secretName: tunnel-secret
+        - name: cloudflared-config-volume
+          configMap:
+            defaultMode: 420
+            optional: false
+            name: cloudflared-mosaic
