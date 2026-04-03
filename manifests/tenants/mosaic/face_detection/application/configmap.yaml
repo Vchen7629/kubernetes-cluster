@@ -10,5 +10,5 @@ data:
   SERVER_PORT: "40040"
   METRICS_PORT: "9092"
   MODELS_DIR: "models"
-  REC_POOL_SIZE: "5"
-  PROD_MODE: "true"
+  REC_POOL_SIZE: "2"
+  PROD_MODE: "false"
