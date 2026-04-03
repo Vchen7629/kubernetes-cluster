@@ -65,7 +65,14 @@
     - observability/metrics_server
   tags: [core, observability, all_services]
 
-# data layer
+- name: Networking services deployment (used by cyphria, cinesense)
+  hosts: server
+  become: true
+  gather_facts: true
+  roles:
+    - networking/external_dns
+  tags: [core, networking, all_services]
+
 - name: Data layer deployment
   hosts: server
   become: true
@@ -73,23 +80,19 @@
   roles:
     - data/postgres
     - data/valkey
-  tags: [data, cyphria, mosaic, cinesense, splice, all_services]
+  tags: [core, data, all_services]
 
 # Tenant platform services
-- name: Networking services deployment (used by cyphria, cinesense)
-  hosts: server
-  become: true
-  gather_facts: true
-  roles:
-    - networking/cloudflare_tunnel
-    - networking/external_dns
-  tags: [cyphria, cinesense, all_services]
-
 - name: Cyphria services
   hosts: server
   become: true
   gather_facts: true
+  vars:
+    cf_tunnel_name: cyphria
+    cf_tunnel_hostname: cyphria.com
+    cf_tunnel_service: "{{ cilium_map.gateway.frontend.ingress }}"
   roles:
+    - networking/cloudflare_tunnel
     - tenants/cyphria/shared
     - platform/airflow
     - tenants/cyphria/frontend
@@ -104,7 +107,15 @@
   hosts: server
   become: true
   gather_facts: true
+  vars:
+    cf_tunnel_name: mosaic
+    cf_tunnel_hostname: api.mosaic.yourdomain.com
+    cf_tunnel_service: https://cilium-gateway-mosaic-grpc-gateway.mosaic-grpc-gateway.svc.cluster.local:443
+    cf_tunnel_origin_request:
+      http2Origin: true
+      noTLSVerify: true
   roles:
+    - networking/cloudflare_tunnel
     - bootstrap/mosaic_storage
     - platform/nvidia_device_plugin
     - platform/ollama

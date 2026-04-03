@@ -3,6 +3,8 @@
   hosts: server
   become: true
   gather_facts: true
+  vars:
+    cf_tunnel_name: mosaic
   tasks:
     - name: Get packages information
       ansible.builtin.package_facts:
@@ -19,6 +21,7 @@
         - platform/ollama
         - platform/nvidia_device_plugin
         - bootstrap/mosaic_storage
+        - networking/cloudflare_tunnel
       loop_control:
         loop_var: reset
   tags: [mosaic, tenants, all_services]
@@ -27,6 +30,8 @@
   hosts: server
   become: true
   gather_facts: true
+  vars:
+    cf_tunnel_name: cyphria
   tasks:
     - name: Get packages information
       ansible.builtin.package_facts:
@@ -44,6 +49,7 @@
         - tenants/cyphria/frontend
         - platform/airflow
         - tenants/cyphria/shared
+        - networking/cloudflare_tunnel
       loop_control:
         loop_var: reset
   tags: [cyphria, tenants, all_services]
@@ -62,7 +68,6 @@
         tasks_from: reset
       loop:
         - networking/external_dns
-        - networking/cloudflare_tunnel
       loop_control:
         loop_var: reset
   tags: [cyphria, cinesense, all_services]
