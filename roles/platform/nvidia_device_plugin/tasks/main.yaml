@@ -1,8 +1,13 @@
 ---
 - name: Role Facts
   ansible.builtin.include_role:
-    name: platform/nvidia_device_plugin
+    name: "{{ role }}"
     tasks_from: facts
+  loop:
+    - platform/nvidia_device_plugin
+    - bootstrap/k3s
+  loop_control:
+    loop_var: role
 
 - name: Install NVIDIA Container Toolkit
   when: inventory_hostname in k3s_vars.nodes.gpu.hosts
