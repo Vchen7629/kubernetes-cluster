@@ -104,7 +104,7 @@
           type: CNAME
           name: "{{ cf_tunnel_hostname }}"
           content: "{{ tunnel_id }}.cfargotunnel.com"
-          proxied: false
+          proxied: true
         return_content: true
       delegate_to: localhost
       become: false
