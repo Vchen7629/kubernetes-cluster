@@ -13,5 +13,5 @@ spec:
             io.kubernetes.pod.namespace: mosaic-grpc-gateway
       toPorts:
         - ports:
-            - port: "443"
+            - port: "80"
               protocol: TCP
