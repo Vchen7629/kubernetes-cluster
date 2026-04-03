@@ -13,7 +13,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /face_detection.FaceDetectionService/
+        value: /proto.face_detection.FaceDetectionService/
     backendRefs:
     - name: face-detection-service
       port: 40040
