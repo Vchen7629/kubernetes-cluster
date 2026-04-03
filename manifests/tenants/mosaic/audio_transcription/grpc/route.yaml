@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-kind: GRPCRoute
+kind: HTTPRoute
 metadata:
   name: audio-transcription-grpc
   namespace: mosaic-audio-transcription
@@ -10,6 +10,10 @@ spec:
   hostnames:
   - "api.verturus.com"
   rules:
-  - backendRefs:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /audio_transcription.AudioTranscriptionService/
+    backendRefs:
     - name: audio-transcription-service
       port: 50051
