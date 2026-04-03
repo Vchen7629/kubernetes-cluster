@@ -100,7 +100,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(rate(process_cpu_seconds_total{job=\"audio-transcription-service\"}[2m]))",
+              "expr": "rate(process_cpu_seconds_total{job=\"audio-transcription-service\", pod=~\"$pod\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -165,7 +165,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(process_resident_memory_bytes{job=\"audio-transcription-service\"})",
+              "expr": "process_resident_memory_bytes{job=\"audio-transcription-service\", pod=~\"$pod\"}",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -253,7 +253,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(audio_transcription_errors_total[2m])",
+              "expr": "rate(audio_transcription_errors_total{pod=~\"$pod\"}[2m])",
               "legendFormat": "{{operation}}",
               "refId": "A"
             }
@@ -340,7 +340,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(rate(process_cpu_seconds_total{job=\"audio-transcription-service\"}[2m]))",
+              "expr": "rate(process_cpu_seconds_total{job=\"audio-transcription-service\", pod=~\"$pod\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -427,7 +427,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(process_resident_memory_bytes{job=\"audio-transcription-service\"})",
+              "expr": "process_resident_memory_bytes{job=\"audio-transcription-service\", pod=~\"$pod\"}",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -528,22 +528,22 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "histogram_quantile(0.50, rate(audio_transcription_whisper_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.50, rate(audio_transcription_whisper_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, rate(audio_transcription_whisper_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.95, rate(audio_transcription_whisper_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p95",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, rate(audio_transcription_whisper_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.99, rate(audio_transcription_whisper_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p99",
               "refId": "C"
             },
             {
-              "expr": "rate(audio_transcription_whisper_duration_milliseconds_sum[2m]) / rate(audio_transcription_whisper_duration_milliseconds_count[2m])",
+              "expr": "rate(audio_transcription_whisper_duration_milliseconds_sum{pod=~\"$pod\"}[2m]) / rate(audio_transcription_whisper_duration_milliseconds_count{pod=~\"$pod\"}[2m])",
               "legendFormat": "avg",
               "refId": "D"
             }
@@ -631,22 +631,22 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "histogram_quantile(0.50, rate(audio_transcription_db_save_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.50, rate(audio_transcription_db_save_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, rate(audio_transcription_db_save_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.95, rate(audio_transcription_db_save_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p95",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, rate(audio_transcription_db_save_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.99, rate(audio_transcription_db_save_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p99",
               "refId": "C"
             },
             {
-              "expr": "rate(audio_transcription_db_save_duration_milliseconds_sum[2m]) / rate(audio_transcription_db_save_duration_milliseconds_count[2m])",
+              "expr": "rate(audio_transcription_db_save_duration_milliseconds_sum{pod=~\"$pod\"}[2m]) / rate(audio_transcription_db_save_duration_milliseconds_count{pod=~\"$pod\"}[2m])",
               "legendFormat": "avg",
               "refId": "D"
             }
@@ -746,7 +746,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(audio_transcription_db_writes_total[2m])",
+              "expr": "rate(audio_transcription_db_writes_total{pod=~\"$pod\"}[2m])",
               "legendFormat": "{{operation}}",
               "refId": "A"
             }
@@ -800,7 +800,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(audio_transcription_whisper_duration_milliseconds_count[2m])",
+              "expr": "rate(audio_transcription_whisper_duration_milliseconds_count{pod=~\"$pod\"}[2m])",
               "legendFormat": "calls/sec",
               "refId": "A"
             }
@@ -814,7 +814,29 @@ data:
       "schemaVersion": 41,
       "tags": [],
       "templating": {
-        "list": []
+        "list": [
+          {
+            "current": {},
+            "datasource": {
+              "type": "prometheus"
+            },
+            "definition": "label_values(process_cpu_seconds_total{job=\"audio-transcription-service\"}, pod)",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Pod",
+            "multi": false,
+            "name": "pod",
+            "options": [],
+            "query": {
+              "query": "label_values(process_cpu_seconds_total{job=\"audio-transcription-service\"}, pod)",
+              "refId": "StandardVariableQuery"
+            },
+            "refresh": 2,
+            "regex": "",
+            "sort": 1,
+            "type": "query"
+          }
+        ]
       },
       "time": {
         "from": "now-30m",

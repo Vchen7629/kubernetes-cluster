@@ -100,7 +100,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(process_resident_memory_bytes{job=\"conversation-briefing-service\"})",
+              "expr": "process_resident_memory_bytes{job=\"conversation-briefing-service\", pod=~\"$pod\"}",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -162,7 +162,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(go_goroutines{job=\"conversation-briefing-service\"})",
+              "expr": "go_goroutines{job=\"conversation-briefing-service\", pod=~\"$pod\"}",
               "legendFormat": "goroutines",
               "refId": "A"
             }
@@ -250,7 +250,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(conversation_briefing_errors_total[2m])",
+              "expr": "rate(conversation_briefing_errors_total{pod=~\"$pod\"}[2m])",
               "legendFormat": "{{operation}}",
               "refId": "A"
             }
@@ -337,7 +337,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(rate(process_cpu_seconds_total{job=\"conversation-briefing-service\"}[2m]))",
+              "expr": "rate(process_cpu_seconds_total{job=\"conversation-briefing-service\", pod=~\"$pod\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -424,7 +424,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(process_resident_memory_bytes{job=\"conversation-briefing-service\"})",
+              "expr": "process_resident_memory_bytes{job=\"conversation-briefing-service\", pod=~\"$pod\"}",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -486,7 +486,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(rate(process_cpu_seconds_total{job=\"conversation-briefing-service\"}[2m]))",
+              "expr": "rate(process_cpu_seconds_total{job=\"conversation-briefing-service\", pod=~\"$pod\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -587,22 +587,22 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "histogram_quantile(0.50, rate(conversation_briefing_llm_response_duration_milliseconds_bucket[5m]))",
+              "expr": "histogram_quantile(0.50, rate(conversation_briefing_llm_response_duration_milliseconds_bucket{pod=~\"$pod\"}[5m]))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, rate(conversation_briefing_llm_response_duration_milliseconds_bucket[5m]))",
+              "expr": "histogram_quantile(0.95, rate(conversation_briefing_llm_response_duration_milliseconds_bucket{pod=~\"$pod\"}[5m]))",
               "legendFormat": "p95",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, rate(conversation_briefing_llm_response_duration_milliseconds_bucket[5m]))",
+              "expr": "histogram_quantile(0.99, rate(conversation_briefing_llm_response_duration_milliseconds_bucket{pod=~\"$pod\"}[5m]))",
               "legendFormat": "p99",
               "refId": "C"
             },
             {
-              "expr": "rate(conversation_briefing_llm_response_duration_milliseconds_sum[5m]) / rate(conversation_briefing_llm_response_duration_milliseconds_count[5m])",
+              "expr": "rate(conversation_briefing_llm_response_duration_milliseconds_sum{pod=~\"$pod\"}[5m]) / rate(conversation_briefing_llm_response_duration_milliseconds_count{pod=~\"$pod\"}[5m])",
               "legendFormat": "avg",
               "refId": "D"
             }
@@ -690,22 +690,22 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "histogram_quantile(0.50, rate(conversation_briefing_briefing_insert_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.50, rate(conversation_briefing_briefing_insert_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, rate(conversation_briefing_briefing_insert_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.95, rate(conversation_briefing_briefing_insert_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p95",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, rate(conversation_briefing_briefing_insert_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.99, rate(conversation_briefing_briefing_insert_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p99",
               "refId": "C"
             },
             {
-              "expr": "rate(conversation_briefing_briefing_insert_duration_milliseconds_sum[2m]) / rate(conversation_briefing_briefing_insert_duration_milliseconds_count[2m])",
+              "expr": "rate(conversation_briefing_briefing_insert_duration_milliseconds_sum{pod=~\"$pod\"}[2m]) / rate(conversation_briefing_briefing_insert_duration_milliseconds_count{pod=~\"$pod\"}[2m])",
               "legendFormat": "avg",
               "refId": "D"
             }
@@ -793,22 +793,22 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "histogram_quantile(0.50, rate(conversation_briefing_conversation_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.50, rate(conversation_briefing_conversation_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, rate(conversation_briefing_conversation_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.95, rate(conversation_briefing_conversation_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p95",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, rate(conversation_briefing_conversation_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.99, rate(conversation_briefing_conversation_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p99",
               "refId": "C"
             },
             {
-              "expr": "rate(conversation_briefing_conversation_fetch_duration_milliseconds_sum[2m]) / rate(conversation_briefing_conversation_fetch_duration_milliseconds_count[2m])",
+              "expr": "rate(conversation_briefing_conversation_fetch_duration_milliseconds_sum{pod=~\"$pod\"}[2m]) / rate(conversation_briefing_conversation_fetch_duration_milliseconds_count{pod=~\"$pod\"}[2m])",
               "legendFormat": "avg",
               "refId": "D"
             }
@@ -908,12 +908,12 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(conversation_briefing_db_reads_total[2m])",
+              "expr": "rate(conversation_briefing_db_reads_total{pod=~\"$pod\"}[2m])",
               "legendFormat": "reads \u2014 {{operation}}",
               "refId": "A"
             },
             {
-              "expr": "rate(conversation_briefing_db_writes_total[2m])",
+              "expr": "rate(conversation_briefing_db_writes_total{pod=~\"$pod\"}[2m])",
               "legendFormat": "writes \u2014 {{operation}}",
               "refId": "B"
             }
@@ -927,7 +927,29 @@ data:
       "schemaVersion": 41,
       "tags": [],
       "templating": {
-        "list": []
+        "list": [
+          {
+            "current": {},
+            "datasource": {
+              "type": "prometheus"
+            },
+            "definition": "label_values(process_cpu_seconds_total{job=\"conversation-briefing-service\"}, pod)",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Pod",
+            "multi": false,
+            "name": "pod",
+            "options": [],
+            "query": {
+              "query": "label_values(process_cpu_seconds_total{job=\"conversation-briefing-service\"}, pod)",
+              "refId": "StandardVariableQuery"
+            },
+            "refresh": 2,
+            "regex": "",
+            "sort": 1,
+            "type": "query"
+          }
+        ]
       },
       "time": {
         "from": "now-30m",

@@ -103,7 +103,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(rate(process_cpu_seconds_total{job=\"face-detection-service\"}[2m]))",
+              "expr": "rate(process_cpu_seconds_total{job=\"face-detection-service\", pod=~\"$pod\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -165,7 +165,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(process_resident_memory_bytes{job=\"face-detection-service\"})",
+              "expr": "process_resident_memory_bytes{job=\"face-detection-service\", pod=~\"$pod\"}",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -227,7 +227,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(go_goroutines{job=\"face-detection-service\"})",
+              "expr": "go_goroutines{job=\"face-detection-service\", pod=~\"$pod\"}",
               "legendFormat": "goroutines",
               "refId": "A"
             }
@@ -315,7 +315,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(face_detection_errors_total[2m])",
+              "expr": "rate(face_detection_errors_total{pod=~\"$pod\"}[2m])",
               "legendFormat": "{{operation}}",
               "refId": "A"
             }
@@ -405,7 +405,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(rate(process_cpu_seconds_total{job=\"face-detection-service\"}[2m]))",
+              "expr": "rate(process_cpu_seconds_total{job=\"face-detection-service\", pod=~\"$pod\"}[2m])",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -492,7 +492,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "avg without(pod, instance)(process_resident_memory_bytes{job=\"face-detection-service\"})",
+              "expr": "process_resident_memory_bytes{job=\"face-detection-service\", pod=~\"$pod\"}",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -618,22 +618,22 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "histogram_quantile(0.50, rate(face_detection_profile_emb_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.50, rate(face_detection_profile_emb_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, rate(face_detection_profile_emb_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.95, rate(face_detection_profile_emb_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p95",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, rate(face_detection_profile_emb_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.99, rate(face_detection_profile_emb_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p99",
               "refId": "C"
             },
             {
-              "expr": "rate(face_detection_profile_emb_fetch_duration_milliseconds_sum[2m]) / rate(face_detection_profile_emb_fetch_duration_milliseconds_count[2m])",
+              "expr": "rate(face_detection_profile_emb_fetch_duration_milliseconds_sum{pod=~\"$pod\"}[2m]) / rate(face_detection_profile_emb_fetch_duration_milliseconds_count{pod=~\"$pod\"}[2m])",
               "legendFormat": "avg",
               "refId": "D"
             }
@@ -721,22 +721,22 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "histogram_quantile(0.50, rate(face_detection_visitor_emb_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.50, rate(face_detection_visitor_emb_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, rate(face_detection_visitor_emb_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.95, rate(face_detection_visitor_emb_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p95",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, rate(face_detection_visitor_emb_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.99, rate(face_detection_visitor_emb_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p99",
               "refId": "C"
             },
             {
-              "expr": "rate(face_detection_visitor_emb_fetch_duration_milliseconds_sum[2m]) / rate(face_detection_visitor_emb_fetch_duration_milliseconds_count[2m])",
+              "expr": "rate(face_detection_visitor_emb_fetch_duration_milliseconds_sum{pod=~\"$pod\"}[2m]) / rate(face_detection_visitor_emb_fetch_duration_milliseconds_count{pod=~\"$pod\"}[2m])",
               "legendFormat": "avg",
               "refId": "D"
             }
@@ -824,22 +824,22 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "histogram_quantile(0.50, rate(face_detection_embedding_generation_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.50, rate(face_detection_embedding_generation_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, rate(face_detection_embedding_generation_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.95, rate(face_detection_embedding_generation_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p95",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, rate(face_detection_embedding_generation_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.99, rate(face_detection_embedding_generation_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p99",
               "refId": "C"
             },
             {
-              "expr": "rate(face_detection_embedding_generation_duration_milliseconds_sum[2m]) / rate(face_detection_embedding_generation_duration_milliseconds_count[2m])",
+              "expr": "rate(face_detection_embedding_generation_duration_milliseconds_sum{pod=~\"$pod\"}[2m]) / rate(face_detection_embedding_generation_duration_milliseconds_count{pod=~\"$pod\"}[2m])",
               "legendFormat": "avg",
               "refId": "D"
             }
@@ -927,22 +927,22 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "histogram_quantile(0.50, rate(face_detection_briefing_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.50, rate(face_detection_briefing_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, rate(face_detection_briefing_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.95, rate(face_detection_briefing_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p95",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, rate(face_detection_briefing_fetch_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.99, rate(face_detection_briefing_fetch_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "p99",
               "refId": "C"
             },
             {
-              "expr": "rate(face_detection_briefing_fetch_duration_milliseconds_sum[2m]) / rate(face_detection_briefing_fetch_duration_milliseconds_count[2m])",
+              "expr": "rate(face_detection_briefing_fetch_duration_milliseconds_sum{pod=~\"$pod\"}[2m]) / rate(face_detection_briefing_fetch_duration_milliseconds_count{pod=~\"$pod\"}[2m])",
               "legendFormat": "avg",
               "refId": "D"
             }
@@ -1030,12 +1030,12 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "histogram_quantile(0.99, rate(face_detection_visitor_comparison_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.99, rate(face_detection_visitor_comparison_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "visitor cmp p99",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.99, rate(face_detection_profile_comparison_duration_milliseconds_bucket[2m]))",
+              "expr": "histogram_quantile(0.99, rate(face_detection_profile_comparison_duration_milliseconds_bucket{pod=~\"$pod\"}[2m]))",
               "legendFormat": "profile cmp p99",
               "refId": "B"
             }
@@ -1136,17 +1136,17 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(face_detection_db_reads_total{operation=\"fetch_visitor_data\"}[2m])",
+              "expr": "rate(face_detection_db_reads_total{operation=\"fetch_visitor_data\", pod=~\"$pod\"}[2m])",
               "legendFormat": "fetch_visitor_data",
               "refId": "A"
             },
             {
-              "expr": "rate(face_detection_db_reads_total{operation=\"fetch_profile_embeddings\"}[2m])",
+              "expr": "rate(face_detection_db_reads_total{operation=\"fetch_profile_embeddings\", pod=~\"$pod\"}[2m])",
               "legendFormat": "fetch_profile_embeddings",
               "refId": "B"
             },
             {
-              "expr": "rate(face_detection_db_reads_total{operation=\"fetch_briefing\"}[2m])",
+              "expr": "rate(face_detection_db_reads_total{operation=\"fetch_briefing\", pod=~\"$pod\"}[2m])",
               "legendFormat": "fetch_briefing",
               "refId": "C"
             }
@@ -1160,7 +1160,29 @@ data:
       "schemaVersion": 41,
       "tags": [],
       "templating": {
-        "list": []
+        "list": [
+          {
+            "current": {},
+            "datasource": {
+              "type": "prometheus"
+            },
+            "definition": "label_values(process_cpu_seconds_total{job=\"face-detection-service\"}, pod)",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Pod",
+            "multi": false,
+            "name": "pod",
+            "options": [],
+            "query": {
+              "query": "label_values(process_cpu_seconds_total{job=\"face-detection-service\"}, pod)",
+              "refId": "StandardVariableQuery"
+            },
+            "refresh": 2,
+            "regex": "",
+            "sort": 1,
+            "type": "query"
+          }
+        ]
       },
       "time": {
         "from": "now-30m",
