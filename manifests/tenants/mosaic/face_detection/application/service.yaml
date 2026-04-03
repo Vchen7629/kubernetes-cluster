@@ -21,3 +21,4 @@ spec:
       targetPort: 40040
       protocol: TCP
       name: grpc
+      appProtocol: kubernetes.io/h2c
