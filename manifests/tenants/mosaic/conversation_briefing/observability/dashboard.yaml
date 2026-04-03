@@ -100,7 +100,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "process_resident_memory_bytes{job=\"conversation-briefing-service\"}",
+              "expr": "avg without(pod, instance)(process_resident_memory_bytes{job=\"conversation-briefing-service\"})",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -162,7 +162,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "go_goroutines{job=\"conversation-briefing-service\"}",
+              "expr": "avg without(pod, instance)(go_goroutines{job=\"conversation-briefing-service\"})",
               "legendFormat": "goroutines",
               "refId": "A"
             }
@@ -337,7 +337,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(process_cpu_seconds_total{job=\"conversation-briefing-service\"}[2m])",
+              "expr": "avg without(pod, instance)(rate(process_cpu_seconds_total{job=\"conversation-briefing-service\"}[2m]))",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -424,7 +424,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "process_resident_memory_bytes{job=\"conversation-briefing-service\"}",
+              "expr": "avg without(pod, instance)(process_resident_memory_bytes{job=\"conversation-briefing-service\"})",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -486,7 +486,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(process_cpu_seconds_total{job=\"conversation-briefing-service\"}[2m])",
+              "expr": "avg without(pod, instance)(rate(process_cpu_seconds_total{job=\"conversation-briefing-service\"}[2m]))",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -909,12 +909,12 @@ data:
           "targets": [
             {
               "expr": "rate(conversation_briefing_db_reads_total[2m])",
-              "legendFormat": "reads — {{operation}}",
+              "legendFormat": "reads \u2014 {{operation}}",
               "refId": "A"
             },
             {
               "expr": "rate(conversation_briefing_db_writes_total[2m])",
-              "legendFormat": "writes — {{operation}}",
+              "legendFormat": "writes \u2014 {{operation}}",
               "refId": "B"
             }
           ],

@@ -103,7 +103,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(process_cpu_seconds_total{job=\"face-detection-service\"}[2m])",
+              "expr": "avg without(pod, instance)(rate(process_cpu_seconds_total{job=\"face-detection-service\"}[2m]))",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -165,7 +165,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "process_resident_memory_bytes{job=\"face-detection-service\"}",
+              "expr": "avg without(pod, instance)(process_resident_memory_bytes{job=\"face-detection-service\"})",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -227,7 +227,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "go_goroutines{job=\"face-detection-service\"}",
+              "expr": "avg without(pod, instance)(go_goroutines{job=\"face-detection-service\"})",
               "legendFormat": "goroutines",
               "refId": "A"
             }
@@ -405,7 +405,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "rate(process_cpu_seconds_total{job=\"face-detection-service\"}[2m])",
+              "expr": "avg without(pod, instance)(rate(process_cpu_seconds_total{job=\"face-detection-service\"}[2m]))",
               "legendFormat": "cpu",
               "refId": "A"
             }
@@ -492,7 +492,7 @@ data:
           "pluginVersion": "11.6.0",
           "targets": [
             {
-              "expr": "process_resident_memory_bytes{job=\"face-detection-service\"}",
+              "expr": "avg without(pod, instance)(process_resident_memory_bytes{job=\"face-detection-service\"})",
               "legendFormat": "rss",
               "refId": "A"
             }
@@ -638,7 +638,7 @@ data:
               "refId": "D"
             }
           ],
-          "title": "Per-Frame Latency — Fetch Profile Embeddings (ms)",
+          "title": "Per-Frame Latency \u2014 Fetch Profile Embeddings (ms)",
           "type": "timeseries"
         },
         {
@@ -741,11 +741,11 @@ data:
               "refId": "D"
             }
           ],
-          "title": "Per-Frame Latency — Fetch Visitor Embeddings (ms)",
+          "title": "Per-Frame Latency \u2014 Fetch Visitor Embeddings (ms)",
           "type": "timeseries"
         },
         {
-          "description": "CPU-bound Kagami/go-face model inference. Not cacheable — baseline for comparison.",
+          "description": "CPU-bound Kagami/go-face model inference. Not cacheable \u2014 baseline for comparison.",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -951,7 +951,7 @@ data:
           "type": "timeseries"
         },
         {
-          "description": "Profile and visitor embedding comparisons — pure CPU, should be negligible.",
+          "description": "Profile and visitor embedding comparisons \u2014 pure CPU, should be negligible.",
           "fieldConfig": {
             "defaults": {
               "color": {
