@@ -15,7 +15,7 @@ spec:
         - matchLabels:
             io.kubernetes.pod.namespace: mosaic-grpc-gateway
       fromEntities:
-        - host
+        - ingress
       toPorts:
         - ports:
             - port: "40040"
