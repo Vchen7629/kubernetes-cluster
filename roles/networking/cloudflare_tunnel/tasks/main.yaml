@@ -45,6 +45,70 @@
         account_tag: "{{ tunnel_result.json.result.credentials_file.AccountTag }}"
         tunnel_secret: "{{ tunnel_result.json.result.credentials_file.TunnelSecret }}"
 
+    - name: Get Cloudflare zone ID
+      ansible.builtin.uri:
+        url: "https://api.cloudflare.com/client/v4/zones?name={{ cf_tunnel_hostname | regex_replace('^[^.]+\\.', '') }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+          Content-Type: "application/json"
+        return_content: true
+      register: zone_result
+      delegate_to: localhost
+      become: false
+
+    - name: Set zone ID fact
+      ansible.builtin.set_fact:
+        cf_zone_id: "{{ zone_result.json.result[0].id }}"
+
+    - name: Get existing DNS record
+      ansible.builtin.uri:
+        url: "https://api.cloudflare.com/client/v4/zones/{{ cf_zone_id }}/dns_records?name={{ cf_tunnel_hostname }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+          Content-Type: "application/json"
+        return_content: true
+      register: existing_dns
+      delegate_to: localhost
+      become: false
+
+    - name: Create DNS record for tunnel
+      when: existing_dns.json.result | length == 0
+      ansible.builtin.uri:
+        url: "https://api.cloudflare.com/client/v4/zones/{{ cf_zone_id }}/dns_records"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          type: CNAME
+          name: "{{ cf_tunnel_hostname }}"
+          content: "{{ tunnel_id }}.cfargotunnel.com"
+          proxied: false
+        return_content: true
+      delegate_to: localhost
+      become: false
+
+    - name: Update existing DNS record for tunnel
+      when: existing_dns.json.result | length > 0
+      ansible.builtin.uri:
+        url: "https://api.cloudflare.com/client/v4/zones/{{ cf_zone_id }}/dns_records/{{ existing_dns.json.result[0].id }}"
+        method: PUT
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          type: CNAME
+          name: "{{ cf_tunnel_hostname }}"
+          content: "{{ tunnel_id }}.cfargotunnel.com"
+          proxied: false
+        return_content: true
+      delegate_to: localhost
+      become: false
+
     - name: Save to file
       ansible.builtin.copy:
         dest: "{{ role_path }}/credentials/temp-{{ cf_tunnel_name }}.yaml"
@@ -52,6 +116,8 @@
           tunnel_id: {{ tunnel_id }}
           account_id: {{ cf_account_id }}
           api_key: {{ api_token }}
+          zone_id: {{ cf_zone_id }}
+          hostname: {{ cf_tunnel_hostname }}
       delegate_to: localhost
       become: false
       run_once: true

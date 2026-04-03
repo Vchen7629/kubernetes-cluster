@@ -32,9 +32,12 @@ spec:
           ingress:
             - hostname: '{{ cf_tunnel_hostname }}'
               service: '{{ cf_tunnel_service }}'
-              {% if cf_tunnel_origin_request %}
-              originRequest: {{ cf_tunnel_origin_request | to_yaml }}
-              {% endif %}
+{% if cf_tunnel_origin_request %}
+              originRequest:
+{% for key, value in cf_tunnel_origin_request.items() %}
+                {{ key }}: {{ value }}
+{% endfor %}
+{% endif %}
 
             - hostname: '*.{{ cf_tunnel_hostname }}'
               service: '{{ cf_tunnel_service }}'

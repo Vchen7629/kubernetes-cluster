@@ -1,5 +1,5 @@
 ---
-- name: Uninstall prometheus operator in argocd
+- name: Uninstall cloudflared in argocd
   kubernetes.core.k8s:
     api_version: argoproj.io/v1alpha1
     state: absent
@@ -58,5 +58,35 @@
     headers:
       Authorization: "Bearer {{ api_key }}"
       Content-Type: "application/json"
+  delegate_to: localhost
+  become: false
+
+- name: Get DNS record ID for tunnel hostname
+  ansible.builtin.uri:
+    url: "https://api.cloudflare.com/client/v4/zones/{{ zone_id }}/dns_records?name={{ hostname }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ api_key }}"
+      Content-Type: "application/json"
+    return_content: true
+  register: dns_records
+  delegate_to: localhost
+  become: false
+
+- name: Delete DNS record for tunnel
+  ansible.builtin.uri:
+    url: "https://api.cloudflare.com/client/v4/zones/{{ zone_id }}/dns_records/{{ dns_records.json.result[0].id }}"
+    method: DELETE
+    headers:
+      Authorization: "Bearer {{ api_key }}"
+      Content-Type: "application/json"
+  when: dns_records.json.result | length > 0
+  delegate_to: localhost
+  become: false
+
+- name: Delete credentials file
+  ansible.builtin.file:
+    path: "{{ role_path }}/credentials/temp-{{ cf_tunnel_name }}.yaml"
+    state: absent
   delegate_to: localhost
   become: false

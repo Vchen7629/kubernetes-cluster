@@ -1,4 +1,6 @@
 ---
+cf_tunnel_origin_request: {}
+
 cloudflared_vars:
   kubernetes:
     helm:
