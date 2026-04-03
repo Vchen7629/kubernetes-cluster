@@ -13,7 +13,7 @@
   block:
     - name: Create Cloudflare namespace
       kubernetes.core.k8s:
-        name: cloudflare-tunnel
+        name: "cloudflare-tunnel-{{ cf_tunnel_name }}"
         state: present
         kind: Namespace
         api_version: v1
@@ -32,7 +32,10 @@
         headers:
           Authorization: "Bearer {{ api_token }}"
           Content-type: "application/json"
-        body: "{{ {'name': 'cyphria', 'config_src': 'cloudflare'} | to_json }}"
+        body_format: json
+        body:
+          name: "{{ cf_tunnel_name }}"
+          config_src: cloudflare
         return_content: true
       register: tunnel_result
 
@@ -44,7 +47,7 @@
 
     - name: Save to file
       ansible.builtin.copy:
-        dest: "{{ role_path }}/credentials/temp.yaml"
+        dest: "{{ role_path }}/credentials/temp-{{ cf_tunnel_name }}.yaml"
         content: |
           tunnel_id: {{ tunnel_id }}
           account_id: {{ cf_account_id }}
@@ -56,5 +59,5 @@
     - name: Deploy to argocd
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('ansible.builtin.template', 'deployment.yaml') | from_yaml }}"
+        definition: "{{ lookup('ansible.builtin.template', 'deployment.j2') | from_yaml }}"
         kubeconfig: /etc/rancher/k3s/k3s.yaml

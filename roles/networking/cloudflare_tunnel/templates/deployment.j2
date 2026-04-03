@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cloudflared
+  name: "cloudflared-{{ cf_tunnel_name }}"
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -26,16 +26,18 @@ spec:
           auth:
             tunnelID: "{{ tunnel_id }}"
             accountTag: "{{ account_tag }}"
-            tunnelName: cyphria
+            tunnelName: "{{ cf_tunnel_name }}"
             tunnelSecret: "{{ tunnel_secret }}"
 
-          # this forwards 
           ingress:
-            - hostname: 'cyphria.com'
-              service: '{{ cilium_map.gateway.frontend.ingress }}'
+            - hostname: '{{ cf_tunnel_hostname }}'
+              service: '{{ cf_tunnel_service }}'
+              {% if cf_tunnel_origin_request %}
+              originRequest: {{ cf_tunnel_origin_request | to_yaml }}
+              {% endif %}
 
-            - hostname: '*.cyphria.com'
-              service: '{{ cilium_map.gateway.frontend.ingress }}'
+            - hostname: '*.{{ cf_tunnel_hostname }}'
+              service: '{{ cf_tunnel_service }}'
             
             - service: http_status:404
               
@@ -47,7 +49,7 @@ spec:
             memory: '{{ cloudflared_vars.kubernetes.resources.requests.memory }}'
   destination:
     server: https://kubernetes.default.svc
-    namespace: cloudflare-tunnel
+    namespace: "cloudflare-tunnel-{{ cf_tunnel_name }}"
 
   syncPolicy:
     automated:

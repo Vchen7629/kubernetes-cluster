@@ -4,12 +4,12 @@
     api_version: argoproj.io/v1alpha1
     state: absent
     kind: Application
-    name: cloudflared
+    name: "cloudflared-{{ cf_tunnel_name }}"
     namespace: argocd
 
 - name: Include tunnel facts variables
   ansible.builtin.include_vars:
-    file: "{{ role_path }}/credentials/temp.yaml"
+    file: "{{ role_path }}/credentials/temp-{{ cf_tunnel_name }}.yaml"
 
 - name: Get Cloudflare tunnel info
   ansible.builtin.uri:
