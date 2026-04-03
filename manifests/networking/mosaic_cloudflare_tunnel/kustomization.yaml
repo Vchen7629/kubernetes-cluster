@@ -5,5 +5,7 @@ kind: Kustomization
 namespace: cloudflare-tunnel-mosaic
 
 resources:
-  - deployment.yaml
-  - service.yaml
+  - application/deployment.yaml
+  - application/service.yaml
+
+  - network-policy/egress-to-mosaic.yaml

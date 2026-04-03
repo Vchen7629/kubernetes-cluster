@@ -1,0 +1,47 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-cloudflare-tunnel-to-audio-transcription-access
+spec:
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-audio-transcription
+      toPorts:
+        - ports:
+            - port: "50051"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-cloudflare-tunnel-to-face-detection-access
+spec:
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-face-detection
+      toPorts:
+        - ports:
+            - port: "40040"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-cloudflare-tunnel-to-conversation-briefing-access
+spec:
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-conversation-briefing
+      toPorts:
+        - ports:
+            - port: "30030"
+              protocol: TCP
