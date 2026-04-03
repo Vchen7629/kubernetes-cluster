@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
+kind: GRPCRoute
 metadata:
   name: face-detection-grpc
   namespace: mosaic-face-detection
@@ -11,9 +11,8 @@ spec:
   - "api.verturus.com"
   rules:
   - matches:
-    - path:
-        type: PathPrefix
-        value: /proto.face_detection.FaceDetectionService/
+    - method:
+        service: proto.face_detection.FaceDetectionService
     backendRefs:
     - name: face-detection-service
       port: 40040

@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
+kind: GRPCRoute
 metadata:
   name: conversation-briefing-grpc
   namespace: mosaic-conversation-briefing
@@ -11,9 +11,8 @@ spec:
   - "api.verturus.com"
   rules:
   - matches:
-    - path:
-        type: PathPrefix
-        value: /conversation_briefing.ConversationBriefingService/
+    - method:
+        service: conversation_briefing.ConversationBriefingService
     backendRefs:
     - name: conversation-briefing-service
       port: 30030
