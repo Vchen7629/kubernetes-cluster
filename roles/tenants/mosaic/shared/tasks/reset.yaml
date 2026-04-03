@@ -19,6 +19,13 @@
         kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
 
+    - name: Delete CiliumNetworkPolicy custom resources
+      ansible.builtin.shell: |
+        kubectl delete ciliumnetworkpolicies.cilium.io -n cloudflare-tunnel-mosaic --all --timeout=30s 2>/dev/null || true
+      environment:
+        KUBECONFIG: "{{ k3s_project.cluster.kubeconfig }}"
+      ignore_errors: true
+
     - name: Delete VMPodScrape from victoria-metrics namespace
       kubernetes.core.k8s:
         api_version: operator.victoriametrics.com/v1beta1
@@ -99,7 +106,7 @@
         wait: false
         kubeconfig: "{{ k3s_project.cluster.kubeconfig }}"
       ignore_errors: true
-
+      
     - name: Wait for mosaic-grpc-gateway namespace deletion
       ansible.builtin.shell: |
         for i in {1..15}; do
