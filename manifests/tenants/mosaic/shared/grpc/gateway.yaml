@@ -9,7 +9,7 @@ spec:
   - name: grpc
     port: 443
     protocol: HTTPS
-    hostname: "*.mosaic.com"
+    hostname: "api.verturus.com"
     allowedRoutes:
       namespaces:
         from: Selector
