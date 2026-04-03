@@ -8,7 +8,7 @@ spec:
   - name: mosaic-grpc-gateway
     namespace: mosaic-grpc-gateway
   hostnames:
-  - "conversation-briefing.mosaic.com"
+  - "api.verturus.com"
   rules:
   - backendRefs:
     - name: conversation-briefing-service
