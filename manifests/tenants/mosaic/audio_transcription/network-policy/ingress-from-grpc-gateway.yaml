@@ -13,6 +13,8 @@ spec:
     - fromEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: mosaic-grpc-gateway
+      fromEntities:
+        - host
       toPorts:
         - ports:
             - port: "50051"
