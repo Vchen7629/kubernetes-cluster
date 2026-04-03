@@ -1,0 +1,29 @@
+---
+# Cloudflare Tunnel
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-cloudflare-tunnel-to-all-access
+  namespace: cloudflare-tunnel-mosaic
+spec:
+  endpointSelector: {}
+  egress:
+    # Cloudflare edge (TLS + QUIC)
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "7844"
+              protocol: TCP
+            - port: "7844"
+              protocol: UDP
+    # Mosaic gRPC gateway
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-grpc-gateway
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

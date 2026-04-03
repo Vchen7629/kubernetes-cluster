@@ -1,8 +1,9 @@
 ---
+apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: cloudflare-tunnel-from-world-access
-  namespace: cloudflare-tunnel
+  name: mosaic-cloudflare-tunnel-from-world-access
+  namespace: cloudflare-tunnel-mosaic
 spec:
   endpointSelector: {}
   ingress:

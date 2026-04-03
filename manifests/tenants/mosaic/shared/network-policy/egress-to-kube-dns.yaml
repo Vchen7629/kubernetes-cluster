@@ -3,8 +3,8 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: cloudflare-tunnel-to-kube-dns-access
-  namespace: cloudflare-tunnel
+  name: mosaic-cloudflare-tunnel-to-kube-dns-access
+  namespace: cloudflare-tunnel-mosaic
 spec:
   endpointSelector: {}
   egress:

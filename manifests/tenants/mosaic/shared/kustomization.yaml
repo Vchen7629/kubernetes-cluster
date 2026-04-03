@@ -9,7 +9,13 @@ resources:
   - database/storage-class.yaml
   - database/persistent-volume.yaml
 
-  - networking/grpc-gateway.yaml
+  - grpc/gateway.yaml
+
+  - network-policy/egress-to-all.yaml
+  - network-policy/egress-to-kube-dns.yaml
+  - network-policy/ingress-from-networking.yaml
+  - network-policy/ingress-from-observability.yaml
+  - network-policy/ingress-from-world.yaml
 
   - observability/pod-monitor.yaml
   
