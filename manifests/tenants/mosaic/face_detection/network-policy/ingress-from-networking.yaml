@@ -20,3 +20,24 @@ spec:
         - ports:
             - port: "40040"
               protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-face-detection-from-mosaic-cloudflare-tunnel-access
+  namespace: mosaic-face-detection
+  annotations:
+    kubernetes.io/description: allows access from mosaic cloudflare tunnel
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: mosaic-face-detection
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: cloudflare-tunnel-mosaic
+      toPorts:
+        - ports:
+            - port: "40040"
+              protocol: TCP

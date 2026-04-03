@@ -1,0 +1,41 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-conversation-briefing-grpc-ingress
+  namespace: mosaic-conversation-briefing
+  annotations:
+    kubernetes.io/description: allows grpc gateway to call the conversation-briefing grpc endpoint
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: mosaic-conversation-briefing
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: mosaic-grpc-gateway
+      toPorts:
+        - ports:
+            - port: "30030"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosaic-conversation-briefing-from-mosaic-cloudflare-tunnel-access
+  namespace: mosaic-conversation-briefing
+  annotations:
+    kubernetes.io/description: allows access from mosaic cloudflare tunnel
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: mosaic-conversation-briefing
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: cloudflare-tunnel-mosaic
+      toPorts:
+        - ports:
+            - port: "30030"
+              protocol: TCP
