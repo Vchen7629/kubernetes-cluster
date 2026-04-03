@@ -822,7 +822,7 @@ data:
             },
             "definition": "label_values(process_cpu_seconds_total{job=\"audio-transcription-service\"}, pod)",
             "hide": 0,
-            "includeAll": true,
+            "includeAll": false,
             "label": "Pod",
             "multi": false,
             "name": "pod",
