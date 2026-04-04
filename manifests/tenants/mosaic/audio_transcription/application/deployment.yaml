@@ -21,7 +21,7 @@ spec:
         - name: download-whisper-model
           image: ghcr.io/vchen7629/mosaic-audio_transcription
           command:
-            - python
+            - /app/.venv/bin/python
             - -c
             - |
               from faster_whisper import WhisperModel
