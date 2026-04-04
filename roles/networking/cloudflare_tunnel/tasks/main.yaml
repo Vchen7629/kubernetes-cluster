@@ -134,3 +134,18 @@
         definition: "{{ item }}"
         kubeconfig: /etc/rancher/k3s/k3s.yaml
       loop: "{{ lookup('ansible.builtin.template', 'deployment.j2') | from_yaml_all | list }}"
+
+    - name: Restart cloudflared deployment to pick up new tunnel credentials
+      kubernetes.core.k8s:
+        state: patched
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        kind: Deployment
+        name: "cloudflared-{{ cf_tunnel_name }}"
+        namespace: "cloudflare-tunnel-{{ cf_tunnel_name }}"
+        definition:
+          spec:
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/restartedAt: "{{ ansible_date_time.iso8601 }}"
+      ignore_errors: true

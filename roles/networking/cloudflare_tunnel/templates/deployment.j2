@@ -25,6 +25,7 @@ data:
     tunnel: {{ tunnel_id }}
     credentials-file: /etc/cloudflared/tunnel-config.json
     protocol: http2
+    edge-ip-version: "4"
     warp-routing:
       enabled: false
     ingress:
@@ -33,7 +34,7 @@ data:
 {% if cf_tunnel_origin_request %}
         originRequest:
 {% for key, value in cf_tunnel_origin_request.items() %}
-          {{ key }}: {{ value }}
+          {{ key }}: {{ value | lower if value is boolean else value }}
 {% endfor %}
 {% endif %}
       - hostname: '*.{{ cf_tunnel_hostname }}'
