@@ -23,6 +23,18 @@ spec:
 
           deviceDiscoveryStrategy: nvml
 
+          config:
+            map:
+              default: |-
+                version: v1
+                sharing:
+                  timeSlicing:
+                    renameByDefault: false
+                    failRequestsGreaterThanOne: false
+                    resources:
+                      - name: nvidia.com/gpu
+                        replicas: 4
+
   destination:
     server: https://kubernetes.default.svc
     namespace: '{{ nvidia_device_plugin_vars.kubernetes.namespace }}'
