@@ -59,7 +59,7 @@ spec:
               cpu: "0.05m"
               nvidia.com/gpu: "1"
             limits:
-              memory: "1200Mi"
+              memory: "3500Mi"
               nvidia.com/gpu: "1"
           env:
             # Non-sensitive config from ConfigMap
