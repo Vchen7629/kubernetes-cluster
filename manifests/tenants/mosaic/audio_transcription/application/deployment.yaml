@@ -57,8 +57,10 @@ spec:
             requests:                                                                                                                                                                                
               memory: "550Mi"
               cpu: "0.05m"
+              nvidia.com/gpu: "1"
             limits:
               memory: "1200Mi"
+              nvidia.com/gpu: "1"
           env:
             # Non-sensitive config from ConfigMap
             - name: SERVER_PORT
