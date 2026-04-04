@@ -11,5 +11,5 @@ data:
   DB_HOST: "mosaic-postgres-cluster-rw.postgres.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "mosaic"
-  VALKEY_HOST: "redis://valkey.valkey.svc.cluster.local"
+  VALKEY_HOST: "valkey.valkey.svc.cluster.local"
   VALKEY_PORT: "6379"
