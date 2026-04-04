@@ -17,6 +17,13 @@ spec:
       labels:
         app.kubernetes.io/name: mosaic-audio-transcription
     spec:
+      nodeSelector:
+        nvidia.com/gpu.present: "true"
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Equal
+          value: present
+          effect: NoSchedule
       initContainers:
         - name: download-whisper-model
           image: ghcr.io/vchen7629/mosaic-audio_transcription
