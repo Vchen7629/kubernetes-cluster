@@ -13,8 +13,7 @@ spec:
   egress:
     - toFQDNs:
         - matchName: "huggingface.co"
-        - matchName: "cdn-lfs.huggingface.co"
-        - matchName: "cdn-lfs-us-1.huggingface.co"
+        - matchPattern: "*.huggingface.co"
       toPorts:
         - ports:
             - port: "443"
