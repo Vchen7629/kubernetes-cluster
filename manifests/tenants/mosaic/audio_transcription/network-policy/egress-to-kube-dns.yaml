@@ -5,7 +5,6 @@ metadata:
   namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: allow audio-transcription to perform DNS lookups via kube-dns
-    argocd.argoproj.io/sync-wave: "0"
 spec:
   endpointSelector:
     matchLabels:

@@ -27,7 +27,6 @@ metadata:
   namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: allows cillium envoy l7lb to call the audio-transcription
-    argocd.argoproj.io/sync-wave: "0"
 spec:
   endpointSelector:
     matchLabels:
