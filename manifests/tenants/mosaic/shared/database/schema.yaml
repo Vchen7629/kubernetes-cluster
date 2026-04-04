@@ -54,3 +54,10 @@ data:
     CREATE INDEX idx_visitor_face_embedding ON visitor_face_embeddings USING ivfflat (face_embedding vector_l2_ops);
     CREATE INDEX idx_patient_face_embedding ON profile_face_embeddings USING ivfflat (face_embedding vector_l2_ops);
 
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO app;
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO app;
+    GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO app;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO app;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO app;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO app;
+
