@@ -31,14 +31,17 @@ spec:
             - /app/.venv/bin/python
             - -c
             - |
-              from faster_whisper import WhisperModel
               import os
+              os.environ["HF_HUB_VERBOSITY"] = "info"
+              from faster_whisper import WhisperModel
+              import huggingface_hub
+              huggingface_hub.logging.set_verbosity_info()
               if not os.path.exists("/root/.cache/huggingface/hub/models--Systran--faster-whisper-medium"):
                   print("Downloading whisper medium model...")
                   WhisperModel("medium", device="cpu", compute_type="int8")
-                  print("Done.")
+                  print("Done.", flush=True)
               else:
-                  print("Model already cached, skipping.")
+                  print("Model already cached, skipping.", flush=True)
           volumeMounts:
             - name: model-cache
               mountPath: /root/.cache/huggingface
