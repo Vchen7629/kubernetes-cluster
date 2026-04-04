@@ -7,9 +7,11 @@ ollama_vars:
         limits:
           cpu:
           memory: 4096Mi
+          gpu: "1"
         requests:
           cpu: 500m
           memory: 2048Mi
+          gpu: "1"
     helm:
       chart:
         name: ollama

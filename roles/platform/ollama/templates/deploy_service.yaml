@@ -42,9 +42,11 @@ spec:
           resources:
             limits:
               memory: '{{ ollama_vars.kubernetes.controller.resources.limits.memory }}'
+              nvidia.com/gpu: '{{ ollama_vars.kubernetes.controller.resources.limits.gpu }}'
             requests:
               cpu: '{{ ollama_vars.kubernetes.controller.resources.requests.cpu }}'
               memory: '{{ ollama_vars.kubernetes.controller.resources.requests.memory }}'
+              nvidia.com/gpu: '{{ ollama_vars.kubernetes.controller.resources.requests.gpu }}'
 
   destination:
     server: https://kubernetes.default.svc
