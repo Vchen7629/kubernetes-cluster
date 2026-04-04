@@ -33,6 +33,9 @@ spec:
             - |
               import os
               os.environ["HF_HUB_VERBOSITY"] = "info"
+              import socket
+              socket.getaddrinfo("cdn-lfs.huggingface.co", 443)
+              print("DNS resolved", flush=True)
               from faster_whisper import WhisperModel
               import huggingface_hub
               huggingface_hub.logging.set_verbosity_info()
