@@ -36,7 +36,9 @@ spec:
               from faster_whisper import WhisperModel
               import huggingface_hub
               huggingface_hub.logging.set_verbosity_info()
-              if not os.path.exists("/root/.cache/huggingface/hub/models--Systran--faster-whisper-medium"):
+              cache_dir = "/root/.cache/huggingface/hub/models--Systran--faster-whisper-medium"
+              incomplete = any(f.endswith(".incomplete") for f in os.listdir(cache_dir + "/blobs")) if os.path.exists(cache_dir + "/blobs") else False
+              if not os.path.exists(cache_dir) or incomplete:
                   print("Downloading whisper medium model...")
                   WhisperModel("medium", device="cpu", compute_type="int8")
                   print("Done.", flush=True)
