@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mosaic-audio-transcription-whisper-model-cache
+  namespace: mosaic-audio-transcription
+  annotations:
+    kubernetes.io/description: "PVC for caching faster-whisper model so it survives pod restarts"
+spec:
+  accessModes:  
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 3Gi

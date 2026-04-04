@@ -5,11 +5,13 @@ kind: Kustomization
 resources:
   - application/config-map.yaml
   - application/deployment.yaml
+  - application/model-cache.yaml
   - application/service.yaml
 
   - grpc/route.yaml
 
   - network-policy/egress-to-data.yaml
+  - network-policy/egress-to-hugging-face.yaml
   - network-policy/egress-to-kube-dns.yaml
   - network-policy/ingress-from-argocd.yaml
   - network-policy/ingress-from-host.yaml

@@ -8,6 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: mosaic-audio-transcription
 spec:
+  progressDeadlineSeconds: 900 # 15 mins
   selector:
     matchLabels:
       app.kubernetes.io/name: mosaic-audio-transcription
@@ -16,6 +17,24 @@ spec:
       labels:
         app.kubernetes.io/name: mosaic-audio-transcription
     spec:
+      initContainers:
+        - name: download-whisper-model
+          image: ghcr.io/vchen7629/mosaic-audio_transcription
+          command:
+            - python
+            - -c
+            - |
+              from faster_whisper import WhisperModel
+              import os
+              if not os.path.exists("/root/.cache/huggingface/hub/models--Systran--faster-whisper-medium"):
+                  print("Downloading whisper medium model...")
+                  WhisperModel("medium", device="cpu", compute_type="int8")
+                  print("Done.")
+              else:
+                  print("Model already cached, skipping.")
+          volumeMounts:
+            - name: model-cache
+              mountPath: /root/.cache/huggingface
       containers:
         - name: mosaic-audio-transcription
           image: ghcr.io/vchen7629/mosaic-audio_transcription
@@ -77,3 +96,10 @@ spec:
             initialDelaySeconds: 60
             periodSeconds: 10
             failureThreshold: 6
+          volumeMounts:
+            - name: model-cache
+              mountPath: /root/.cache/huggingface
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: mosaic-audio-transcription-model-cache

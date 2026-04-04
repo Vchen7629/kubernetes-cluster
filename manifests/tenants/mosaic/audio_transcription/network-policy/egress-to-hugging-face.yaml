@@ -1,0 +1,21 @@
+---
+apiVersion: cilium.io/v2                                                                                                                                                                   
+kind: CiliumNetworkPolicy                                                                                                                                                                  
+metadata:
+  name: mosaic-audio-transcription-to-huggingface                                                                                                                                          
+  namespace: mosaic-audio-transcription
+  annotations:
+    kubernetes.io/description: "allow init container to download whisper model from HuggingFace"
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: mosaic-audio-transcription
+  egress:
+    - toFQDNs:
+        - matchName: "huggingface.co"
+        - matchName: "cdn-lfs.huggingface.co"
+        - matchName: "cdn-lfs-us-1.huggingface.co"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
