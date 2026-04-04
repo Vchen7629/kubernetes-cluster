@@ -6,6 +6,7 @@ metadata:
   namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: allows argocd to access the audio transcription service for health checks and sync operations
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   endpointSelector:
     matchLabels:

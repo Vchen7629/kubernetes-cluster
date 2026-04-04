@@ -5,6 +5,7 @@ metadata:
   namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: "deployment for mosaic audio transcription service docker container, resources, and env variables"
+    argocd.argoproj.io/sync-wave: "1"
   labels:
     app.kubernetes.io/name: mosaic-audio-transcription
 spec:
@@ -34,7 +35,7 @@ spec:
               import os
               os.environ["HF_HUB_VERBOSITY"] = "info"
               import socket
-              socket.getaddrinfo("cdn-lfs.huggingface.co", 443)
+              socket.getaddrinfo("cas-bridge.xethub.hf.co", 443)
               print("DNS resolved", flush=True)
               from faster_whisper import WhisperModel
               import huggingface_hub

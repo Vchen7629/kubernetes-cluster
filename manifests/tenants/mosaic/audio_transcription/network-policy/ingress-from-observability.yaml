@@ -5,6 +5,7 @@ metadata:
   namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: allows vm to scrape the metrics endpoint for audio transcription service
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   endpointSelector:
     matchLabels:

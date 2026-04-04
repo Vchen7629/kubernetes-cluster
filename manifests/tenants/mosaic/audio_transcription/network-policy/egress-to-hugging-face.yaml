@@ -6,6 +6,7 @@ metadata:
   namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: "allow init container to download whisper model from HuggingFace"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   endpointSelector:
     matchLabels:

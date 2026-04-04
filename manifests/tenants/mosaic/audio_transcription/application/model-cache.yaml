@@ -6,6 +6,7 @@ metadata:
   namespace: mosaic-audio-transcription
   annotations:
     kubernetes.io/description: "PVC for caching faster-whisper model so it survives pod restarts"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   accessModes:  
     - ReadWriteOnce
